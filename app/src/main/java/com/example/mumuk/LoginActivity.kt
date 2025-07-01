@@ -21,8 +21,6 @@ class LoginActivity : AppCompatActivity() {
             insets
         }
 
-        val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_nav_view)
-        bottomNav.selectedItemId = R.id.navigation_my_page
 
         // 버튼들 클릭 시 MainActivity로 이동
         findViewById<Button>(R.id.btn_signup).setOnClickListener {
