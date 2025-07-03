@@ -19,6 +19,38 @@ class CategoryFragment : Fragment() {
         return binding.root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val btns = listOf(
+            binding.categoryWeightTypeBtn,
+            binding.categoryHealthTypeBtn,
+            binding.categoryRandomBtn
+        )
+
+        replaceCategoryFragment(CategoryWeightFragment())
+        btns.forEachIndexed { i, btn -> btn.isSelected = (i == 0) }
+
+        btns[0].setOnClickListener {
+            replaceCategoryFragment(CategoryWeightFragment())
+            btns.forEachIndexed { i, b -> b.isSelected = (i == 0) }
+        }
+        btns[1].setOnClickListener {
+            replaceCategoryFragment(CategoryHealthFragment())
+            btns.forEachIndexed { i, b -> b.isSelected = (i == 1) }
+        }
+        btns[2].setOnClickListener {
+            replaceCategoryFragment(CategoryRandomFragment())
+            btns.forEachIndexed { i, b -> b.isSelected = (i == 2) }
+        }
+    }
+
+    private fun replaceCategoryFragment(fragment: Fragment) {
+        childFragmentManager.beginTransaction()
+            .replace(R.id.category_content_container_fl, fragment)
+            .commit()
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
