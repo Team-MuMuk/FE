@@ -1,20 +1,17 @@
-package com.example.mumuk
+package com.example.mumuk.Signup
 
-import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.example.mumuk.Login.LoginIntroActivity
+import com.example.mumuk.R
 
-class IntroActivity : AppCompatActivity() {
+class SignupActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_intro)
+        setContentView(R.layout.activity_signup)
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -22,10 +19,10 @@ class IntroActivity : AppCompatActivity() {
             insets
         }
 
-        Handler(Looper.getMainLooper()).postDelayed({
-            val intent = Intent(this, LoginIntroActivity::class.java)
-            startActivity(intent)
-            finish()
-        }, 3000) // 3000ms = 3초
+        if(savedInstanceState==null){
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.signup_container, SignupStep0Fragment())
+                .commit()
+        }
     }
 }

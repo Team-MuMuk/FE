@@ -23,9 +23,9 @@
 
     <View
         android:id="@+id/line"
-        android:layout_width="300dp"
-        android:layout_height="1dp"
-        android:background="@color/white"
+        android:layout_width="332dp"
+        android:layout_height="2dp"
+        android:background="#004142"
         android:layout_marginBottom="16dp"
         app:layout_constraintBottom_toTopOf="@+id/iv_logo"
         app:layout_constraintStart_toStartOf="parent"
@@ -41,14 +41,5 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <ImageButton
-        android:id="@+id/btn_next"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/btn_next"
-        android:background="@android:color/transparent"
-        android:layout_marginBottom="32dp"
-        android:layout_marginEnd="32dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
