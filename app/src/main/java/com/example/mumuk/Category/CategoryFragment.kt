@@ -1,10 +1,14 @@
-package com.example.mumuk
+package com.example.mumuk.Category
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.example.mumuk.Category.Health.CategoryHealthFragment
+import com.example.mumuk.Category.Random.CategoryRandomFragment
+import com.example.mumuk.Category.Weight.CategoryWeightFragment
+import com.example.mumuk.R
 import com.example.mumuk.databinding.FragmentCategoryBinding
 
 class CategoryFragment : Fragment() {
