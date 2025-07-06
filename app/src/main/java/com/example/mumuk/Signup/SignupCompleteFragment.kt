@@ -6,8 +6,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatButton
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.fragment.app.Fragment
-import com.example.mumuk.MainActivity
+import com.example.mumuk.ui.MainActivity
 import com.example.mumuk.R
 
 class SignupCompleteFragment : Fragment() {
