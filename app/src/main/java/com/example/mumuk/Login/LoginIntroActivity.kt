@@ -7,7 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.example.mumuk.MainActivity
+import com.example.mumuk.ui.MainActivity
 import com.example.mumuk.R
 import com.example.mumuk.Signup.SignupActivity
 
