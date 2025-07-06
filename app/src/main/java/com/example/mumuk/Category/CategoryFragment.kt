@@ -1,15 +1,15 @@
 package com.example.mumuk.Category
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import com.example.mumuk.Category.Health.CategoryHealthFragment
 import com.example.mumuk.Category.Random.CategoryRandomFragment
 import com.example.mumuk.Category.Weight.CategoryWeightFragment
-import com.example.mumuk.R
 import com.example.mumuk.databinding.FragmentCategoryBinding
+import com.example.mumuk.R
 
 class CategoryFragment : Fragment() {
     private var _binding: FragmentCategoryBinding? = null
@@ -24,8 +24,6 @@ class CategoryFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
         val btns = listOf(
             binding.categoryWeightTypeBtn,
             binding.categoryHealthTypeBtn,
@@ -47,11 +45,35 @@ class CategoryFragment : Fragment() {
             replaceCategoryFragment(CategoryRandomFragment())
             btns.forEachIndexed { i, b -> b.isSelected = (i == 2) }
         }
+
+        childFragmentManager.addOnBackStackChangedListener {
+            val fullscreenFragment = childFragmentManager.findFragmentById(R.id.category_fullscreen_container)
+            if (fullscreenFragment == null) {
+                binding.categoryButtonArea.visibility = View.VISIBLE
+                binding.categoryContentContainerFl.visibility = View.VISIBLE
+                binding.categoryFullscreenContainer.visibility = View.GONE
+            }
+        }
     }
 
     private fun replaceCategoryFragment(fragment: Fragment) {
+        binding.categoryButtonArea.visibility = View.VISIBLE
+        binding.categoryContentContainerFl.visibility = View.VISIBLE
+        binding.categoryFullscreenContainer.visibility = View.GONE
+
         childFragmentManager.beginTransaction()
             .replace(R.id.category_content_container_fl, fragment)
+            .commit()
+    }
+
+    fun showFullScreenFragment(fragment: Fragment) {
+        binding.categoryButtonArea.visibility = View.GONE
+        binding.categoryContentContainerFl.visibility = View.GONE
+        binding.categoryFullscreenContainer.visibility = View.VISIBLE
+
+        childFragmentManager.beginTransaction()
+            .replace(R.id.category_fullscreen_container, fragment)
+            .addToBackStack(null)
             .commit()
     }
 
