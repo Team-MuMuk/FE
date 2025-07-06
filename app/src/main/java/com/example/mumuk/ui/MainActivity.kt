@@ -1,9 +1,10 @@
-package com.example.mumuk
+package com.example.mumuk.ui
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
+import com.example.mumuk.R
 import com.example.mumuk.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
