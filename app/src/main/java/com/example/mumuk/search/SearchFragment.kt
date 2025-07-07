@@ -1,4 +1,4 @@
-package com.example.mumuk
+package com.example.mumuk.search
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment

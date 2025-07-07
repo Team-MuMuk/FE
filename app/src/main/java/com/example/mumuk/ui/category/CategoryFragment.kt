@@ -1,13 +1,13 @@
-package com.example.mumuk.Category
+package com.example.mumuk.ui.category
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.example.mumuk.Category.Health.CategoryHealthFragment
-import com.example.mumuk.Category.Random.CategoryRandomFragment
-import com.example.mumuk.Category.Weight.CategoryWeightFragment
+import com.example.mumuk.ui.category.Health.CategoryHealthFragment
+import com.example.mumuk.ui.category.Random.CategoryRandomFragment
+import com.example.mumuk.ui.category.Weight.CategoryWeightFragment
 import com.example.mumuk.databinding.FragmentCategoryBinding
 import com.example.mumuk.R
 

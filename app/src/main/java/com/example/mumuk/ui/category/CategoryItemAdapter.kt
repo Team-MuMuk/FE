@@ -1,4 +1,4 @@
-package com.example.mumuk.Category
+package com.example.mumuk.ui.category
 
 import android.view.LayoutInflater
 import android.view.View

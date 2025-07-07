@@ -12,12 +12,12 @@
         tools:layout="@layout/fragment_home" />
     <fragment
         android:id="@+id/navigation_category"
-        android:name="com.example.mumuk.Category.CategoryFragment"
+        android:name="com.example.mumuk.ui.category.CategoryFragment"
         android:label="fragment_category"
         tools:layout="@layout/fragment_category" />
     <fragment
         android:id="@+id/navigation_search"
-        android:name="com.example.mumuk.SearchFragment"
+        android:name="com.example.mumuk.search.SearchFragment"
         android:label="fragment_search"
         tools:layout="@layout/fragment_search" />
     <fragment
