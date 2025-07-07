@@ -12,7 +12,7 @@
         tools:layout="@layout/fragment_home" />
     <fragment
         android:id="@+id/navigation_category"
-        android:name="com.example.mumuk.CategoryFragment"
+        android:name="com.example.mumuk.Category.CategoryFragment"
         android:label="fragment_category"
         tools:layout="@layout/fragment_category" />
     <fragment
