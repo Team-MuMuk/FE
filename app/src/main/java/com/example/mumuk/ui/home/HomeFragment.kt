@@ -1,10 +1,10 @@
-package com.example.mumuk
+package com.example.mumuk.ui.home
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import com.example.mumuk.databinding.FragmentHomeBinding
 
 class HomeFragment : Fragment() {

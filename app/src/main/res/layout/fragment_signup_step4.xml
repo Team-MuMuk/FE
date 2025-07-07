@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <View
+        android:id="@+id/line"
+        android:layout_width="372dp"
+        android:layout_height="5dp"
+        android:background="#F3F3F3"
+        android:layout_marginBottom="70dp"
+        app:layout_constraintBottom_toTopOf="@+id/tv_step4_title"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <View
+        android:id="@+id/subline"
+        android:layout_width="296dp"
+        android:layout_height="5dp"
+        android:background="#7CE5B4"
+        app:layout_constraintTop_toTopOf="@+id/line"
+        app:layout_constraintBottom_toBottomOf="@id/line"
+        app:layout_constraintStart_toStartOf="@id/line" />
+
+    <TextView
+        android:id="@+id/tv_step4_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="STEP 4"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="36dp"
+        android:layout_marginTop="150dp"
+        android:textSize="24sp"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/tv_step4_subtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="비밀번호를 입력해주세요 :)"
+        app:layout_constraintTop_toBottomOf="@id/tv_step4_title"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="36dp"
+        android:layout_marginTop="3dp"
+        android:textSize="24sp"
+        android:textStyle="bold"/>
+
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/layout_pw"
+        android:layout_width="318dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="180dp"
+        app:boxBackgroundMode="none"
+        app:errorEnabled="true"
+        app:hintEnabled="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.494"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_step4_title">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_pw"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:hint="영문자,숫자,특수문자를 조합하여 입력하세요."
+                android:inputType="text|textCapSentences"
+                android:paddingTop="4dp"
+                android:paddingStart="0dp"
+                android:paddingEnd="0dp"
+                android:paddingBottom="4dp"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/tv_pw_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|start"
+                android:layout_marginTop="36dp"
+                android:text=""
+                android:textColor="#007AFF"
+                android:textSize="12sp" />
+        </FrameLayout>
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+    <View
+        android:id="@+id/view_line"
+        android:layout_width="318dp"
+        android:layout_height="1dp"
+        android:background="@color/black"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/layout_pw"
+        android:layout_marginTop="49dp"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+
+
+    <ImageButton
+        android:id="@+id/btn_back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/btn_back"
+        android:background="@android:color/transparent"
+        android:layout_marginBottom="32dp"
+        android:layout_marginStart="32dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <ImageButton
+        android:id="@+id/btn_next"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/btn_next"
+        android:background="@android:color/transparent"
+        android:layout_marginBottom="32dp"
+        android:layout_marginEnd="32dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
