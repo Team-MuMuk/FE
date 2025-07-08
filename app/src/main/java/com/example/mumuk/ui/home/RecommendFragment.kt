@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import com.example.mumuk.R
 import com.example.mumuk.databinding.FragmentRecommendBinding
 
 class RecommendFragment : Fragment() {
@@ -32,6 +33,10 @@ class RecommendFragment : Fragment() {
         }
 
         val recipeAdapter = RecommendRecipeAdapter()
+
+        recipeAdapter.onItemClick = {
+            findNavController().navigate(R.id.action_recommendFragment_to_recipeFragment)
+        }
 
         binding.recipeRV.apply {
             adapter = recipeAdapter

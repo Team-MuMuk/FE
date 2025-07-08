@@ -10,6 +10,8 @@ import com.example.mumuk.databinding.ItemRecipeBinding
 
 class RecommendRecipeAdapter : ListAdapter<Recipe, RecommendRecipeAdapter.RecipeViewHolder>(RecipeDiffCallback()) {
 
+    var onItemClick: ((Recipe) -> Unit)? = null
+
     inner class RecipeViewHolder(private val binding: ItemRecipeBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
@@ -27,7 +29,12 @@ class RecommendRecipeAdapter : ListAdapter<Recipe, RecommendRecipeAdapter.Recipe
     }
 
     override fun onBindViewHolder(holder: RecipeViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        val currentRecipe = getItem(position)
+        holder.bind(currentRecipe)
+
+        holder.itemView.setOnClickListener {
+            onItemClick?.invoke(currentRecipe)
+        }
     }
 
     class RecipeDiffCallback : DiffUtil.ItemCallback<Recipe>() {

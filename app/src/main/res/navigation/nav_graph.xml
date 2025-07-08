@@ -40,5 +40,19 @@
         android:id="@+id/recommendFragment"
         android:name="com.example.mumuk.ui.home.RecommendFragment"
         android:label="fragment_recommend"
-        tools:layout="@layout/fragment_recommend" />
+        tools:layout="@layout/fragment_recommend" >
+        <action
+            android:id="@+id/action_recommendFragment_to_recipeFragment"
+            app:destination="@id/recipeFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/hold"
+            app:popEnterAnim="@anim/hold"
+            app:popExitAnim="@anim/slide_out_right"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/recipeFragment"
+        android:name="com.example.mumuk.ui.recipe.RecipeFragment"
+        android:label="fragment_recipe"
+        tools:layout="@layout/fragment_recipe" />
 </navigation>
