@@ -61,7 +61,7 @@ class LoginIntroActivity : AppCompatActivity() {
 
             supportFragmentManager.commit {
                 setReorderingAllowed(true)
-                replace(R.id.login_intro_fragment_container, FindIdFragment())
+                replace(R.id.login_intro_fragment_container, FindAccountFragment())
                 addToBackStack(null)
             }
         }
