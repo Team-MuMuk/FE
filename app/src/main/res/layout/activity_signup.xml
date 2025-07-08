@@ -5,12 +5,12 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Signup.SignupActivity">
+    tools:context=".ui.signup.SignupActivity">
 
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/signup_container"
-        android:name="com.example.mumuk.Signup.SignupStep0Fragment"
+        android:name="com.example.mumuk.ui.signup.SignupStep0Fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintTop_toTopOf="parent"

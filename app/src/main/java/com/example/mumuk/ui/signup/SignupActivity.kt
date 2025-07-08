@@ -1,4 +1,4 @@
-package com.example.mumuk.Signup
+package com.example.mumuk.ui.signup
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge

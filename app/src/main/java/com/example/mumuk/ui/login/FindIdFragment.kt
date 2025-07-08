@@ -1,66 +1,63 @@
-package com.example.mumuk.Login
+package com.example.mumuk.ui.login
 
 import android.app.Dialog
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.view.Window
-import android.widget.ImageView
+import android.view.*
 import android.widget.TextView
-import androidx.appcompat.widget.AppCompatButton
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
-import com.example.mumuk.ChangePwFragment
 import com.example.mumuk.R
+import com.example.mumuk.databinding.FragmentFindIdBinding
 
+class FindIdFragment : Fragment() {
 
-class FindPwFragment : Fragment() {
+    private var _binding: FragmentFindIdBinding? = null
+    private val binding get() = _binding!!
+
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.fragment_find_pw, container, false)
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentFindIdBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-        val btnBack = view.findViewById<ImageView>(R.id.btn_back)
-        val tabFindId = view.findViewById<TextView>(R.id.tab_find_id)
-        val tabFindPw = view.findViewById<TextView>(R.id.tab_find_pw)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        btnBack.setOnClickListener {
+        binding.btnBack.setOnClickListener {
             startActivity(Intent(requireContext(), LoginActivity::class.java))
             requireActivity().finish()
         }
 
-        tabFindId.setOnClickListener {
+        binding.tabFindId.setOnClickListener {
             parentFragmentManager.commit {
                 replace(R.id.login_fragment_container, FindIdFragment())
                 addToBackStack(null)
             }
         }
 
-        tabFindPw.setOnClickListener {
+        binding.tabFindPw.setOnClickListener {
             parentFragmentManager.commit {
                 replace(R.id.login_fragment_container, FindPwFragment())
                 addToBackStack(null)
             }
         }
 
-        val btnSendCode = view.findViewById<AppCompatButton>(R.id.btn_send_code)
-        btnSendCode.setOnClickListener {
+        binding.btnSendCode.setOnClickListener {
             showCustomDialog("인증코드가 발송되었습니다.", R.layout.dialog_code_sent)
         }
 
-        val btnConfirmCode = view.findViewById<AppCompatButton>(R.id.btn_confirm_code)
-        btnConfirmCode.setOnClickListener {
+        binding.btnConfirmCode.setOnClickListener {
             showCustomDialog("인증코드가 확인되었습니다.", R.layout.dialog_confirm)
         }
+    }
 
-        return view
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun showCustomDialog(message: String, layoutResId: Int) {
@@ -81,17 +78,8 @@ class FindPwFragment : Fragment() {
         tvMessage.text = message
         btnOk.setOnClickListener {
             dialog.dismiss()
-
-            if (layoutResId == R.layout.dialog_confirm) {
-                parentFragmentManager.commit {
-                    replace(R.id.login_fragment_container, ChangePwFragment())
-                    addToBackStack(null)
-                }
-            }
         }
 
         dialog.show()
     }
-
-
 }

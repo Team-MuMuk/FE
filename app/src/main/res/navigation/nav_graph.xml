@@ -8,21 +8,59 @@
     <fragment
         android:id="@+id/navigation_home"
         android:name="com.example.mumuk.ui.home.HomeFragment"
-        android:label="fragment_home"
+        android:label="홈"
         tools:layout="@layout/fragment_home" />
+
     <fragment
         android:id="@+id/navigation_category"
         android:name="com.example.mumuk.CategoryFragment"
-        android:label="fragment_category"
+        android:label="카테고리"
         tools:layout="@layout/fragment_category" />
+
     <fragment
         android:id="@+id/navigation_search"
         android:name="com.example.mumuk.SearchFragment"
-        android:label="fragment_search"
+        android:label="검색"
         tools:layout="@layout/fragment_search" />
+
     <fragment
         android:id="@+id/navigation_my_page"
-        android:name="com.example.mumuk.MyPageFragment"
-        android:label="fragment_my_page"
-        tools:layout="@layout/fragment_my_page" />
+        android:name="com.example.mumuk.ui.mypage.MyPageFragment"
+        android:label="마이페이지"
+        tools:layout="@layout/fragment_my_page">
+
+        <action
+            android:id="@+id/action_myPage_to_settings"
+            app:destination="@id/settingsFragment"
+             />
+
+        <action
+            android:id="@+id/action_myPage_to_profile"
+            app:destination="@id/profileFragment"
+             />
+
+        <action
+            android:id="@+id/action_myPage_to_favorites"
+            app:destination="@id/favoriteRecipeFragment"
+            />
+    </fragment>
+
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.example.mumuk.ui.mypage.SettingsFragment"
+        android:label="설정"
+        tools:layout="@layout/fragment_settings" />
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.example.mumuk.ui.mypage.ProfileFragment"
+        android:label="프로필"
+        tools:layout="@layout/fragment_profile" />
+
+    <fragment
+        android:id="@+id/favoriteRecipeFragment"
+        android:name="com.example.mumuk.ui.mypage.FavoriteRecipeFragment"
+        android:label="찜한 레시피"
+        tools:layout="@layout/fragment_favorite_recipe" />
+
 </navigation>
