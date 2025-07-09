@@ -7,4 +7,5 @@
     <color name="category_tab_unselected_bg">#CCCCCC</color>
     <color name="category_tab_selected_text">#FFFFFF</color>
     <color name="category_tab_unselected_text">#000000</color>
+    <color name="red">#D12323</color>
 </resources>

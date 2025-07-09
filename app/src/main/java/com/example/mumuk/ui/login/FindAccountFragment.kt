@@ -30,8 +30,15 @@ class FindAccountFragment : Fragment() {
         showFindIdLayout()
 
         binding.btnBack.setOnClickListener {
-            startActivity(Intent(requireContext(), LoginActivity::class.java))
-            requireActivity().finish()
+            val currentActivity = requireActivity()
+            if (currentActivity is LoginActivity) {
+                currentActivity.findViewById<View>(R.id.login_layout).visibility = View.VISIBLE
+                currentActivity.findViewById<View>(R.id.login_fragment_container).visibility = View.GONE
+            } else if (currentActivity is LoginIntroActivity) {
+                currentActivity.findViewById<View>(R.id.login_intro_layout).visibility = View.VISIBLE
+                currentActivity.findViewById<View>(R.id.login_intro_fragment_container).visibility = View.GONE
+            }
+            currentActivity.supportFragmentManager.popBackStack()
         }
 
         binding.tabFindId.setOnClickListener { showFindIdLayout() }
