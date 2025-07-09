@@ -13,8 +13,8 @@
 
     <fragment
         android:id="@+id/navigation_category"
-        android:name="com.example.mumuk.CategoryFragment"
-        android:label="카테고리"
+        android:name="com.example.mumuk.Category.CategoryFragment"
+        android:label="fragment_category"
         tools:layout="@layout/fragment_category" />
 
     <fragment
