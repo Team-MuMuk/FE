@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/search_result_rv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="12dp"
+        android:clipToPadding="false"
+        android:scrollbars="vertical" />
+
+    <TextView
+        android:id="@+id/search_result_empty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="검색 결과가 없습니다.\n다시 입력해주세요."
+        android:textAlignment="center"
+        android:textColor="#888888"
+        android:textSize="16sp"
+        android:visibility="gone" />
+</FrameLayout>

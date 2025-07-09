@@ -10,19 +10,43 @@
         android:name="com.example.mumuk.ui.home.HomeFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_home" />
+
     <fragment
         android:id="@+id/navigation_category"
         android:name="com.example.mumuk.ui.category.CategoryFragment"
         android:label="fragment_category"
         tools:layout="@layout/fragment_category" />
+
     <fragment
         android:id="@+id/navigation_search"
         android:name="com.example.mumuk.search.SearchFragment"
         android:label="fragment_search"
-        tools:layout="@layout/fragment_search" />
+        tools:layout="@layout/fragment_search">
+        <action
+            android:id="@+id/action_searchFragment_to_searchAutocompleteFragment"
+            app:destination="@id/searchAutocompleteFragment"/>
+    </fragment>
+
     <fragment
         android:id="@+id/navigation_my_page"
         android:name="com.example.mumuk.MyPageFragment"
         android:label="fragment_my_page"
         tools:layout="@layout/fragment_my_page" />
+
+    <!--Search Fragment -->
+    <fragment
+        android:id="@+id/searchAutocompleteFragment"
+        android:name="com.example.mumuk.search.SearchAutocompleteFragment"
+        android:label="fragment_search_autocomplete"
+        tools:layout="@layout/fragment_search_autocomplete">
+        <action
+            android:id="@+id/action_searchAutocompleteFragment_to_searchResultFragment"
+            app:destination="@id/searchResultFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/searchResultFragment"
+        android:name="com.example.mumuk.search.SearchResultFragment"
+        android:label="fragment_search_result"
+        tools:layout="@layout/fragment_search_result" />
 </navigation>

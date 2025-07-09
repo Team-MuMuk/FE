@@ -1,6 +1,7 @@
 package com.example.mumuk.ui
 
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
@@ -15,7 +16,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
-
         setContentView(binding.root)
 
         val navHostFragment = supportFragmentManager
@@ -23,5 +23,13 @@ class MainActivity : AppCompatActivity() {
         val navController = navHostFragment.navController
 
         binding.bottomNavView.setupWithNavController(navController)
+    }
+
+    fun hideBottomNav() {
+        binding.bottomNavView.visibility = View.GONE
+    }
+
+    fun showBottomNav() {
+        binding.bottomNavView.visibility = View.VISIBLE
     }
 }

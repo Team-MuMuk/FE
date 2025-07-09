@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="32dp"
+    android:orientation="horizontal"
+    android:background="@drawable/bg_search_suggest_chip"
+    android:gravity="center_vertical"
+    android:paddingStart="12dp"
+    android:paddingEnd="12dp"
+    android:layout_marginEnd="8dp"
+    android:layout_marginBottom="8dp">
+
+    <TextView
+        android:id="@+id/search_suggest_keyword_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="아보카도 샐러드"
+        android:textColor="@color/black"
+        android:textSize="14sp"
+        android:background="@android:color/transparent" />
+</LinearLayout>

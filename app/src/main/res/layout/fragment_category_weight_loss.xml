@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    tools:context=".ui.category.Weight.CategoryWeightLossFragment">
+    tools:context=".ui.category.weight.CategoryWeightLossFragment">
 
     <ImageView
         android:id="@+id/category_back_btn"

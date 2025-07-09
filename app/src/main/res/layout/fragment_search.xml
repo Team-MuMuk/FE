@@ -1,97 +1,121 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="@android:color/white"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".ui.home.HomeFragment"
-    android:background="@color/white">
+    android:paddingHorizontal="16dp">
 
-    <View
-        android:id="@+id/search_edit_frame"
-        android:layout_width="370dp"
-        android:layout_height="32dp"
-        android:background="@drawable/bg_search_frame"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="16dp" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_search_frame">
 
-    <EditText
-        android:id="@+id/sign_up_id_et"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="@null"
-        android:hint="검색어를 입력하세요"
-        android:inputType="text"
-        android:textSize="16sp"
-        android:layout_marginStart="16dp"
-        app:layout_constraintStart_toStartOf="@id/search_edit_frame"
-        app:layout_constraintBottom_toBottomOf="@+id/search_edit_frame"
-        app:layout_constraintTop_toTopOf="@id/search_edit_frame"/>
-    
-    <ImageView
-        android:id="@+id/search_btn"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:src="@drawable/ic_search"
-        android:layout_marginEnd="10dp"
-        app:layout_constraintEnd_toEndOf="@id/search_edit_frame"
-        app:layout_constraintTop_toTopOf="@id/search_edit_frame"
-        app:layout_constraintBottom_toBottomOf="@id/search_edit_frame"/>
+        <EditText
+            android:id="@+id/search_edit_et"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginStart="10dp"
+            android:hint="검색어를 입력하세요"
+            android:background="@android:color/transparent"
+            android:padding="0dp"
+            android:textSize="15sp"
+            android:inputType="text" />
+
+        <ImageView
+            android:id="@+id/search_btn"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_search"
+            android:layout_marginEnd="8dp" />
+    </LinearLayout>
 
     <TextView
-        android:id="@+id/search_recently_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="최근 검색어"
         android:textStyle="bold"
-        android:textSize="20sp"
-        android:layout_marginStart="5dp"
-        android:layout_marginTop="20dp"
-        app:layout_constraintTop_toBottomOf="@id/search_edit_frame"
-        app:layout_constraintStart_toStartOf="@id/search_edit_frame" />
+        android:textSize="16sp"
+        android:layout_marginTop="16dp"/>
 
-    <FrameLayout
-        android:id="@+id/search_recently_container_fl"
-        android:layout_width="90dp"
-        android:layout_height="35dp"
-        android:layout_marginTop="16dp"
-        android:background="@drawable/bg_search_frame"
-        app:layout_constraintStart_toStartOf="@id/search_recently_tv"
-        app:layout_constraintTop_toBottomOf="@id/search_recently_tv" >
+    <com.google.android.flexbox.FlexboxLayout
+        android:id="@+id/search_recent_keywords_fl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp" />
 
-        <TextView
-            android:id="@+id/search_recently_container_text_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="포케"
-            android:textSize="20sp"
-            android:textColor="@color/darker_gray"
-            android:layout_marginStart="8dp"
-            android:layout_marginBottom="3dp"
-            app:layout_constraintStart_toStartOf="@id/search_recently_container_fl"
-            app:layout_constraintTop_toTopOf="@id/search_recently_container_fl"
-            app:layout_constraintBottom_toBottomOf="@id/search_recently_container_fl"/>
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_search_delete"
-            android:layout_marginEnd="8dp"
-            app:layout_constraintEnd_toEndOf="@id/search_recently_container_fl"
-            app:layout_constraintTop_toTopOf="@id/search_recently_container_fl"
-            app:layout_constraintBottom_toBottomOf="@id/search_recently_container_fl"/>
-    
     <TextView
-        android:id="@+id/search_recommendation_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="추천 검색어"
         android:textStyle="bold"
-        android:textSize="20sp"
-        android:layout_marginStart="5dp"
-        android:layout_marginTop="20dp"
-        app:layout_constraintTop_toBottomOf="@id/search_recently_container_fl"
-        app:layout_constraintStart_toStartOf="@id/search_recently_container_fl" />
+        android:textSize="16sp"
+        android:layout_marginTop="12dp"/>
 
+    <com.google.android.flexbox.FlexboxLayout
+        android:id="@+id/search_suggest_keywords_fl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"/>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="4dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="인기 검색어"
+            android:textStyle="bold"
+            android:textSize="16sp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+
+        <TextView
+            android:id="@+id/search_popular_time_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="2025.07.03 16:00 기준"
+            android:textSize="12sp"
+            android:textColor="#999999"
+            android:gravity="end"/>
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/search_popular_keywords_rv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:overScrollMode="never"
+        android:layout_marginBottom="8dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="최근 본 레시피"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/search_recent_recipe_rv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="100dp"
+        android:overScrollMode="never"
+        android:layout_marginBottom="8dp"/>
+</LinearLayout>
