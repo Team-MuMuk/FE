@@ -1,20 +1,24 @@
-package com.example.mumuk.search
+package com.example.mumuk.ui.search
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mumuk.R
 import com.example.mumuk.databinding.FragmentSearchBinding
+import com.example.mumuk.databinding.ItemSearchSuggestKeywordChipBinding
 import com.example.mumuk.ui.category.CategoryRecipeCard
 
 class SearchFragment : Fragment() {
     private var _binding: FragmentSearchBinding? = null
     private val binding get() = _binding!!
-    private val recentKeywords = listOf("포케", "샐러드", "스테이크", "파스타", "닭가슴살 도시락", "아보카도", "연어", "볶음밥")
+
+    private val recentKeywords = mutableListOf("포케", "샐러드", "스테이크", "파스타", "닭가슴살 도시락", "아보카도", "연어", "볶음밥")
     private val suggestKeywords = listOf("포케", "아보카도 샐러드", "샐러드", "닭가슴살", "건강주스", "키토김밥")
     private val popularKeywords = listOf("곤약밥 레시피", "곤약밥 레시피", "곤약밥 레시피", "곤약밥 레시피", "곤약밥 레시피", "곤약밥 레시피", "곤약밥 레시피", "곤약밥 레시피", "곤약밥 레시피", "곤약밥 레시피")
 
@@ -29,7 +33,7 @@ class SearchFragment : Fragment() {
     ): View {
         _binding = FragmentSearchBinding.inflate(inflater, container, false)
 
-        setupRecentKeywordChips(inflater)
+        setupRecentKeywordList()
         setupSuggestKeywordChips(inflater)
         setupPopularKeywordList()
         setupRecentRecipeList()
@@ -41,32 +45,37 @@ class SearchFragment : Fragment() {
         return binding.root
     }
 
-    private fun setupRecentKeywordChips(inflater: LayoutInflater) {
-        val flexbox = binding.searchRecentKeywordsFl
-        flexbox.removeAllViews()
-        for (keyword in recentKeywords) {
-            val chipBinding = com.example.mumuk.databinding.ItemSearchRecentKeywordChipBinding.inflate(inflater, flexbox, false)
-            chipBinding.searchRecentKeywordTv.text = keyword
-            chipBinding.searchRecentKeywordDeleteBtn.visibility = View.VISIBLE
-            chipBinding.searchRecentKeywordDeleteBtn.setOnClickListener {
-            }
-            chipBinding.searchRecentKeywordTv.setOnClickListener {
-                binding.searchEditEt.setText(keyword)
-            }
-            flexbox.addView(chipBinding.root)
+    private fun setupRecentKeywordList() {
+        val adapter = SearchRecentKeywordAdapter(recentKeywords) { keyword ->
+            binding.searchEditEt.setText(keyword)
         }
+        binding.searchRecentKeywordsRv.adapter = adapter
+        binding.searchRecentKeywordsRv.layoutManager =
+            LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
     }
 
     private fun setupSuggestKeywordChips(inflater: LayoutInflater) {
         val flexbox = binding.searchSuggestKeywordsFl
         flexbox.removeAllViews()
-        for (keyword in suggestKeywords) {
-            val chipBinding = com.example.mumuk.databinding.ItemSearchSuggestKeywordChipBinding.inflate(inflater, flexbox, false)
-            chipBinding.searchSuggestKeywordTv.text = keyword
-            chipBinding.searchSuggestKeywordTv.setOnClickListener {
-                binding.searchEditEt.setText(keyword)
+        val keywordsPerRow = 3
+        val keywords = suggestKeywords.take(6) //
+
+        for (i in keywords.indices step keywordsPerRow) {
+            val rowLayout = LinearLayout(requireContext()).apply {
+                orientation = LinearLayout.HORIZONTAL
             }
-            flexbox.addView(chipBinding.root)
+            for (j in 0 until keywordsPerRow) {
+                val index = i + j
+                if (index < keywords.size) {
+                    val chipBinding = ItemSearchSuggestKeywordChipBinding.inflate(inflater, rowLayout, false)
+                    chipBinding.searchSuggestKeywordTv.text = keywords[index]
+                    chipBinding.searchSuggestKeywordTv.setOnClickListener {
+                        binding.searchEditEt.setText(keywords[index])
+                    }
+                    rowLayout.addView(chipBinding.root)
+                }
+            }
+            flexbox.addView(rowLayout)
         }
     }
 
@@ -79,7 +88,8 @@ class SearchFragment : Fragment() {
     private fun setupRecentRecipeList() {
         val adapter = SearchRecentRecipeAdapter(recentRecipes)
         binding.searchRecentRecipeRv.adapter = adapter
-        binding.searchRecentRecipeRv.layoutManager = GridLayoutManager(context, 2)
+        binding.searchRecentRecipeRv.layoutManager =
+            LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
     }
 
     override fun onDestroyView() {

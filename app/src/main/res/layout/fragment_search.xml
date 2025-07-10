@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:background="@android:color/white"
     android:layout_width="match_parent"
@@ -43,12 +44,16 @@
         android:textSize="16sp"
         android:layout_marginTop="16dp"/>
 
-    <com.google.android.flexbox.FlexboxLayout
-        android:id="@+id/search_recent_keywords_fl"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/search_recent_keywords_rv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp" />
+        android:layout_marginBottom="8dp"
+        android:overScrollMode="never"
+        android:paddingStart="4dp"
+        android:paddingEnd="4dp"
+        tools:listitem="@layout/item_search_recent_keyword_chip"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -60,10 +65,14 @@
 
     <com.google.android.flexbox.FlexboxLayout
         android:id="@+id/search_suggest_keywords_fl"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"/>
+        android:layout_marginBottom="8dp"
+        app:flexWrap="wrap"
+        app:justifyContent="flex_start"
+        app:alignItems="center"
+        app:maxLine="2"/>
 
     <LinearLayout
         android:layout_width="match_parent"

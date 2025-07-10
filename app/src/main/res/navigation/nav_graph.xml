@@ -19,7 +19,7 @@
 
     <fragment
         android:id="@+id/navigation_search"
-        android:name="com.example.mumuk.search.SearchFragment"
+        android:name="com.example.mumuk.ui.search.SearchFragment"
         android:label="fragment_search"
         tools:layout="@layout/fragment_search">
         <action
@@ -36,7 +36,7 @@
     <!--Search Fragment -->
     <fragment
         android:id="@+id/searchAutocompleteFragment"
-        android:name="com.example.mumuk.search.SearchAutocompleteFragment"
+        android:name="com.example.mumuk.ui.search.SearchAutocompleteFragment"
         android:label="fragment_search_autocomplete"
         tools:layout="@layout/fragment_search_autocomplete">
         <action
@@ -46,7 +46,7 @@
 
     <fragment
         android:id="@+id/searchResultFragment"
-        android:name="com.example.mumuk.search.SearchResultFragment"
+        android:name="com.example.mumuk.ui.search.SearchResultFragment"
         android:label="fragment_search_result"
         tools:layout="@layout/fragment_search_result" />
 </navigation>
