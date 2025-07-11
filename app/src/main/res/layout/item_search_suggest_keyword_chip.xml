@@ -15,8 +15,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="아보카도 샐러드"
-        android:textColor="@color/search_suggest_keyword_bg"
+        android:textColor="@color/search_suggest_keyword_text"
         android:textSize="16sp"
-        android:background="@android:color/transparent"
+        android:background="@color/search_suggest_keyword_bg"
         android:gravity="center" />
 </LinearLayout>

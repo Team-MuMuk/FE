@@ -13,11 +13,9 @@ class CategoryRecipeCardAdapter(
 ) : RecyclerView.Adapter<CategoryRecipeCardAdapter.ViewHolder>() {
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val label: TextView = itemView.findViewById(R.id.label)
         private val title: TextView = itemView.findViewById(R.id.recipe_title)
 
         fun bind(item: CategoryRecipeCard) {
-            label.text = item.label
             title.text = item.title
 
             itemView.setOnClickListener {

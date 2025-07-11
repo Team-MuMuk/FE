@@ -23,7 +23,6 @@ class SearchResultAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = items[position]
         holder.binding.recipeTitle.text = item.title
-        holder.binding.label.text = item.label
     }
 
     override fun getItemCount() = items.size

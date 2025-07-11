@@ -24,7 +24,6 @@ class SearchRecentRecipeAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = recipes[position]
-        holder.binding.label.text = item.label
         holder.binding.recipeTitle.text = item.title
     }
 }

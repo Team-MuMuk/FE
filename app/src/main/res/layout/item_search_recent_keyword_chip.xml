@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:text="포케"
         android:textSize="16sp"
-        android:textColor="@color/darker_gray"
+        android:textColor="@color/search_recent_keyword_text"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         app:layout_constraintStart_toStartOf="@+id/search_recent_frame"
