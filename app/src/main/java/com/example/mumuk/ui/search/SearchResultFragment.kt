@@ -5,7 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import com.example.mumuk.R
 import com.example.mumuk.databinding.FragmentSearchResultBinding
 import com.example.mumuk.ui.category.CategoryRecipeCard
 
@@ -38,6 +40,14 @@ class SearchResultFragment : Fragment() {
             if (dummyList.isEmpty()) View.GONE else View.VISIBLE
 
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        binding.searchResultBackBtn.setOnClickListener {
+            findNavController().navigate(R.id.action_searchResultFragment_to_searchFragment)
+        }
     }
 
     override fun onDestroyView() {

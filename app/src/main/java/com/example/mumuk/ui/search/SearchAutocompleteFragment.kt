@@ -1,10 +1,12 @@
 package com.example.mumuk.ui.search
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -36,22 +38,50 @@ class SearchAutocompleteFragment : Fragment() {
         binding.searchAutocompleteRv.layoutManager = LinearLayoutManager(context)
 
         binding.searchAutocompleteEditEt.setText("")
-        binding.searchAutocompleteEditEt.requestFocus()
 
-        binding.searchAutocompleteEditEt.setOnEditorActionListener { v, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                findNavController().navigate(R.id.action_searchAutocompleteFragment_to_searchResultFragment)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        binding.searchAutocompleteEditEt.requestFocus()
+        view.postDelayed({
+            val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.showSoftInput(binding.searchAutocompleteEditEt, InputMethodManager.SHOW_IMPLICIT)
+        }, 100)
+
+        binding.searchAutocompleteEditEt.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH
+                || actionId == EditorInfo.IME_ACTION_DONE
+                || actionId == EditorInfo.IME_NULL
+            ) {
+                navigateToResult()
                 true
             } else {
                 false
             }
         }
 
+        binding.searchAutocompleteBtn.setOnClickListener {
+            navigateToResult()
+        }
+
+
+        binding.searchAutocompleteBtn.setOnClickListener {
+            navigateToResult()
+        }
+
         binding.searchAutocompleteEditEt.addTextChangedListener {
             val query = it?.toString() ?: ""
         }
+    }
 
-        return binding.root
+    private fun navigateToResult() {
+        val navController = findNavController()
+        if (navController.currentDestination?.id == R.id.searchAutocompleteFragment) {
+            navController.navigate(R.id.action_searchAutocompleteFragment_to_searchResultFragment)
+        }
     }
 
     override fun onResume() {

@@ -33,7 +33,6 @@
         android:label="fragment_my_page"
         tools:layout="@layout/fragment_my_page" />
 
-    <!--Search Fragment -->
     <fragment
         android:id="@+id/searchAutocompleteFragment"
         android:name="com.example.mumuk.ui.search.SearchAutocompleteFragment"
@@ -48,5 +47,9 @@
         android:id="@+id/searchResultFragment"
         android:name="com.example.mumuk.ui.search.SearchResultFragment"
         android:label="fragment_search_result"
-        tools:layout="@layout/fragment_search_result" />
+        tools:layout="@layout/fragment_search_result">
+        <action
+            android:id="@+id/action_searchResultFragment_to_searchFragment"
+            app:destination="@id/navigation_search" />
+    </fragment>
 </navigation>
