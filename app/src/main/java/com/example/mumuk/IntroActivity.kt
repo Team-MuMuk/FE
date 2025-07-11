@@ -27,5 +27,6 @@ class IntroActivity : AppCompatActivity() {
             startActivity(intent)
             finish()
         }, 3000) // 3000ms = 3초
+
     }
 }

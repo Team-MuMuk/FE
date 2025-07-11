@@ -1,4 +1,4 @@
-package com.example.mumuk.Category.Weight
+package com.example.mumuk.ui.category.Random
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,20 +8,20 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.mumuk.Category.CategoryRecipeCard
-import com.example.mumuk.Category.CategoryRecipeCardAdapter
+import com.example.mumuk.ui.category.CategoryRecipeCard
+import com.example.mumuk.ui.category.CategoryRecipeCardAdapter
 import com.example.mumuk.R
 import com.google.android.material.tabs.TabLayout
 
-class CategoryWeightLossFragment : Fragment() {
+class CategoryRandomRecipeFragment : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var tabLayout: TabLayout
     private var selectedTabTitle: String? = null
 
     companion object {
-        fun newInstance(selectedTab: String): CategoryWeightLossFragment {
-            val fragment = CategoryWeightLossFragment()
+        fun newInstance(selectedTab: String): CategoryRandomRecipeFragment {
+            val fragment = CategoryRandomRecipeFragment()
             val args = Bundle()
             args.putString("selected_tab", selectedTab)
             fragment.arguments = args
@@ -36,7 +36,7 @@ class CategoryWeightLossFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View? = inflater.inflate(R.layout.fragment_category_weight_loss, container, false)
+    ): View? = inflater.inflate(R.layout.fragment_category_random_recipe, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -49,23 +49,17 @@ class CategoryWeightLossFragment : Fragment() {
         recyclerView = view.findViewById(R.id.category_recipe_recycler_view)
         recyclerView.layoutManager = GridLayoutManager(context, 2)
 
-        setupCustomTabs()
-        setupTabSelectionListener()
+        setupSingleTab()
+        setupTabListener()
     }
 
-    private fun setupCustomTabs() {
-        val tabs = listOf("체중 감량", "근육 증가")
-        val initialTab = selectedTabTitle ?: "체중 감량"
-
-        for (title in tabs) {
-            val tab = tabLayout.newTab()
-            tabLayout.addTab(tab)
-            tab.customView = createCustomTabView(title, selected = (title == initialTab))
-            if (title == initialTab) {
-                tab.select()
-                updateRecyclerWith(title)
-            }
-        }
+    private fun setupSingleTab() {
+        val tabName = selectedTabTitle ?: "랜덤식단"
+        val tab = tabLayout.newTab()
+        tabLayout.addTab(tab)
+        tab.customView = createCustomTabView(tabName, true)
+        tab.select()
+        updateRecyclerWith(tabName)
     }
 
     private fun createCustomTabView(title: String, selected: Boolean): View {
@@ -76,12 +70,11 @@ class CategoryWeightLossFragment : Fragment() {
         return view
     }
 
-    private fun setupTabSelectionListener() {
+    private fun setupTabListener() {
         tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
-                val textView = tab?.customView?.findViewById<TextView>(R.id.tab_text)
-                textView?.isSelected = true
-                updateRecyclerWith(textView?.text.toString())
+                tab?.customView?.findViewById<TextView>(R.id.tab_text)?.isSelected = true
+                updateRecyclerWith(tab?.customView?.findViewById<TextView>(R.id.tab_text)?.text.toString())
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab?) {
@@ -94,13 +87,10 @@ class CategoryWeightLossFragment : Fragment() {
 
     private fun updateRecyclerWith(tabName: String) {
         val items = when (tabName) {
-            "체중 감량" -> listOf(
-                CategoryRecipeCard("헬스식단", "연어 포케"),
-                CategoryRecipeCard("헬스식단", "연어 포케")
-            )
-            "근육 증가" -> listOf(
-                CategoryRecipeCard("벌크업식단", "연어 포케"),
-                CategoryRecipeCard("벌크업식단", "연어 포케")
+            "랜덤식단" -> listOf(
+                CategoryRecipeCard("랜덤식단", "연어 포케"),
+                CategoryRecipeCard("랜덤식단", "연어 포케"),
+                CategoryRecipeCard("랜덤식단", "연어 포케")
             )
             else -> emptyList()
         }

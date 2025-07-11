@@ -1,4 +1,4 @@
-package com.example.mumuk.Category.Health
+package com.example.mumuk.ui.category.Weight
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,20 +8,20 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.mumuk.Category.CategoryRecipeCard
-import com.example.mumuk.Category.CategoryRecipeCardAdapter
+import com.example.mumuk.ui.category.CategoryRecipeCard
+import com.example.mumuk.ui.category.CategoryRecipeCardAdapter
 import com.example.mumuk.R
 import com.google.android.material.tabs.TabLayout
 
-class CategoryLowSugarFragment : Fragment() {
+class CategoryWeightLossFragment : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var tabLayout: TabLayout
     private var selectedTabTitle: String? = null
 
     companion object {
-        fun newInstance(selectedTab: String): CategoryLowSugarFragment {
-            val fragment = CategoryLowSugarFragment()
+        fun newInstance(selectedTab: String): CategoryWeightLossFragment {
+            val fragment = CategoryWeightLossFragment()
             val args = Bundle()
             args.putString("selected_tab", selectedTab)
             fragment.arguments = args
@@ -36,7 +36,7 @@ class CategoryLowSugarFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View? = inflater.inflate(R.layout.fragment_category_low_sugar, container, false)
+    ): View? = inflater.inflate(R.layout.fragment_category_weight_loss, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -54,8 +54,8 @@ class CategoryLowSugarFragment : Fragment() {
     }
 
     private fun setupCustomTabs() {
-        val tabs = listOf("당 줄이기", "혈압관리", "콜레스테롤 관리", "소화 건강")
-        val initialTab = selectedTabTitle ?: "당 줄이기"
+        val tabs = listOf("체중 감량", "근육 증가")
+        val initialTab = selectedTabTitle ?: "체중 감량"
 
         for (title in tabs) {
             val tab = tabLayout.newTab()
@@ -94,21 +94,13 @@ class CategoryLowSugarFragment : Fragment() {
 
     private fun updateRecyclerWith(tabName: String) {
         val items = when (tabName) {
-            "당 줄이기" -> listOf(
-                CategoryRecipeCard("당줄이기", "연어 포케"),
-                CategoryRecipeCard("당줄이기", "연어 포케")
+            "체중 감량" -> listOf(
+                CategoryRecipeCard("헬스식단", "연어 포케"),
+                CategoryRecipeCard("헬스식단", "연어 포케")
             )
-            "혈압관리" -> listOf(
-                CategoryRecipeCard("혈압관리", "연어 포케"),
-                CategoryRecipeCard("혈압관리", "연어 포케")
-            )
-            "콜레스테롤 관리" -> listOf(
-                CategoryRecipeCard("콜레스테롤", "연어 포케"),
-                CategoryRecipeCard("콜레스테롤", "연어 포케")
-            )
-            "소화 건강" -> listOf(
-                CategoryRecipeCard("소화건강", "연어 포케"),
-                CategoryRecipeCard("소화건강", "연어 포케")
+            "근육 증가" -> listOf(
+                CategoryRecipeCard("벌크업식단", "연어 포케"),
+                CategoryRecipeCard("벌크업식단", "연어 포케")
             )
             else -> emptyList()
         }
