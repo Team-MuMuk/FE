@@ -79,14 +79,16 @@
                 android:textSize="24dp"
                 android:textStyle="bold"/>
 
-            <androidx.cardview.widget.CardView
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/likeBtn"
                 android:layout_width="66dp"
                 android:layout_height="25dp"
                 android:layout_marginStart="8dp"
-                android:backgroundTint="#FFEEDC"
                 app:cardCornerRadius="4dp"
                 app:cardElevation="0dp"
+                app:strokeColor="@color/lightGray"
+                android:backgroundTint="@color/white"
+                app:strokeWidth="1dp"
                 app:layout_constraintBottom_toBottomOf="@+id/recipeTitle"
                 app:layout_constraintStart_toEndOf="@+id/recipeTitle"
                 app:layout_constraintTop_toTopOf="@+id/recipeTitle">
@@ -103,7 +105,8 @@
                         android:src="@drawable/btn_heart_ouline"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:tint="@color/red"/>
 
                     <TextView
                         android:id="@+id/textView7"
@@ -111,14 +114,14 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
                         android:text="찜하기"
-                        android:textColor="#DB553D"
+                        android:textColor="@color/red"
                         android:textSize="12dp"
                         android:textStyle="bold"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardView"
@@ -185,27 +188,29 @@
                 android:textSize="12dp"/>
 
             <androidx.cardview.widget.CardView
+                android:id="@+id/category"
                 android:layout_width="wrap_content"
                 android:layout_height="25dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
-                app:layout_constraintStart_toEndOf="@+id/cardView"
-                app:layout_constraintTop_toBottomOf="@+id/textView12"
-                app:cardElevation="0dp"
+                android:backgroundTint="#FFEEDC"
+                android:visibility="gone"
                 app:cardCornerRadius="4dp"
-                android:backgroundTint="#FFEEDC">
+                app:cardElevation="0dp"
+                app:layout_constraintStart_toEndOf="@+id/cardView"
+                app:layout_constraintTop_toBottomOf="@+id/textView12">
 
                 <TextView
                     android:id="@+id/textView13"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:text="# 당 줄이기"
                     android:paddingStart="8dp"
                     android:paddingEnd="8dp"
+                    android:text="# 당 줄이기"
                     android:textColor="#DB553D"
                     android:textSize="12dp"
-                    android:textStyle="bold"/>
+                    android:textStyle="bold" />
             </androidx.cardview.widget.CardView>
 
             <View
@@ -224,12 +229,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="16dp"
                 android:text="해당 레시피 추정 영양정보"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/view3"
+                android:textSize="24dp"
                 android:textStyle="bold"
-                android:textSize="24dp"/>
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/view3" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/infoRV"
@@ -302,7 +307,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="16dp"
                 android:text="조리방법"
                 android:textSize="24dp"
                 android:textStyle="bold"
@@ -319,11 +324,60 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/textView24" />
 
+            <androidx.cardview.widget.CardView
+                android:id="@+id/example"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:backgroundTint="@color/lightGray"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="0dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/textView25" />
+
+            <View
+                android:id="@+id/view7"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="24dp"
+                android:background="#CFCFCF"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/example" />
+
+            <TextView
+                android:id="@+id/textView4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="16dp"
+                android:text="추천 장보기 아이템"
+                android:textSize="20dp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/view7" />
+
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/cookRV"
+                android:id="@+id/shopRV"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:layout_constraintTop_toBottomOf="@id/textView25" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/textView4" />
+
+            <View
+                android:id="@+id/view8"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="24dp"
+                android:background="#CFCFCF"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/shopRV" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

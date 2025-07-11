@@ -33,7 +33,6 @@ class RecipeFragment : Fragment() {
         }
 
         val nutritionInfoAdapter = NutritionInfoAdapter()
-
         binding.infoRV.apply {
             adapter = nutritionInfoAdapter
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
@@ -41,6 +40,16 @@ class RecipeFragment : Fragment() {
 
         recipeViewModel.nutritionInfoList.observe(viewLifecycleOwner) { infoList ->
             nutritionInfoAdapter.submitList(infoList)
+        }
+
+        val shopAdapter = ShopAdapter()
+        binding.shopRV.apply {
+            adapter = shopAdapter
+            layoutManager = GridLayoutManager(context, 2)
+        }
+
+        recipeViewModel.shopItemList.observe(viewLifecycleOwner) { shopList ->
+            shopAdapter.submitList(shopList)
         }
     }
 

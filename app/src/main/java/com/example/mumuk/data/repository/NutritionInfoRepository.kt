@@ -2,7 +2,7 @@ package com.example.mumuk.data.repository
 
 import com.example.mumuk.data.model.NutritionInfo
 
-class RecipeDetailRepository {
+class NutritionInfoRepository {
     suspend fun getNutritionInfoList(): List<NutritionInfo> {
         return listOf(
             NutritionInfo("단백질", "40g"),

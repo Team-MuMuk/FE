@@ -16,7 +16,7 @@ class RecommendRecipeAdapter : ListAdapter<Recipe, RecommendRecipeAdapter.Recipe
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(recipe: Recipe) {
-            binding.imageView5.setImageResource(recipe.imageResId)
+            binding.recipeImg.setImageResource(recipe.imageResId)
             binding.recipeTitle.text = recipe.title
             binding.recipeSubtitle.text = recipe.subtitle
         }
