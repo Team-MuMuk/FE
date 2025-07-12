@@ -8,59 +8,77 @@
     <fragment
         android:id="@+id/navigation_home"
         android:name="com.example.mumuk.ui.home.HomeFragment"
-        android:label="홈"
-        tools:layout="@layout/fragment_home" />
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_navigation_home_to_recommendFragment"
+            app:destination="@id/recommendFragment"
+
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/hold"
+            app:popEnterAnim="@anim/hold"
+            app:popExitAnim="@anim/slide_out_right"/>
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_category"
-        android:name="com.example.mumuk.Category.CategoryFragment"
+        android:name="com.example.mumuk.ui.category.CategoryFragment"
         android:label="fragment_category"
         tools:layout="@layout/fragment_category" />
 
     <fragment
         android:id="@+id/navigation_search"
-        android:name="com.example.mumuk.SearchFragment"
-        android:label="검색"
-        tools:layout="@layout/fragment_search" />
-
-    <fragment
-        android:id="@+id/navigation_my_page"
-        android:name="com.example.mumuk.ui.mypage.MyPageFragment"
-        android:label="마이페이지"
-        tools:layout="@layout/fragment_my_page">
-
+        android:name="com.example.mumuk.ui.search.main.SearchFragment"
+        android:label="fragment_search"
+        tools:layout="@layout/fragment_search">
         <action
-            android:id="@+id/action_myPage_to_settings"
-            app:destination="@id/settingsFragment"
-             />
-
-        <action
-            android:id="@+id/action_myPage_to_profile"
-            app:destination="@id/profileFragment"
-             />
-
-        <action
-            android:id="@+id/action_myPage_to_favorites"
-            app:destination="@id/favoriteRecipeFragment"
-            />
+            android:id="@+id/action_searchFragment_to_searchAutocompleteFragment"
+            app:destination="@id/searchAutocompleteFragment"/>
     </fragment>
 
     <fragment
-        android:id="@+id/settingsFragment"
-        android:name="com.example.mumuk.ui.mypage.SettingsFragment"
-        android:label="설정"
-        tools:layout="@layout/fragment_settings" />
+        android:id="@+id/navigation_my_page"
+        android:name="com.example.mumuk.MyPageFragment"
+        android:label="fragment_my_page"
+        tools:layout="@layout/fragment_my_page" />
 
     <fragment
-        android:id="@+id/profileFragment"
-        android:name="com.example.mumuk.ui.mypage.ProfileFragment"
-        android:label="프로필"
-        tools:layout="@layout/fragment_profile" />
+        android:id="@+id/recommendFragment"
+        android:name="com.example.mumuk.ui.home.RecommendFragment"
+        android:label="fragment_recommend"
+        tools:layout="@layout/fragment_recommend" >
+        <action
+            android:id="@+id/action_recommendFragment_to_recipeFragment"
+            app:destination="@id/recipeFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/hold"
+            app:popEnterAnim="@anim/hold"
+            app:popExitAnim="@anim/slide_out_right"/>
+    </fragment>
 
     <fragment
-        android:id="@+id/favoriteRecipeFragment"
-        android:name="com.example.mumuk.ui.mypage.FavoriteRecipeFragment"
-        android:label="찜한 레시피"
-        tools:layout="@layout/fragment_favorite_recipe" />
+        android:id="@+id/recipeFragment"
+        android:name="com.example.mumuk.ui.recipe.RecipeFragment"
+        android:label="fragment_recipe"
+        tools:layout="@layout/fragment_recipe" />
 
+    <fragment
+        android:id="@+id/searchAutocompleteFragment"
+        android:name="com.example.mumuk.ui.search.autocomplete.SearchAutocompleteFragment"
+        android:label="fragment_search_autocomplete"
+        tools:layout="@layout/fragment_search_autocomplete">
+        <action
+            android:id="@+id/action_searchAutocompleteFragment_to_searchResultFragment"
+            app:destination="@id/searchResultFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/searchResultFragment"
+        android:name="com.example.mumuk.ui.search.result.SearchResultFragment"
+        android:label="fragment_search_result"
+        tools:layout="@layout/fragment_search_result">
+        <action
+            android:id="@+id/action_searchResultFragment_to_searchFragment"
+            app:destination="@id/navigation_search" />
+    </fragment>
 </navigation>

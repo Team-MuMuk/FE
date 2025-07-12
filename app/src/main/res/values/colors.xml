@@ -2,10 +2,16 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="red">#D12323</color>
+    <color name="black_200">#CFCFCF</color>
+    <color name="black_100">#F3F3F3</color>
+    <color name="gray">#E0E0E0</color>
+    <color name="search_recent_keyword_text">#A2A2A2</color>
     <color name="mainColor">#007251</color>
-    <color name="category_tab_selected_bg">#FFA552</color>
-    <color name="category_tab_unselected_bg">#CCCCCC</color>
+    <color name="category_tab_selected_bg">#BAAE99</color>
+    <color name="category_tab_unselected_bg">#F3F3F3</color>
     <color name="category_tab_selected_text">#FFFFFF</color>
     <color name="category_tab_unselected_text">#000000</color>
-    <color name="red">#D12323</color>
+    <color name="search_suggest_keyword_bg">#D4CEC1</color>
+    <color name="search_suggest_keyword_text">#665E52</color>
 </resources>

@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    tools:context=".Category.Health.CategoryLowSugarFragment">
+    tools:context=".ui.category.health.CategoryLowSugarFragment">
 
     <ImageView
         android:id="@+id/category_back_btn"
