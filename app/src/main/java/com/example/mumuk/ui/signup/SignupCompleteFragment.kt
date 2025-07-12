@@ -1,4 +1,4 @@
-package com.example.mumuk.Signup
+package com.example.mumuk.ui.signup
 
 import android.content.Intent
 import android.os.Bundle
@@ -8,8 +8,8 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.fragment.app.Fragment
-import com.example.mumuk.ui.MainActivity
 import com.example.mumuk.R
+import com.example.mumuk.ui.MainActivity
 
 class SignupCompleteFragment : Fragment() {
     override fun onCreateView(

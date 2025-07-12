@@ -1,4 +1,4 @@
-package com.example.mumuk.Signup
+package com.example.mumuk.ui.signup
 
 import android.graphics.Color
 import android.os.Bundle
@@ -15,37 +15,36 @@ import com.example.mumuk.R
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 
-
-class SignupStep2Fragment : Fragment() {
+class SignupStep4Fragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_signup_step2, container, false)
+        val view = inflater.inflate(R.layout.fragment_signup_step4, container, false)
 
         val btnNext = view.findViewById<ImageButton>(R.id.btn_next)
         val btnBack = view.findViewById<ImageButton>(R.id.btn_back)
 
-        val etNickname = view.findViewById<TextInputEditText>(R.id.et_nickname)
-        val layoutNickname = view.findViewById<TextInputLayout>(R.id.layout_nickname)
-        val tvStatus = view.findViewById<TextView>(R.id.tv_nickname_status)
+        val etPw = view.findViewById<TextInputEditText>(R.id.et_pw)
+        val layoutPw = view.findViewById<TextInputLayout>(R.id.layout_pw)
+        val tvStatus = view.findViewById<TextView>(R.id.tv_pw_status)
 
+        val passwordRegex = Regex("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[!@#\$%^&*()_+=\\-]).{3,15}$")
 
-        etNickname.addTextChangedListener(object : TextWatcher {
+        etPw.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun afterTextChanged(s: Editable?) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                val nickname = s.toString()
-
+                val input = s.toString()
                 when {
-                    nickname.isBlank() -> {
-                        tvStatus.text = "닉네임을 입력해주세요."
+                    input.isBlank() -> {
+                        tvStatus.text = "비밀번호를 입력해주세요."
                         tvStatus.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
                     }
-                    nickname.length >= 10 -> {
-                        tvStatus.text = "글자 수가 초과되었습니다. 10자 이내로 입력해주세요."
+                    !passwordRegex.matches(input) -> {
+                        tvStatus.text = "비밀번호 형식에 맞지 않습니다. 다시 시도해주세요."
                         tvStatus.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
                     }
                     else -> {
@@ -57,27 +56,31 @@ class SignupStep2Fragment : Fragment() {
         })
 
         btnNext.setOnClickListener {
-            val nickname = etNickname.text.toString()
+            val input = etPw.text.toString()
+            val statusText = tvStatus.text.toString()
 
-            if (nickname.isNotBlank() && nickname.length < 10) {
+            if (statusText == "정상적으로 확인되었습니다 :)") {
+                val step5Fragment = SignupStep5Fragment()
+                val bundle = Bundle().apply {
+                    putString("password", input)
+                }
+                step5Fragment.arguments = bundle
+
                 parentFragmentManager.beginTransaction()
-                    .replace(R.id.signup_container, SignupStep3Fragment())
+                    .replace(R.id.signup_container, step5Fragment)
                     .addToBackStack(null)
                     .commit()
+
             }
         }
 
-
-
-        btnBack.setOnClickListener{
+        btnBack.setOnClickListener {
             parentFragmentManager.beginTransaction()
-                .replace(R.id.signup_container, SignupStep1Fragment())
+                .replace(R.id.signup_container, SignupStep3Fragment())
                 .addToBackStack(null)
                 .commit()
         }
 
         return view
     }
-
-
 }
