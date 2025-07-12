@@ -3,49 +3,43 @@ package com.example.mumuk.ui
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.NavigationUI
 import com.example.mumuk.R
 import com.example.mumuk.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private lateinit var navController: NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-        val navController = navHostFragment.navController
-
-        val navOptions = NavOptions.Builder()
-            .setLaunchSingleTop(true)
-            .setPopUpTo(R.id.nav_graph, false)
-            .build()
+        navController = navHostFragment.navController
 
         binding.bottomNavView.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.navigation_home -> {
-                    navController.navigate(R.id.navigation_home, null, navOptions)
-                    true
-                }
-                R.id.navigation_category -> {
-                    navController.navigate(R.id.navigation_category, null, navOptions)
-                    true
-                }
-                R.id.navigation_search -> {
-                    navController.navigate(R.id.navigation_search, null, navOptions)
-                    true
-                }
-                R.id.navigation_my_page -> {
-                    navController.navigate(R.id.navigation_my_page, null, navOptions)
-                    true
-                }
-                else -> false
+            if (item.itemId == binding.bottomNavView.selectedItemId) {
+                navController.popBackStack(item.itemId, inclusive = false)
+                return@setOnItemSelectedListener true
+            }
+
+            val builder = NavOptions.Builder()
+                .setLaunchSingleTop(true)
+                .setPopUpTo(navController.graph.startDestinationId, false)
+
+            val options = builder.build()
+            try {
+                navController.navigate(item.itemId, null, options)
+                true
+            } catch (e: IllegalArgumentException) {
+                false
             }
         }
     }
