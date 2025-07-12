@@ -5,9 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.example.mumuk.ui.category.Health.CategoryHealthFragment
-import com.example.mumuk.ui.category.Random.CategoryRandomFragment
-import com.example.mumuk.ui.category.Weight.CategoryWeightFragment
+import com.example.mumuk.ui.category.health.CategoryHealthFragment
+import com.example.mumuk.ui.category.random.CategoryRandomFragment
+import com.example.mumuk.ui.category.weight.CategoryWeightFragment
 import com.example.mumuk.databinding.FragmentCategoryBinding
 import com.example.mumuk.R
 
