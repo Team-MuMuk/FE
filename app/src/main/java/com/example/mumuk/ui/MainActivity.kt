@@ -1,6 +1,7 @@
 package com.example.mumuk.ui
 
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
@@ -41,5 +42,12 @@ class MainActivity : AppCompatActivity() {
                 false
             }
         }
+
+    fun hideBottomNav() {
+        binding.bottomNavView.visibility = View.GONE
+    }
+
+    fun showBottomNav() {
+        binding.bottomNavView.visibility = View.VISIBLE
     }
 }
