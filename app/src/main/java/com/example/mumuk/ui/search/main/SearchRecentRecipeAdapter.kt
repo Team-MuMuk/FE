@@ -1,4 +1,4 @@
-package com.example.mumuk.ui.search
+package com.example.mumuk.ui.search.main
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -6,9 +6,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.mumuk.databinding.ItemCategoryRecipeCardBinding
 import com.example.mumuk.ui.category.CategoryRecipeCard
 
-class SearchResultAdapter(
-    private val items: List<CategoryRecipeCard>
-) : RecyclerView.Adapter<SearchResultAdapter.ViewHolder>() {
+class SearchRecentRecipeAdapter(
+    private val recipes: List<CategoryRecipeCard>
+) : RecyclerView.Adapter<SearchRecentRecipeAdapter.ViewHolder>() {
 
     inner class ViewHolder(val binding: ItemCategoryRecipeCardBinding) :
         RecyclerView.ViewHolder(binding.root)
@@ -20,10 +20,10 @@ class SearchResultAdapter(
         return ViewHolder(binding)
     }
 
+    override fun getItemCount() = recipes.size
+
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = items[position]
+        val item = recipes[position]
         holder.binding.recipeTitle.text = item.title
     }
-
-    override fun getItemCount() = items.size
 }

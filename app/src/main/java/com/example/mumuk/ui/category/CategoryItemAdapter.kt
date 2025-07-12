@@ -1,40 +1,35 @@
 package com.example.mumuk.ui.category
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.mumuk.R
+import com.example.mumuk.databinding.ItemCategoryBinding
 
 class CategoryItemAdapter(
     private val items: List<CategoryItem>,
     private val onItemClick: (CategoryItem) -> Unit
 ) : RecyclerView.Adapter<CategoryItemAdapter.ViewHolder>() {
 
-    inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val name: TextView = view.findViewById(R.id.item_name)
-        val image: ImageView = view.findViewById(R.id.item_image)
+    inner class ViewHolder(private val binding: ItemCategoryBinding) : RecyclerView.ViewHolder(binding.root) {
 
-        init {
-            view.setOnClickListener {
-                onItemClick(items[adapterPosition])
+        fun bind(item: CategoryItem) {
+            binding.itemName.text = item.name
+            binding.itemImage.setImageResource(item.imageResId)
+
+            binding.root.setOnClickListener {
+                onItemClick(item)
             }
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_category, parent, false)
-        return ViewHolder(view)
+        val binding = ItemCategoryBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ViewHolder(binding)
     }
 
     override fun getItemCount() = items.size
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = items[position]
-        holder.name.text = item.name
-        holder.image.setImageResource(item.imageResId)
+        holder.bind(items[position])
     }
 }

@@ -1,4 +1,4 @@
-package com.example.mumuk.ui.category.Random
+package com.example.mumuk.ui.category.random
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,16 +7,16 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.mumuk.ui.category.CategoryRecipeCard
 import com.example.mumuk.ui.category.CategoryRecipeCardAdapter
-import com.example.mumuk.R
+import com.example.mumuk.databinding.FragmentCategoryRandomRecipeBinding
 import com.google.android.material.tabs.TabLayout
 
 class CategoryRandomRecipeFragment : Fragment() {
 
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var tabLayout: TabLayout
+    private var _binding: FragmentCategoryRandomRecipeBinding? = null
+    private val binding get() = _binding!!
+
     private var selectedTabTitle: String? = null
 
     companion object {
@@ -36,18 +36,19 @@ class CategoryRandomRecipeFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View? = inflater.inflate(R.layout.fragment_category_random_recipe, container, false)
+    ): View {
+        _binding = FragmentCategoryRandomRecipeBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        view.findViewById<View>(R.id.category_back_btn)?.setOnClickListener {
+        binding.categoryBackBtn.setOnClickListener {
             parentFragmentManager.popBackStack()
         }
 
-        tabLayout = view.findViewById(R.id.category_tab_layout)
-        recyclerView = view.findViewById(R.id.category_recipe_recycler_view)
-        recyclerView.layoutManager = GridLayoutManager(context, 2)
+        binding.categoryRecipeRecyclerView.layoutManager = GridLayoutManager(context, 2)
 
         setupSingleTab()
         setupTabListener()
@@ -55,30 +56,30 @@ class CategoryRandomRecipeFragment : Fragment() {
 
     private fun setupSingleTab() {
         val tabName = selectedTabTitle ?: "랜덤식단"
-        val tab = tabLayout.newTab()
-        tabLayout.addTab(tab)
+        val tab = binding.categoryTabLayout.newTab()
+        binding.categoryTabLayout.addTab(tab)
         tab.customView = createCustomTabView(tabName, true)
         tab.select()
         updateRecyclerWith(tabName)
     }
 
     private fun createCustomTabView(title: String, selected: Boolean): View {
-        val view = layoutInflater.inflate(R.layout.category_custom_tab, null)
-        val textView = view.findViewById<TextView>(R.id.tab_text)
+        val view = layoutInflater.inflate(com.example.mumuk.R.layout.category_custom_tab, null)
+        val textView = view.findViewById<TextView>(com.example.mumuk.R.id.tab_text)
         textView.text = title
         textView.isSelected = selected
         return view
     }
 
     private fun setupTabListener() {
-        tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+        binding.categoryTabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
-                tab?.customView?.findViewById<TextView>(R.id.tab_text)?.isSelected = true
-                updateRecyclerWith(tab?.customView?.findViewById<TextView>(R.id.tab_text)?.text.toString())
+                tab?.customView?.findViewById<TextView>(com.example.mumuk.R.id.tab_text)?.isSelected = true
+                updateRecyclerWith(tab?.customView?.findViewById<TextView>(com.example.mumuk.R.id.tab_text)?.text.toString())
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab?) {
-                tab?.customView?.findViewById<TextView>(R.id.tab_text)?.isSelected = false
+                tab?.customView?.findViewById<TextView>(com.example.mumuk.R.id.tab_text)?.isSelected = false
             }
 
             override fun onTabReselected(tab: TabLayout.Tab?) {}
@@ -95,6 +96,11 @@ class CategoryRandomRecipeFragment : Fragment() {
             else -> emptyList()
         }
 
-        recyclerView.adapter = CategoryRecipeCardAdapter(items)
+        binding.categoryRecipeRecyclerView.adapter = CategoryRecipeCardAdapter(items)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

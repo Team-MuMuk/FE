@@ -1,4 +1,4 @@
-package com.example.mumuk.ui.search
+package com.example.mumuk.ui.search.autocomplete
 
 import android.content.Context
 import android.os.Bundle

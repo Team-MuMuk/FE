@@ -1,4 +1,4 @@
-package com.example.mumuk.ui.search
+package com.example.mumuk.ui.search.main
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
