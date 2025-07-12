@@ -15,7 +15,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:strokeColor="@color/lighterGray"
+        app:strokeColor="@color/black_100"
         app:strokeWidth="1dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -49,7 +49,7 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="24dp"
-                android:backgroundTint="@color/lighterGray"
+                android:backgroundTint="@color/black_100"
                 app:cardCornerRadius="4dp"
                 app:cardElevation="0dp"
                 app:layout_constraintBottom_toBottomOf="parent"

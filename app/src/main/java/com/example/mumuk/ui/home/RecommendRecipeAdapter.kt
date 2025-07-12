@@ -18,7 +18,6 @@ class RecommendRecipeAdapter : ListAdapter<Recipe, RecommendRecipeAdapter.Recipe
         fun bind(recipe: Recipe) {
             binding.recipeImg.setImageResource(recipe.imageResId)
             binding.recipeTitle.text = recipe.title
-            binding.recipeSubtitle.text = recipe.subtitle
         }
     }
 

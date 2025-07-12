@@ -4,6 +4,6 @@
     <color name="white">#FFFFFFFF</color>
     <color name="mainColor">#007251</color>
     <color name="red">#D12323</color>
-    <color name="lightGray">#CFCFCF</color>
-    <color name="lighterGray">#F3F3F3</color>
+    <color name="black_200">#CFCFCF</color>
+    <color name="black_100">#F3F3F3</color>
 </resources>
