@@ -13,7 +13,14 @@
         <action
             android:id="@+id/action_navigation_home_to_recommendFragment"
             app:destination="@id/recommendFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/hold"
+            app:popEnterAnim="@anim/hold"
+            app:popExitAnim="@anim/slide_out_right"/>
 
+        <action
+            android:id="@+id/action_navigation_home_to_recipeFragment"
+            app:destination="@id/recipeFragment"
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/hold"
             app:popEnterAnim="@anim/hold"

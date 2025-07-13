@@ -15,7 +15,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:strokeColor="@color/black_100"
+        app:strokeColor="@color/black_300"
         app:strokeWidth="1dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -25,12 +25,13 @@
 
             <ImageView
                 android:id="@+id/recipeImg"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="177.88dp"
+                android:layout_height="164dp"
+                android:scaleType="centerCrop"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/img_food_sample" />
+                app:srcCompat="@drawable/bg_mosaic" />
 
             <TextView
                 android:id="@+id/recipeTitle"

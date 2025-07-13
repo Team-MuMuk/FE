@@ -3,6 +3,7 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="red">#D12323</color>
+    <color name="black_300">#A2A2A2</color>
     <color name="black_200">#CFCFCF</color>
     <color name="black_100">#F3F3F3</color>
     <color name="gray">#E0E0E0</color>
@@ -14,4 +15,5 @@
     <color name="category_tab_unselected_text">#000000</color>
     <color name="search_suggest_keyword_bg">#D4CEC1</color>
     <color name="search_suggest_keyword_text">#665E52</color>
+    <color name="blue">#2238DF</color>
 </resources>

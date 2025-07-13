@@ -6,12 +6,17 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.mumuk.R
+import com.example.mumuk.data.model.Recipe
 import com.example.mumuk.databinding.FragmentHomeBinding
 
 class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
+
+    private val recipeRepository = HomeRecipeRepository()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -26,6 +31,20 @@ class HomeFragment : Fragment() {
 
         binding.imageView3.setOnClickListener {
             findNavController().navigate(R.id.action_navigation_home_to_recommendFragment)
+        }
+
+        setupRecyclerView(binding.todayRV, recipeRepository.getTodayRecipes())
+        setupRecyclerView(binding.recentRV, recipeRepository.getRecentRecipes())
+        setupRecyclerView(binding.healthRV, recipeRepository.getHealthRecipes())
+        setupRecyclerView(binding.recommendedRV, recipeRepository.getRecommendedRecipes())
+    }
+
+    private fun setupRecyclerView(recyclerView: RecyclerView, recipeList: List<Recipe>) {
+        recyclerView.apply {
+            layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+            adapter = RecipeAdapter(recipeList) {
+                findNavController().navigate(R.id.action_navigation_home_to_recipeFragment)
+            }
         }
     }
 
