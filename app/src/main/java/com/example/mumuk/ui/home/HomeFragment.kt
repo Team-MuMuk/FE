@@ -40,6 +40,10 @@ class HomeFragment : Fragment() {
             showInfoPopup(it)
         }
 
+        binding.healthBtn.setOnClickListener {
+            findNavController().navigate(R.id.action_navigation_home_to_healthManagementFragment)
+        }
+
         setupRecyclerView(binding.todayRV, recipeRepository.getTodayRecipes())
         setupRecyclerView(binding.recentRV, recipeRepository.getRecentRecipes())
         setupRecyclerView(binding.healthRV, recipeRepository.getHealthRecipes())

@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="20dp"
+    tools:context=".ui.health.Step2Fragment">
+
+    <TextView
+        android:id="@+id/tv_step"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="STEP 2"
+        android:textColor="@color/black"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="건강목표를 모두 선택해주세요!"
+        android:textColor="@android:color/black"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_step" />
+
+    <ScrollView
+        android:id="@+id/scroll_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="40dp"
+        android:scrollbars="none"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_title">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/layout_goals"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_weight_loss"
+                    android:layout_width="match_parent"
+                    android:layout_height="55dp"
+                    android:layout_marginBottom="8dp"
+                    android:backgroundTint="@color/health_button_background_selector"
+                    android:checkable="true"
+                    android:paddingLeft="16dp"
+                    android:text="체중감량"
+                    android:textAlignment="viewStart"
+                    android:textColor="@color/health_button_text_selector"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="8dp"
+                    app:rippleColor="@android:color/transparent"
+                    app:strokeColor="@color/beige_500"
+                    app:strokeWidth="2dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_muscle_gain"
+                    android:layout_width="match_parent"
+                    android:layout_height="55dp"
+                    android:layout_marginBottom="8dp"
+                    android:backgroundTint="@color/health_button_background_selector"
+                    android:checkable="true"
+                    android:paddingLeft="16dp"
+                    android:text="근육량 증가"
+                    android:textAlignment="viewStart"
+                    android:textColor="@color/health_button_text_selector"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="8dp"
+                    app:rippleColor="@android:color/transparent"
+                    app:strokeColor="@color/beige_500"
+                    app:strokeWidth="2dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_sugar_reduction"
+                    android:layout_width="match_parent"
+                    android:layout_height="55dp"
+                    android:layout_marginBottom="8dp"
+                    android:backgroundTint="@color/health_button_background_selector"
+                    android:checkable="true"
+                    android:paddingLeft="16dp"
+                    android:text="당 줄이기"
+                    android:textAlignment="viewStart"
+                    android:textColor="@color/health_button_text_selector"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="8dp"
+                    app:rippleColor="@android:color/transparent"
+                    app:strokeColor="@color/beige_500"
+                    app:strokeWidth="2dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_blood_pressure"
+                    android:layout_width="match_parent"
+                    android:layout_height="55dp"
+                    android:layout_marginBottom="8dp"
+                    android:backgroundTint="@color/health_button_background_selector"
+                    android:checkable="true"
+                    android:paddingLeft="16dp"
+                    android:text="혈압관리"
+                    android:textAlignment="viewStart"
+                    android:textColor="@color/health_button_text_selector"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="8dp"
+                    app:rippleColor="@android:color/transparent"
+                    app:strokeColor="@color/beige_500"
+                    app:strokeWidth="2dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_cholesterol"
+                    android:layout_width="match_parent"
+                    android:layout_height="55dp"
+                    android:layout_marginBottom="8dp"
+                    android:backgroundTint="@color/health_button_background_selector"
+                    android:checkable="true"
+                    android:paddingLeft="16dp"
+                    android:text="콜레스테롤 관리"
+                    android:textAlignment="viewStart"
+                    android:textColor="@color/health_button_text_selector"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="8dp"
+                    app:rippleColor="@android:color/transparent"
+                    app:strokeColor="@color/beige_500"
+                    app:strokeWidth="2dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_digestive_health"
+                    android:layout_width="match_parent"
+                    android:layout_height="55dp"
+                    android:layout_marginBottom="8dp"
+                    android:backgroundTint="@color/health_button_background_selector"
+                    android:checkable="true"
+                    android:paddingLeft="16dp"
+                    android:text="소화 및 장 건강"
+                    android:textAlignment="viewStart"
+                    android:textColor="@color/health_button_text_selector"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="8dp"
+                    app:rippleColor="@android:color/transparent"
+                    app:strokeColor="@color/beige_500"
+                    app:strokeWidth="2dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_none"
+                    android:layout_width="match_parent"
+                    android:layout_height="55dp"
+                    android:layout_marginBottom="8dp"
+                    android:backgroundTint="@color/health_button_background_selector"
+                    android:checkable="true"
+                    android:paddingLeft="16dp"
+                    android:text="없습니다"
+                    android:textAlignment="viewStart"
+                    android:textColor="@color/health_button_text_selector"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="8dp"
+                    app:rippleColor="@android:color/transparent"
+                    app:strokeColor="@color/beige_500"
+                    app:strokeWidth="2dp" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/layout_custom_goal"
+                    android:layout_width="match_parent"
+                    android:layout_height="49dp"
+                    android:layout_marginTop="0dp"
+                    android:background="@drawable/bg_edittext_rounded"
+                    android:paddingHorizontal="16dp">
+
+                    <EditText
+                        android:id="@+id/et_custom_goal"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:background="@android:color/transparent"
+                        android:gravity="start|center_vertical"
+                        android:hint="직접 추가"
+                        android:inputType="text"
+                        android:textColor="@android:color/black"
+                        android:textColorHint="@android:color/darker_gray"
+                        android:textSize="16sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

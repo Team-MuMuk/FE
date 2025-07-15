@@ -25,6 +25,14 @@
             app:exitAnim="@anim/hold"
             app:popEnterAnim="@anim/hold"
             app:popExitAnim="@anim/slide_out_right"/>
+
+        <action
+            android:id="@+id/action_navigation_home_to_healthManagementFragment"
+            app:destination="@id/healthManagementFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/hold"
+            app:popEnterAnim="@anim/hold"
+            app:popExitAnim="@anim/slide_out_right"/>
     </fragment>
 
     <fragment
@@ -121,5 +129,43 @@
         <action
             android:id="@+id/action_searchResultFragment_to_searchFragment"
             app:destination="@id/navigation_search" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/healthManagementFragment"
+        android:name="com.example.mumuk.ui.health.HealthManagementFragment"
+        android:label="HealthManagementFragment"
+        tools:layout="@layout/fragment_health_management">
+        <action
+            android:id="@+id/action_healthManagementFragment_to_navigation_home"
+            app:destination="@id/navigation_home"
+            app:popUpTo="@id/navigation_home"
+            app:popUpToInclusive="true" />
+
+        <action
+            android:id="@+id/action_healthManagement_to_healthComplete"
+            app:destination="@id/healthCompleteFragment"
+            app:popUpTo="@id/healthManagementFragment"
+            app:popUpToInclusive="true"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out"
+            app:popEnterAnim="@android:anim/fade_in"
+            app:popExitAnim="@android:anim/fade_out" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/healthCompleteFragment"
+        android:name="com.example.mumuk.ui.health.HealthCompleteFragment"
+        android:label="HealthCompleteFragment"
+        tools:layout="@layout/fragment_health_complete">
+        <action
+            android:id="@+id/action_healthComplete_to_home"
+            app:destination="@id/navigation_home"
+            app:popUpTo="@id/navigation_home"
+            app:popUpToInclusive="true"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out"
+            app:popEnterAnim="@android:anim/fade_in"
+            app:popExitAnim="@android:anim/fade_out" />
     </fragment>
 </navigation>
