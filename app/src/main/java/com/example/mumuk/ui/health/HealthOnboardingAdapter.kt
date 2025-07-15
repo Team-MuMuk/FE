@@ -13,9 +13,9 @@ class HealthOnboardingAdapter(fragment: Fragment) : FragmentStateAdapter(fragmen
 
     override fun createFragment(position: Int): Fragment {
         val fragment = when (position) {
-            0 -> Step0Fragment()
-            1 -> Step1Fragment()
-            2 -> Step2Fragment()
+            0 -> HealthStep0Fragment()
+            1 -> HealthStep1Fragment()
+            2 -> HealthStep2Fragment()
             else -> throw IllegalStateException("Invalid position $position")
         }
         fragments[position] = fragment

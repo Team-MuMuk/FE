@@ -5,13 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="20dp"
-    tools:context=".ui.health.Step2Fragment">
+    tools:context=".ui.health.HealthStep1Fragment">
 
     <TextView
         android:id="@+id/tv_step"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="STEP 2"
+        android:text="STEP 1"
         android:textColor="@color/black"
         android:textSize="24sp"
         app:layout_constraintStart_toStartOf="parent"
@@ -22,7 +22,7 @@
         android:id="@+id/tv_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="건강목표를 모두 선택해주세요!"
+        android:text="알레르기 정보를 모두 선택해주세요!"
         android:textColor="@android:color/black"
         android:textSize="24sp"
         android:textStyle="bold"
@@ -46,20 +46,20 @@
             android:orientation="vertical">
 
             <LinearLayout
-                android:id="@+id/layout_goals"
+                android:id="@+id/layout_allergies"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_weight_loss"
+                    android:id="@+id/btn_shellfish"
                     android:layout_width="match_parent"
                     android:layout_height="55dp"
                     android:layout_marginBottom="8dp"
                     android:backgroundTint="@color/health_button_background_selector"
                     android:checkable="true"
                     android:paddingLeft="16dp"
-                    android:text="체중감량"
+                    android:text="갑각류 알레르기"
                     android:textAlignment="viewStart"
                     android:textColor="@color/health_button_text_selector"
                     android:textSize="16sp"
@@ -70,14 +70,14 @@
                     app:strokeWidth="2dp" />
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_muscle_gain"
+                    android:id="@+id/btn_nuts"
                     android:layout_width="match_parent"
                     android:layout_height="55dp"
                     android:layout_marginBottom="8dp"
                     android:backgroundTint="@color/health_button_background_selector"
                     android:checkable="true"
                     android:paddingLeft="16dp"
-                    android:text="근육량 증가"
+                    android:text="견과류 알레르기"
                     android:textAlignment="viewStart"
                     android:textColor="@color/health_button_text_selector"
                     android:textSize="16sp"
@@ -88,14 +88,14 @@
                     app:strokeWidth="2dp" />
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_sugar_reduction"
+                    android:id="@+id/btn_dairy"
                     android:layout_width="match_parent"
                     android:layout_height="55dp"
                     android:layout_marginBottom="8dp"
                     android:backgroundTint="@color/health_button_background_selector"
                     android:checkable="true"
                     android:paddingLeft="16dp"
-                    android:text="당 줄이기"
+                    android:text="유제품 알레르기"
                     android:textAlignment="viewStart"
                     android:textColor="@color/health_button_text_selector"
                     android:textSize="16sp"
@@ -106,14 +106,14 @@
                     app:strokeWidth="2dp" />
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_blood_pressure"
+                    android:id="@+id/btn_wheat"
                     android:layout_width="match_parent"
                     android:layout_height="55dp"
                     android:layout_marginBottom="8dp"
                     android:backgroundTint="@color/health_button_background_selector"
                     android:checkable="true"
                     android:paddingLeft="16dp"
-                    android:text="혈압관리"
+                    android:text="밀가루 알레르기"
                     android:textAlignment="viewStart"
                     android:textColor="@color/health_button_text_selector"
                     android:textSize="16sp"
@@ -124,14 +124,14 @@
                     app:strokeWidth="2dp" />
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_cholesterol"
+                    android:id="@+id/btn_egg"
                     android:layout_width="match_parent"
                     android:layout_height="55dp"
                     android:layout_marginBottom="8dp"
                     android:backgroundTint="@color/health_button_background_selector"
                     android:checkable="true"
                     android:paddingLeft="16dp"
-                    android:text="콜레스테롤 관리"
+                    android:text="계란 알레르기"
                     android:textAlignment="viewStart"
                     android:textColor="@color/health_button_text_selector"
                     android:textSize="16sp"
@@ -142,14 +142,32 @@
                     app:strokeWidth="2dp" />
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_digestive_health"
+                    android:id="@+id/btn_fish"
                     android:layout_width="match_parent"
                     android:layout_height="55dp"
                     android:layout_marginBottom="8dp"
                     android:backgroundTint="@color/health_button_background_selector"
                     android:checkable="true"
                     android:paddingLeft="16dp"
-                    android:text="소화 및 장 건강"
+                    android:text="생선 알레르기"
+                    android:textAlignment="viewStart"
+                    android:textColor="@color/health_button_text_selector"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="8dp"
+                    app:rippleColor="@android:color/transparent"
+                    app:strokeColor="@color/beige_500"
+                    app:strokeWidth="2dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_soy"
+                    android:layout_width="match_parent"
+                    android:layout_height="55dp"
+                    android:layout_marginBottom="8dp"
+                    android:backgroundTint="@color/health_button_background_selector"
+                    android:checkable="true"
+                    android:paddingLeft="16dp"
+                    android:text="대두 알레르기"
                     android:textAlignment="viewStart"
                     android:textColor="@color/health_button_text_selector"
                     android:textSize="16sp"
@@ -178,7 +196,7 @@
                     app:strokeWidth="2dp" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/layout_custom_goal"
+                    android:id="@+id/layout_custom_allergy"
                     android:layout_width="match_parent"
                     android:layout_height="49dp"
                     android:layout_marginTop="0dp"
@@ -186,7 +204,7 @@
                     android:paddingHorizontal="16dp">
 
                     <EditText
-                        android:id="@+id/et_custom_goal"
+                        android:id="@+id/et_custom_allergy"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:background="@android:color/transparent"

@@ -7,8 +7,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.view.animation.DecelerateInterpolator
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import com.example.mumuk.R
@@ -18,6 +20,8 @@ class HealthManagementFragment : Fragment() {
 
     private var _binding: FragmentHealthManagementBinding? = null
     private val binding get() = _binding!!
+
+    private val healthViewModel: HealthViewModel by activityViewModels()
 
     private lateinit var viewPager: ViewPager2
     private lateinit var adapter: HealthOnboardingAdapter
@@ -42,16 +46,33 @@ class HealthManagementFragment : Fragment() {
             animateToOnboarding()
         }
 
+        setupNextButton()
+        setupBackButton()
+        observeViewModel()
+    }
+
+    private fun setupNextButton() {
         binding.btnOnboardingNext.setOnClickListener {
-            if (::viewPager.isInitialized) {
-                if (viewPager.currentItem < numPages - 1) {
-                    viewPager.currentItem += 1
-                } else {
-                    navigateToComplete()
-                }
+            if (!::viewPager.isInitialized || !isNextButtonEnabled()) return@setOnClickListener
+
+            if (viewPager.currentItem < numPages - 1) {
+                viewPager.currentItem += 1
+            } else {
+                navigateToComplete()
             }
         }
+    }
 
+    private fun isNextButtonEnabled(): Boolean {
+        return when (viewPager.currentItem) {
+            0 -> healthViewModel.isStep0Complete.value ?: false
+            1 -> healthViewModel.isStep1Complete.value ?: false
+            2 -> healthViewModel.isStep2Complete.value ?: false
+            else -> true
+        }
+    }
+
+    private fun setupBackButton() {
         binding.btnOnboardingBack.setOnClickListener {
             if (::viewPager.isInitialized) {
                 val currentItem = viewPager.currentItem
@@ -61,6 +82,30 @@ class HealthManagementFragment : Fragment() {
                     animateToStart()
                 }
             }
+        }
+    }
+
+    private fun observeViewModel() {
+        val observer: (Boolean) -> Unit = {
+            if (::viewPager.isInitialized) {
+                updateNextButtonState(isNextButtonEnabled())
+            }
+        }
+        healthViewModel.isStep0Complete.observe(viewLifecycleOwner, observer)
+        healthViewModel.isStep1Complete.observe(viewLifecycleOwner, observer)
+        healthViewModel.isStep2Complete.observe(viewLifecycleOwner, observer)
+    }
+
+    private fun updateNextButtonState(isComplete: Boolean) {
+        val context = requireContext()
+        if (isComplete) {
+            binding.btnOnboardingNext.setCardBackgroundColor(ContextCompat.getColor(context, R.color.green_500))
+            binding.tvNext.setTextColor(ContextCompat.getColor(context, R.color.white))
+            binding.ivNextArrow.setColorFilter(ContextCompat.getColor(context, R.color.white))
+        } else {
+            binding.btnOnboardingNext.setCardBackgroundColor(ContextCompat.getColor(context, R.color.black_100))
+            binding.tvNext.setTextColor(ContextCompat.getColor(context, R.color.black_300))
+            binding.ivNextArrow.setColorFilter(ContextCompat.getColor(context, R.color.black_300))
         }
     }
 
@@ -132,8 +177,10 @@ class HealthManagementFragment : Fragment() {
                     else -> 0
                 }
                 animateProgress(progressValue)
+                updateNextButtonState(isNextButtonEnabled())
             }
         })
+        updateNextButtonState(isNextButtonEnabled())
     }
 
     private fun animateProgress(targetProgress: Int) {
@@ -148,7 +195,7 @@ class HealthManagementFragment : Fragment() {
 
     private fun navigateToComplete() {
         val currentFragment = adapter.getFragmentAt(viewPager.currentItem)
-        if (currentFragment is Step2Fragment) {
+        if (currentFragment is HealthStep2Fragment) {
             currentFragment.saveHealthData()
         }
 
