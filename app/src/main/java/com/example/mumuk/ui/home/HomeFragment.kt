@@ -44,6 +44,10 @@ class HomeFragment : Fragment() {
             findNavController().navigate(R.id.action_navigation_home_to_healthManagementFragment)
         }
 
+        binding.bookmarkBtn.setOnClickListener {
+            findNavController().navigate(R.id.action_navigation_home_to_bookmarkRecipeFragment)
+        }
+
         setupRecyclerView(binding.todayRV, recipeRepository.getTodayRecipes())
         setupRecyclerView(binding.recentRV, recipeRepository.getRecentRecipes())
         setupRecyclerView(binding.healthRV, recipeRepository.getHealthRecipes())

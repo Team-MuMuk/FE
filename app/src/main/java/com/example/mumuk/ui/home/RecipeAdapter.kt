@@ -28,7 +28,11 @@ class RecipeAdapter(private val recipes: List<Recipe>, private val onItemClick: 
     class RecipeViewHolder(private val binding: ItemRecipeBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(recipe: Recipe) {
-            binding.recipeImg.setImageResource(recipe.img)
+            if (recipe.img != null) {
+                binding.recipeImg.setImageResource(recipe.img)
+            } else {
+                binding.recipeImg.setImageResource(R.drawable.bg_mosaic)
+            }
             binding.recipeTitle.text = recipe.title
             if (recipe.isLiked) {
                 binding.imageView6.setImageResource(R.drawable.btn_heart_fill)

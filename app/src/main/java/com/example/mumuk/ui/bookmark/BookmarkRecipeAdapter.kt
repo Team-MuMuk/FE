@@ -1,4 +1,4 @@
-package com.example.mumuk.ui.home
+package com.example.mumuk.ui.bookmark
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -9,7 +9,7 @@ import com.example.mumuk.R
 import com.example.mumuk.data.model.Recipe
 import com.example.mumuk.databinding.ItemRecipeBinding
 
-class RecommendRecipeAdapter : ListAdapter<Recipe, RecommendRecipeAdapter.RecipeViewHolder>(RecipeDiffCallback()) {
+class BookmarkRecipeAdapter : ListAdapter<Recipe, BookmarkRecipeAdapter.RecipeViewHolder>(RecipeDiffCallback()) {
 
     var onItemClick: ((Recipe) -> Unit)? = null
 
@@ -20,8 +20,6 @@ class RecommendRecipeAdapter : ListAdapter<Recipe, RecommendRecipeAdapter.Recipe
             if (recipe.img != null) {
                 binding.recipeImg.setImageResource(recipe.img)
             } else {
-                // 뷰 재사용 시 다른 이미지가 남아있는 것을 방지하기 위해 기본 이미지를 명시적으로 설정합니다.
-                // item_recipe.xml의 기본 이미지와 동일하게 맞춰주세요.
                 binding.recipeImg.setImageResource(R.drawable.bg_mosaic)
             }
             binding.recipeTitle.text = recipe.title
