@@ -42,6 +42,18 @@ class MainActivity : AppCompatActivity() {
                 false
             }
         }
+
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            when (destination.id) {
+                R.id.healthManagementFragment,
+                     R.id.healthCompleteFragment-> {
+                    hideBottomNav()
+                }
+                else -> {
+                    showBottomNav()
+                }
+            }
+        }
     }
 
     fun hideBottomNav() {
