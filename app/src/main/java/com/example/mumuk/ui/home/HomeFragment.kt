@@ -32,10 +32,6 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.imageView3.setOnClickListener {
-            findNavController().navigate(R.id.action_navigation_home_to_recommendFragment)
-        }
-
         binding.infoBtn.setOnClickListener {
             showInfoPopup(it)
         }
@@ -81,7 +77,7 @@ class HomeFragment : Fragment() {
     private fun setupRecyclerView(recyclerView: RecyclerView, recipeList: List<Recipe>) {
         recyclerView.apply {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-            adapter = RecipeAdapter(recipeList) {
+            adapter = HomeRecipeAdapter(recipeList) {
                 findNavController().navigate(R.id.action_navigation_home_to_recipeFragment)
             }
         }

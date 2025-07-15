@@ -10,7 +10,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.mumuk.R
 import com.example.mumuk.databinding.FragmentBookmarkRecipeBinding
-import com.example.mumuk.ui.home.RecommendRecipeAdapter
 
 class BookmarkRecipeFragment : Fragment() {
 
@@ -33,7 +32,7 @@ class BookmarkRecipeFragment : Fragment() {
             findNavController().navigateUp()
         }
 
-        val recipeAdapter = RecommendRecipeAdapter()
+        val recipeAdapter = BookmarkRecipeAdapter()
 
         recipeAdapter.onItemClick = {
             findNavController().navigate(R.id.action_bookmarkRecipeFragment_to_recipeFragment)

@@ -7,8 +7,8 @@ import com.example.mumuk.R
 import com.example.mumuk.data.model.Recipe
 import com.example.mumuk.databinding.ItemRecipeBinding
 
-class RecipeAdapter(private val recipes: List<Recipe>, private val onItemClick: (Recipe) -> Unit) :
-    RecyclerView.Adapter<RecipeAdapter.RecipeViewHolder>() {
+class HomeRecipeAdapter(private val recipes: List<Recipe>, private val onItemClick: (Recipe) -> Unit) :
+    RecyclerView.Adapter<HomeRecipeAdapter.RecipeViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecipeViewHolder {
         val binding = ItemRecipeBinding.inflate(LayoutInflater.from(parent.context), parent, false)
