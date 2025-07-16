@@ -8,6 +8,14 @@ import androidx.core.view.WindowInsetsCompat
 import com.example.mumuk.R
 
 class SignupActivity : AppCompatActivity() {
+    var name: String = ""
+    var nickname: String = ""
+    var phoneNumber: String = ""
+    var loginId: String = ""
+    var password: String = ""
+    var confirmPassword: String = ""
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()

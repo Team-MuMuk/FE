@@ -11,6 +11,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.commit
 import com.example.mumuk.R
 import com.example.mumuk.databinding.ActivityLoginBinding
+import com.example.mumuk.ui.MainActivity
 
 class LoginActivity : AppCompatActivity() {
 
@@ -30,6 +31,13 @@ class LoginActivity : AppCompatActivity() {
             startActivity(Intent(this, LoginIntroActivity::class.java))
             finish()
         }
+
+        binding.btnLogin.setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+        }
+
 
         binding.ivTogglePw.setOnClickListener {
             isPasswordVisible = !isPasswordVisible

@@ -49,50 +49,48 @@ class FindAccountFragment : Fragment() {
         }
 
         binding.btnConfirmCode.setOnClickListener {
-            showCustomDialog("인증코드가 확인되었습니다.", R.layout.dialog_confirm)
+            showCustomDialog(
+                message = "인증코드가 확인되었습니다.",
+                layoutResId = R.layout.dialog_confirm,
+                buttonText = "아이디 확인하기"
+            ) {
+                showIdDialog("mumuk123")
+            }
         }
 
         binding.btnSendCodePw.setOnClickListener {
-            showCustomDialog("인증코드가 발송되었습니다.", R.layout.dialog_code_sent)
+            showCustomDialog("임시 비밀번호가 발송되었습니다.", R.layout.dialog_code_sent)
         }
 
-        // ✅ 비밀번호 찾기 > 인증 확인 → 비밀번호 변경 화면으로 전환
+
         binding.btnConfirmCodePw.setOnClickListener {
-            showCustomDialog("인증코드가 확인되었습니다.", R.layout.dialog_confirm) {
-                showChangePwLayout()
+            showCustomDialog(
+                message = "임시 비밀번호가 설정되었습니다.",
+                layoutResId = R.layout.dialog_confirm,
+                buttonText = "새 비밀번호 만들기"
+            ) {
+                val containerId = when (requireActivity()) {
+                    is LoginActivity -> R.id.login_fragment_container
+                    is LoginIntroActivity -> R.id.login_intro_fragment_container
+                    else -> throw IllegalStateException("알 수 없는 액티비티입니다.")
+                }
+
+                parentFragmentManager.beginTransaction()
+                    .replace(containerId, ChangePwFragment())
+                    .addToBackStack(null)
+                    .commit()
             }
         }
 
-        // ✅ 비밀번호 변경 완료 처리
-        binding.btnConfirmChangePw.setOnClickListener {
-            val pw = binding.etPw.text.toString()
-            val pwNew = binding.etPwNew.text.toString()
 
-            val pwPattern =
-                Regex("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@\$!%*#?&])[A-Za-z\\d@\$!%*#?&]{3,}$")
 
-            if (!pwPattern.matches(pw)) {
-                binding.tvPwFormatStatus.text = "비밀번호 형식에 맞지 않습니다. 영문자, 특수문자, 숫자 조합으로 작성해주세요"
-                binding.tvPwStatus.text = ""
-                return@setOnClickListener
-            } else {
-                binding.tvPwFormatStatus.text = ""
-            }
 
-            if (pw != pwNew) {
-                binding.tvPwStatus.text = "비밀번호가 일치하지 않습니다"
-                return@setOnClickListener
-            } else {
-                binding.tvPwStatus.text = ""
-                showPasswordChangedDialog()
-            }
-        }
+
     }
 
     private fun showFindIdLayout() {
         binding.layoutFindId.visibility = View.VISIBLE
         binding.layoutFindPw.visibility = View.GONE
-        binding.layoutChangePw.visibility = View.GONE
 
         binding.tabFindId.setTextColor(resources.getColor(R.color.black))
         binding.tabFindPw.setTextColor(Color.parseColor("#A2A2A2"))
@@ -106,7 +104,6 @@ class FindAccountFragment : Fragment() {
     private fun showFindPwLayout() {
         binding.layoutFindId.visibility = View.GONE
         binding.layoutFindPw.visibility = View.VISIBLE
-        binding.layoutChangePw.visibility = View.GONE
 
         binding.tabFindPw.setTextColor(resources.getColor(R.color.black))
         binding.tabFindId.setTextColor(Color.parseColor("#A2A2A2"))
@@ -117,57 +114,47 @@ class FindAccountFragment : Fragment() {
         binding.subline.layoutParams = params
     }
 
-    private fun showChangePwLayout() {
-        binding.layoutFindId.visibility = View.GONE
-        binding.layoutFindPw.visibility = View.GONE
-        binding.layoutChangePw.visibility = View.VISIBLE
-    }
 
-    private fun showPasswordChangedDialog() {
+    fun showCustomDialog(
+        message: String,
+        layoutResId: Int,
+        buttonText: String = "확인",
+        onButtonClick: (() -> Unit)? = null
+    ) {
         val dialog = Dialog(requireContext())
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setContentView(R.layout.dialog_pw_changed)
-
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialog.window?.setLayout(
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-        dialog.window?.setGravity(Gravity.CENTER)
-
-        val btnOk = dialog.findViewById<TextView>(R.id.btn_dialog_ok)
-        btnOk?.setOnClickListener {
-            dialog.dismiss()
-            startActivity(Intent(requireContext(), LoginActivity::class.java))
-            requireActivity().finish()
-        }
-
-        dialog.show()
-    }
-
-    private fun showCustomDialog(message: String, layoutResId: Int, onOk: (() -> Unit)? = null) {
-        val dialog = Dialog(requireContext())
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(layoutResId)
-
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialog.window?.setLayout(
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-        dialog.window?.setGravity(Gravity.CENTER)
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
         val tvMessage = dialog.findViewById<TextView>(R.id.tv_dialog_message)
-        val btnOk = dialog.findViewById<TextView>(R.id.btn_dialog_ok)
+        tvMessage.text = message
 
-        tvMessage?.text = message
-        btnOk?.setOnClickListener {
+        val btnOk = dialog.findViewById<TextView>(R.id.btn_dialog_ok)
+        btnOk.text = buttonText
+        btnOk.setOnClickListener {
             dialog.dismiss()
-            onOk?.invoke()
+            onButtonClick?.invoke()
         }
 
         dialog.show()
     }
+
+    fun showIdDialog(userId: String) {
+        val dialog = Dialog(requireContext())
+        dialog.setContentView(R.layout.dialog_show_id)
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        val tvMessage = dialog.findViewById<TextView>(R.id.tv_dialog_message)
+        tvMessage.text = "아이디는\n$userId 입니다."
+
+        val btnOk = dialog.findViewById<TextView>(R.id.btn_dialog_ok)
+        btnOk.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
+    }
+
+
 
     override fun onDestroyView() {
         super.onDestroyView()
