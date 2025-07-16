@@ -1,4 +1,4 @@
-package com.example.mumuk.ui.home
+package com.example.mumuk.ui.bookmark
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,19 +9,19 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.mumuk.R
-import com.example.mumuk.databinding.FragmentRecommendBinding
+import com.example.mumuk.databinding.FragmentBookmarkRecipeBinding
 
-class RecommendFragment : Fragment() {
+class BookmarkRecipeFragment : Fragment() {
 
-    private var _binding: FragmentRecommendBinding? = null
+    private var _binding: FragmentBookmarkRecipeBinding? = null
     private val binding get() = _binding!!
-    private val recommendViewModel: RecommendViewModel by viewModels()
+    private val bookmarkViewModel: BookmarkRecipeViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentRecommendBinding.inflate(inflater, container, false)
+        _binding = FragmentBookmarkRecipeBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -32,10 +32,10 @@ class RecommendFragment : Fragment() {
             findNavController().navigateUp()
         }
 
-        val recipeAdapter = RecommendRecipeAdapter()
+        val recipeAdapter = BookmarkRecipeAdapter()
 
         recipeAdapter.onItemClick = {
-            findNavController().navigate(R.id.action_recommendFragment_to_recipeFragment)
+            findNavController().navigate(R.id.action_bookmarkRecipeFragment_to_recipeFragment)
         }
 
         binding.recipeRV.apply {
@@ -43,9 +43,10 @@ class RecommendFragment : Fragment() {
             layoutManager = GridLayoutManager(context, 2)
         }
 
-        recommendViewModel.recipes.observe(viewLifecycleOwner) { recipes ->
+        bookmarkViewModel.recipes.observe(viewLifecycleOwner) { recipes ->
             recipeAdapter.submitList(recipes)
         }
+
     }
 
     override fun onDestroyView() {

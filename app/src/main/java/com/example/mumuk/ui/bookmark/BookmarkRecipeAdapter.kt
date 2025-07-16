@@ -1,14 +1,15 @@
-package com.example.mumuk.ui.home
+package com.example.mumuk.ui.bookmark
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.example.mumuk.R
 import com.example.mumuk.data.model.Recipe
 import com.example.mumuk.databinding.ItemRecipeBinding
 
-class RecommendRecipeAdapter : ListAdapter<Recipe, RecommendRecipeAdapter.RecipeViewHolder>(RecipeDiffCallback()) {
+class BookmarkRecipeAdapter : ListAdapter<Recipe, BookmarkRecipeAdapter.RecipeViewHolder>(RecipeDiffCallback()) {
 
     var onItemClick: ((Recipe) -> Unit)? = null
 
@@ -16,7 +17,11 @@ class RecommendRecipeAdapter : ListAdapter<Recipe, RecommendRecipeAdapter.Recipe
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(recipe: Recipe) {
-            binding.recipeImg.setImageResource(recipe.img)
+            if (recipe.img != null) {
+                binding.recipeImg.setImageResource(recipe.img)
+            } else {
+                binding.recipeImg.setImageResource(R.drawable.bg_mosaic)
+            }
             binding.recipeTitle.text = recipe.title
         }
     }

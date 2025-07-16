@@ -10,13 +10,6 @@
         android:name="com.example.mumuk.ui.home.HomeFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_home" >
-        <action
-            android:id="@+id/action_navigation_home_to_recommendFragment"
-            app:destination="@id/recommendFragment"
-            app:enterAnim="@anim/slide_in_right"
-            app:exitAnim="@anim/hold"
-            app:popEnterAnim="@anim/hold"
-            app:popExitAnim="@anim/slide_out_right"/>
 
         <action
             android:id="@+id/action_navigation_home_to_recipeFragment"
@@ -33,6 +26,18 @@
             app:exitAnim="@anim/hold"
             app:popEnterAnim="@anim/hold"
             app:popExitAnim="@anim/slide_out_right"/>
+
+        <action
+            android:id="@+id/action_navigation_home_to_bookmarkRecipeFragment"
+            app:destination="@id/bookmarkRecipeFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/hold"
+            app:popEnterAnim="@anim/hold"
+            app:popExitAnim="@anim/slide_out_right"/>
+
+        <action
+            android:id="@+id/action_navigation_home_to_categoryFragment"
+            app:destination="@id/navigation_category" />
     </fragment>
 
     <fragment
@@ -90,20 +95,6 @@
         android:name="com.example.mumuk.ui.mypage.FavoriteRecipeFragment"
         android:label="찜한 레시피"
         tools:layout="@layout/fragment_favorite_recipe" />
-
-    <fragment
-        android:id="@+id/recommendFragment"
-        android:name="com.example.mumuk.ui.home.RecommendFragment"
-        android:label="fragment_recommend"
-        tools:layout="@layout/fragment_recommend" >
-        <action
-            android:id="@+id/action_recommendFragment_to_recipeFragment"
-            app:destination="@id/recipeFragment"
-            app:enterAnim="@anim/slide_in_right"
-            app:exitAnim="@anim/hold"
-            app:popEnterAnim="@anim/hold"
-            app:popExitAnim="@anim/slide_out_right"/>
-    </fragment>
 
     <fragment
         android:id="@+id/recipeFragment"
@@ -167,5 +158,19 @@
             app:exitAnim="@android:anim/fade_out"
             app:popEnterAnim="@android:anim/fade_in"
             app:popExitAnim="@android:anim/fade_out" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/bookmarkRecipeFragment"
+        android:name="com.example.mumuk.ui.bookmark.BookmarkRecipeFragment"
+        android:label="fragment_bookmark_recipe"
+        tools:layout="@layout/fragment_bookmark_recipe" >
+        <action
+            android:id="@+id/action_bookmarkRecipeFragment_to_recipeFragment"
+            app:destination="@id/recipeFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/hold"
+            app:popEnterAnim="@anim/hold"
+            app:popExitAnim="@anim/slide_out_right"/>
     </fragment>
 </navigation>

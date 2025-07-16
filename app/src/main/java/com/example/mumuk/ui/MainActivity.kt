@@ -9,8 +9,9 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import com.example.mumuk.R
 import com.example.mumuk.databinding.ActivityMainBinding
+import com.example.mumuk.ui.home.HomeFragment
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), HomeFragment.BottomNavSelector {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
@@ -54,6 +55,10 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    override fun selectBottomNavItem(itemId: Int) {
+        binding.bottomNavView.selectedItemId = itemId
     }
 
     fun hideBottomNav() {
