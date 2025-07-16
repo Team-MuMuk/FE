@@ -158,13 +158,36 @@ class MyPageFragment : Fragment() {
             RecentRecipe("아보카도 포케", R.drawable.bg_mosaic, liked = false)
         )
 
-        // 🔹 RecyclerView 연결
+        // ㄹRecyclerView 연결
         binding.rvRecentRecipes.apply {
             adapter = RecentRecipeAdapter(recentList) { recipe ->
                 findNavController().navigate(R.id.recipeFragment)
             }
             layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         }
+
+        arguments?.let { bundle ->
+            bundle.getString("nickname")?.let { nickname ->
+                binding.tvNickname.text = buildString {
+                    append(nickname)
+                    append("님!")
+                }
+            }
+
+            bundle.getString("status")?.let { status ->
+                binding.tvSubtitle.text = status
+            }
+
+            bundle.getString("name")?.let { name ->
+            }
+
+            val profileImageResId = bundle.getInt(
+                "profileImageResId",
+                R.drawable.ic_user_profile_orange
+            )
+            binding.imgProfile.setImageResource(profileImageResId)
+        }
+
 
     }
 

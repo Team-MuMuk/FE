@@ -50,7 +50,6 @@
     </LinearLayout>
 
 
-
     <ImageView
         android:id="@+id/ic_profile"
         android:layout_width="90dp"

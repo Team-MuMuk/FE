@@ -77,7 +77,7 @@
             app:layout_constraintBottom_toTopOf="@id/btn_login"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="12dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
 
@@ -86,7 +86,7 @@
             android:id="@+id/btn_login"
             android:layout_width="350dp"
             android:layout_height="60dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="12dp"
             android:background="@drawable/btn_signup_bg_green"
             android:backgroundTint="#29AB87"
             android:backgroundTintMode="src_atop"
@@ -104,7 +104,7 @@
             android:layout_height="1dp"
             android:background="#CFCFCF"
             app:layout_constraintTop_toBottomOf="@id/btn_login"
-            android:layout_marginTop="25dp"
+            android:layout_marginTop="40dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
 
@@ -112,7 +112,7 @@
             android:id="@+id/btn_login_naver"
             android:layout_width="350dp"
             android:layout_height="60dp"
-            android:layout_marginTop="25dp"
+            android:layout_marginTop="40dp"
             android:background="@drawable/btn_signup_bg_green"
             android:backgroundTint="#03C75B"
             android:backgroundTintMode="src_atop"
@@ -128,7 +128,7 @@
             android:id="@+id/btn_login_kakao"
             android:layout_width="350dp"
             android:layout_height="60dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="12dp"
             android:background="@drawable/btn_signup_bg_green"
             android:backgroundTint="#FDE500"
             android:backgroundTintMode="src_atop"
@@ -144,7 +144,7 @@
             android:id="@+id/btn_login_samsung"
             android:layout_width="350dp"
             android:layout_height="60dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="12dp"
             android:background="@drawable/btn_signup_bg_green"
             android:backgroundTint="#2238DF"
             android:backgroundTintMode="src_atop"
@@ -163,7 +163,7 @@
             android:textColor="#BDBDBD"
             android:textSize="14sp"
             android:textStyle="bold"
-            android:layout_marginTop="38dp"
+            android:layout_marginTop="40dp"
             app:layout_constraintTop_toBottomOf="@id/btn_login_samsung"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
