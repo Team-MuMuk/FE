@@ -24,7 +24,7 @@
             android:background="@color/white">
 
             <ImageView
-                android:id="@+id/recipeImg"
+                android:id="@+id/iv_recipe_image"
                 android:layout_width="177.88dp"
                 android:layout_height="164dp"
                 android:scaleType="centerCrop"
@@ -34,28 +34,29 @@
                 app:srcCompat="@drawable/bg_mosaic" />
 
             <TextView
-                android:id="@+id/recipeTitle"
+                android:id="@+id/tv_recipe_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="32dp"
-                android:text="두부유부초밥"
+                android:text="연어 포케"
+                android:textColor="@color/black"
                 android:textSize="16dp"
                 android:textStyle="bold"
 
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/recipeImg" />
+                app:layout_constraintTop_toBottomOf="@+id/iv_recipe_image" />
 
             <ImageView
-                android:id="@+id/imageView6"
+                android:id="@+id/iv_recipe_heart"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
-                app:layout_constraintBottom_toBottomOf="@+id/recipeTitle"
+                app:layout_constraintBottom_toBottomOf="@+id/tv_recipe_title"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/recipeTitle"
+                app:layout_constraintTop_toTopOf="@+id/tv_recipe_title"
                 app:srcCompat="@drawable/btn_heart_blank" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>

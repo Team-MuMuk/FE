@@ -102,202 +102,88 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:paddingHorizontal="20dp"
             android:visibility="visible">
 
+            <!-- 이름 입력 -->
+            <EditText
+                android:id="@+id/et_name"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:hint="이름 입력"
+                android:background="@android:color/transparent"
+                android:textColor="@color/black"
+                android:textColorHint="#A2A2A2"
+                android:textSize="16sp"
+                android:inputType="textPersonName"
+                android:paddingStart="10dp"
+                android:paddingBottom="5dp"
+                android:gravity="bottom"
+                android:layout_marginTop="32dp"/>
+
+            <View
+                android:layout_width="263dp"
+                android:layout_height="1dp"
+                android:background="#CFCFCF"
+                android:layout_marginTop="4dp"/>
+
+            <!-- 휴대전화 번호 입력 + 인증 전송 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:layout_marginTop="32dp"
-                android:layout_marginStart="20dp">
-
+                android:layout_marginTop="24dp">
 
                 <EditText
-                    android:id="@+id/et_email"
+                    android:id="@+id/et_num"
                     android:layout_width="0dp"
                     android:layout_height="48dp"
                     android:layout_weight="1"
-                    android:hint="이메일 입력"
+                    android:hint="휴대전화 번호입력"
                     android:background="@android:color/transparent"
                     android:textColor="@color/black"
                     android:textColorHint="#A2A2A2"
                     android:textSize="16sp"
-                    android:inputType="textEmailAddress"
+                    android:inputType="phone"
                     android:paddingStart="10dp"
                     android:paddingBottom="5dp"
                     android:gravity="bottom"/>
 
                 <View
                     android:layout_width="8dp"
-                    android:layout_height="1dp" />
+                    android:layout_height="1dp"/>
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/btn_send_code"
                     android:layout_width="110dp"
                     android:layout_height="48dp"
-                    android:minWidth="100dp"
-                    android:layout_marginEnd="10dp"
                     android:background="@drawable/btn_signup_bg_green"
-                    android:text="인증코드 전송"
+                    android:text="인증번호 전송"
                     android:textColor="@android:color/white"
-                    android:textStyle="bold"/>
+                    />
             </LinearLayout>
 
             <View
                 android:layout_width="263dp"
                 android:layout_height="1dp"
                 android:background="#CFCFCF"
-                android:layout_marginTop="4dp"
-                android:layout_marginStart="20dp"/>
+                android:layout_marginTop="4dp"/>
 
+            <!-- 인증번호 입력 + 확인 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:layout_marginTop="32dp"
-                android:layout_marginStart="20dp">
+                android:layout_marginTop="24dp">
 
                 <EditText
+                    android:id="@+id/et_code"
                     android:layout_width="0dp"
                     android:layout_height="48dp"
                     android:layout_weight="1"
-                    android:hint="인증코드 입력"
-                    android:background="@android:color/transparent"
-                    android:textColor="@color/black"
-                    android:textColorHint="#A2A2A2"
-                    android:textSize="16sp"
-                    android:inputType="textEmailAddress"
-                    android:paddingStart="10dp"
-                    android:paddingBottom="5dp"
-                    android:gravity="bottom"/>
-
-                <View
-                    android:layout_width="8dp"
-                    android:layout_height="1dp" />
-
-                <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/btn_confirm_code"
-                    android:layout_width="110dp"
-                    android:layout_height="48dp"
-                    android:minWidth="100dp"
-                    android:layout_marginEnd="10dp"
-                    android:background="@drawable/btn_signup_bg_green"
-                    android:text="확인"
-                    android:textColor="@android:color/white"
-                    android:textStyle="bold"/>
-            </LinearLayout>
-
-            <View
-                android:layout_width="263dp"
-                android:layout_height="1dp"
-                android:background="#CFCFCF"
-                android:layout_marginTop="4dp"
-                android:layout_marginStart="20dp"/>
-        </LinearLayout>
-
-
-
-        <!-- 비밀번호 찾기 영역 -->
-        <LinearLayout
-            android:id="@+id/layout_find_pw"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:visibility="gone">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginTop="32dp"
-                android:layout_marginStart="20dp">
-
-                <EditText
-                    android:id="@+id/et_id"
-                    android:layout_width="0dp"
-                    android:layout_height="48dp"
-                    android:layout_weight="1"
-                    android:hint="아이디 입력"
-                    android:background="@android:color/transparent"
-                    android:textColor="@color/black"
-                    android:textColorHint="#A2A2A2"
-                    android:textSize="16sp"
-                    android:inputType="text"
-                    android:paddingStart="10dp"
-                    android:paddingBottom="5dp"
-                    android:gravity="bottom" />
-            </LinearLayout>
-
-            <View
-                android:layout_width="263dp"
-                android:layout_height="1dp"
-                android:background="#CFCFCF"
-                android:layout_marginTop="4dp"
-                android:layout_marginStart="20dp"/>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginTop="32dp"
-                android:layout_marginStart="20dp">
-
-                <EditText
-                    android:id="@+id/et_email_pw"
-                    android:layout_width="0dp"
-                    android:layout_height="48dp"
-                    android:layout_weight="1"
-                    android:hint="이메일 입력"
-                    android:background="@android:color/transparent"
-                    android:textColor="@color/black"
-                    android:textColorHint="#A2A2A2"
-                    android:textSize="16sp"
-                    android:inputType="textEmailAddress"
-                    android:paddingStart="10dp"
-                    android:paddingBottom="5dp"
-                    android:gravity="bottom"/>
-
-                <View
-                    android:layout_width="8dp"
-                    android:layout_height="1dp" />
-
-                <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/btn_send_code_pw"
-                    android:layout_width="110dp"
-                    android:layout_height="48dp"
-                    android:minWidth="100dp"
-                    android:layout_marginEnd="10dp"
-                    android:background="@drawable/btn_signup_bg_green"
-                    android:text="인증코드 전송"
-                    android:textColor="@android:color/white"
-                    android:textStyle="bold"/>
-            </LinearLayout>
-
-            <View
-                android:layout_width="263dp"
-                android:layout_height="1dp"
-                android:background="#CFCFCF"
-                android:layout_marginTop="4dp"
-                android:layout_marginStart="20dp"/>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginTop="32dp"
-                android:layout_marginStart="20dp">
-
-                <EditText
-                    android:id="@+id/et_code_pw"
-                    android:layout_width="0dp"
-                    android:layout_height="48dp"
-                    android:layout_weight="1"
-                    android:hint="인증코드 입력"
+                    android:hint="인증번호 입력"
                     android:background="@android:color/transparent"
                     android:textColor="@color/black"
                     android:textColorHint="#A2A2A2"
@@ -309,143 +195,167 @@
 
                 <View
                     android:layout_width="8dp"
-                    android:layout_height="1dp" />
+                    android:layout_height="1dp"/>
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btn_confirm_code"
+                    android:layout_width="110dp"
+                    android:layout_height="48dp"
+                    android:background="@drawable/btn_signup_bg_green"
+                    android:text="확인"
+                    android:textColor="@android:color/white"
+                    />
+            </LinearLayout>
+
+            <View
+                android:layout_width="263dp"
+                android:layout_height="1dp"
+                android:background="#CFCFCF"
+                android:layout_marginTop="4dp"/>
+        </LinearLayout>
+
+
+
+
+        <!-- 비밀번호 찾기 영역 -->
+        <LinearLayout
+            android:id="@+id/layout_find_pw"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:paddingHorizontal="20dp">
+
+            <!-- 이름 입력 -->
+            <EditText
+                android:id="@+id/et_name_pw"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="32dp"
+                android:hint="이름 입력"
+                android:background="@android:color/transparent"
+                android:textColor="@color/black"
+                android:textColorHint="#A2A2A2"
+                android:textSize="16sp"
+                android:inputType="textPersonName"
+                android:paddingStart="10dp"
+                android:paddingBottom="5dp"
+                android:gravity="bottom"/>
+
+            <View
+                android:layout_width="263dp"
+                android:layout_height="1dp"
+                android:background="#CFCFCF"
+                android:layout_marginTop="4dp"/>
+
+            <!-- 아이디 입력 -->
+            <EditText
+                android:id="@+id/et_id_pw"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="24dp"
+                android:hint="아이디 입력"
+                android:background="@android:color/transparent"
+                android:textColor="@color/black"
+                android:textColorHint="#A2A2A2"
+                android:textSize="16sp"
+                android:inputType="text"
+                android:paddingStart="10dp"
+                android:paddingBottom="5dp"
+                android:gravity="bottom"/>
+
+            <View
+                android:layout_width="263dp"
+                android:layout_height="1dp"
+                android:background="#CFCFCF"
+                android:layout_marginTop="4dp"/>
+
+            <!-- 휴대전화 + 전송 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="24dp">
+
+                <EditText
+                    android:id="@+id/et_phone_pw"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:hint="휴대전화 번호입력"
+                    android:background="@android:color/transparent"
+                    android:textColor="@color/black"
+                    android:textColorHint="#A2A2A2"
+                    android:textSize="16sp"
+                    android:inputType="phone"
+                    android:paddingStart="10dp"
+                    android:paddingBottom="5dp"
+                    android:gravity="bottom"/>
+
+                <View
+                    android:layout_width="8dp"
+                    android:layout_height="1dp"/>
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btn_send_code_pw"
+                    android:layout_width="115dp"
+                    android:layout_height="48dp"
+                    android:background="@drawable/btn_signup_bg_green"
+                    android:text="임시 비밀번호 전송"
+                    android:textColor="@android:color/white"
+                    />
+            </LinearLayout>
+
+            <View
+                android:layout_width="263dp"
+                android:layout_height="1dp"
+                android:layout_marginTop="4dp"
+                android:background="#CFCFCF"/>
+
+            <!-- 인증번호 입력 + 확인 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="24dp">
+
+                <EditText
+                    android:id="@+id/et_code_pw"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:hint="임시 비밀번호 입력"
+                    android:background="@android:color/transparent"
+                    android:textColor="@color/black"
+                    android:textColorHint="#A2A2A2"
+                    android:textSize="16sp"
+                    android:inputType="number"
+                    android:paddingStart="10dp"
+                    android:paddingBottom="5dp"
+                    android:gravity="bottom"/>
+
+                <View
+                    android:layout_width="8dp"
+                    android:layout_height="1dp"/>
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/btn_confirm_code_pw"
                     android:layout_width="110dp"
                     android:layout_height="48dp"
-                    android:minWidth="100dp"
-                    android:layout_marginEnd="10dp"
                     android:background="@drawable/btn_signup_bg_green"
                     android:text="확인"
                     android:textColor="@android:color/white"
-                    android:textStyle="bold"/>
+                    />
             </LinearLayout>
 
             <View
                 android:layout_width="263dp"
                 android:layout_height="1dp"
-                android:background="#CFCFCF"
                 android:layout_marginTop="4dp"
-                android:layout_marginStart="20dp"/>
+                android:background="#CFCFCF"/>
         </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/layout_change_pw"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:visibility="gone">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginTop="32dp"
-                android:layout_marginStart="20dp">
-
-                <EditText
-                    android:id="@+id/et_pw"
-                    android:layout_width="0dp"
-                    android:layout_height="48dp"
-                    android:layout_weight="1"
-                    android:hint="새로운 비밀번호 입력"
-                    android:background="@android:color/transparent"
-                    android:textColor="@color/black"
-                    android:textColorHint="#A2A2A2"
-                    android:textSize="16sp"
-                    android:inputType="textEmailAddress"
-                    android:paddingStart="10dp"
-                    android:paddingBottom="5dp"
-                    android:gravity="bottom"/>
-
-                <View
-                    android:layout_width="8dp"
-                    android:layout_height="1dp" />
-
-            </LinearLayout>
-
-            <View
-                android:layout_width="263dp"
-                android:layout_height="1dp"
-                android:background="#CFCFCF"
-                android:layout_marginTop="4dp"
-                android:layout_marginStart="20dp"/>
-
-            <TextView
-                android:id="@+id/tv_pw_format_status"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="4dp"
-                android:text=""
-                android:textColor="#FF3B30"
-                android:textSize="12sp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginTop="32dp"
-                android:layout_marginStart="20dp">
-
-                <EditText
-                    android:id="@+id/et_pw_new"
-                    android:layout_width="0dp"
-                    android:layout_height="48dp"
-                    android:layout_weight="1"
-                    android:hint="새로운 비밀번호 확인"
-                    android:background="@android:color/transparent"
-                    android:textColor="@color/black"
-                    android:textColorHint="#A2A2A2"
-                    android:textSize="16sp"
-                    android:inputType="textEmailAddress"
-                    android:paddingStart="10dp"
-                    android:paddingBottom="5dp"
-                    android:gravity="bottom"/>
-
-                <View
-                    android:layout_width="8dp"
-                    android:layout_height="1dp" />
-
-                <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/btn_confirm_change_pw"
-                    android:layout_width="110dp"
-                    android:layout_height="48dp"
-                    android:minWidth="100dp"
-                    android:layout_marginEnd="10dp"
-                    android:background="@drawable/btn_signup_bg_green"
-                    android:text="확인"
-                    android:textColor="@android:color/white"
-                    android:textStyle="bold"/>
-            </LinearLayout>
-
-            <View
-                android:layout_width="263dp"
-                android:layout_height="1dp"
-                android:background="#CFCFCF"
-                android:layout_marginTop="4dp"
-                android:layout_marginStart="20dp"/>
-
-
-            <TextView
-                android:id="@+id/tv_pw_status"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="4dp"
-                android:text=""
-                android:textColor="#FF3B30"
-                android:textSize="12sp" />
-
-
-
-
-        </LinearLayout>
-
 
     </LinearLayout>
 
