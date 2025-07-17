@@ -91,21 +91,18 @@ class CategoryRandomRecipeFragment : Fragment() {
         val items = when (tabName) {
             "랜덤식단" -> listOf(
                 Recipe(
-                    imageResId = R.drawable.img_food_sample,
+                    img = R.drawable.img_food_sample,
                     title = "연어 포케",
-                    subtitle = "신선한 연어와 채소",
                     isLiked = false
                 ),
                 Recipe(
-                    imageResId = R.drawable.img_food_sample,
+                    img = R.drawable.img_food_sample,
                     title = "바질 파스타",
-                    subtitle = "향긋한 바질과 건강한 파스타",
                     isLiked = false
                 ),
                 Recipe(
-                    imageResId = R.drawable.img_food_sample,
+                    img = R.drawable.img_food_sample,
                     title = "두부유부초밥",
-                    subtitle = "담백한 두부와 유부의 만남",
                     isLiked = false
                 )
             )

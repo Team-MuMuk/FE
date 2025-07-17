@@ -119,6 +119,7 @@
             app:destination="@id/recipeFragment" />
     </fragment>
 
+    <fragment
         android:id="@+id/healthManagementFragment"
         android:name="com.example.mumuk.ui.health.HealthManagementFragment"
         android:label="HealthManagementFragment"

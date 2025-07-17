@@ -98,57 +98,49 @@ class CategoryLowSugarFragment : Fragment() {
         val items = when (tabName) {
             "당 줄이기" -> listOf(
                 Recipe(
-                    imageResId = R.drawable.img_food_sample,
+                    img = R.drawable.img_food_sample,
                     title = "연어 포케",
-                    subtitle = "신선한 연어와 채소가 듬뿍!",
                     isLiked = false
                 ),
                 Recipe(
-                    imageResId = R.drawable.img_food_sample,
+                    img = R.drawable.img_food_sample,
                     title = "두부유부초밥",
-                    subtitle = "부드럽고 고소하게",
                     isLiked = true
                 )
             )
             "혈압관리" -> listOf(
                 Recipe(
-                    imageResId = R.drawable.img_food_sample,
+                    img = R.drawable.img_food_sample,
                     title = "닭가슴살 샐러드",
-                    subtitle = "담백한 단백질 샐러드",
                     isLiked = false
                 ),
                 Recipe(
-                    imageResId = R.drawable.img_food_sample,
+                    img = R.drawable.img_food_sample,
                     title = "오트밀죽",
-                    subtitle = "부드러운 한끼",
                     isLiked = false
                 )
             )
             "콜레스테롤 관리" -> listOf(
                 Recipe(
-                    imageResId = R.drawable.img_food_sample,
+                    img = R.drawable.img_food_sample,
                     title = "아보카도 샐러드",
-                    subtitle = "건강한 지방 가득",
                     isLiked = false
                 ),
                 Recipe(
-                    imageResId = R.drawable.img_food_sample,
+                    img = R.drawable.img_food_sample,
                     title = "병아리콩스튜",
-                    subtitle = "식이섬유로 콜레스테롤 관리",
                     isLiked = false
                 )
             )
             "소화 건강" -> listOf(
                 Recipe(
-                    imageResId = R.drawable.img_food_sample,
+                    img = R.drawable.img_food_sample,
                     title = "요거트볼",
-                    subtitle = "유산균 가득 요거트",
                     isLiked = false
                 ),
                 Recipe(
-                    imageResId = R.drawable.img_food_sample,
+                    img = R.drawable.img_food_sample,
                     title = "바나나 오트밀",
-                    subtitle = "소화를 돕는 바나나와 오트밀",
                     isLiked = false
                 )
             )

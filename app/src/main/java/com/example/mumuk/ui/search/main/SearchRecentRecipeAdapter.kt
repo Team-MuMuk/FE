@@ -25,7 +25,7 @@ class SearchRecentRecipeAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = recipes[position]
         holder.binding.recipeTitle.text = item.title
-        holder.binding.recipeImg.setImageResource(item.imageResId)
+        item.img?.let { holder.binding.recipeImg.setImageResource(it) } ?: holder.binding.recipeImg.setImageDrawable(null)
         holder.binding.imageView6.setImageResource(
             if (item.isLiked) com.example.mumuk.R.drawable.btn_heart_blank
             else com.example.mumuk.R.drawable.btn_heart_blank

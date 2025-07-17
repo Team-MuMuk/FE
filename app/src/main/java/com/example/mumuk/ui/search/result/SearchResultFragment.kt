@@ -19,27 +19,23 @@ class SearchResultFragment : Fragment() {
 
     private val dummyList = listOf(
         Recipe(
-            imageResId = R.drawable.img_food_sample,
+            img = R.drawable.img_food_sample,
             title = "연어 포케",
-            subtitle = "HEALTHY",
             isLiked = false
         ),
         Recipe(
-            imageResId = R.drawable.img_food_sample,
+            img = R.drawable.img_food_sample,
             title = "닭가슴살 포케",
-            subtitle = "PROTEIN",
             isLiked = false
         ),
         Recipe(
-            imageResId = R.drawable.img_food_sample,
+            img = R.drawable.img_food_sample,
             title = "아보카도 포케",
-            subtitle = "VEGAN",
             isLiked = false
         ),
         Recipe(
-            imageResId = R.drawable.img_food_sample,
+            img = R.drawable.img_food_sample,
             title = "참치 포케",
-            subtitle = "HEALTHY",
             isLiked = false
         )
     )
