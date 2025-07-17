@@ -25,13 +25,13 @@
             android:hint="검색어를 입력하세요"
             android:background="@android:color/transparent"
             android:padding="0dp"
-            android:textSize="15sp"
+            android:textSize="16sp"
             android:inputType="text" />
 
         <ImageView
             android:id="@+id/search_btn"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
             android:src="@drawable/ic_search"
             android:layout_marginEnd="8dp" />
     </LinearLayout>
@@ -42,16 +42,14 @@
         android:text="최근 검색어"
         android:textStyle="bold"
         android:textSize="16sp"
-        android:layout_marginTop="16dp"/>
+        android:layout_marginTop="20dp"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/search_recent_keywords_rv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
         android:overScrollMode="never"
-        android:paddingStart="4dp"
         android:paddingEnd="4dp"
         tools:listitem="@layout/item_search_recent_keyword_chip"/>
 
@@ -61,14 +59,13 @@
         android:text="추천 검색어"
         android:textStyle="bold"
         android:textSize="16sp"
-        android:layout_marginTop="12dp"/>
+        android:layout_marginTop="20dp"/>
 
     <com.google.android.flexbox.FlexboxLayout
         android:id="@+id/search_suggest_keywords_fl"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginTop="12dp"
         app:flexWrap="wrap"
         app:justifyContent="flex_start"
         app:alignItems="center"
@@ -79,7 +76,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="20dp"
         android:layout_marginBottom="4dp">
 
         <TextView
@@ -108,8 +105,7 @@
         android:id="@+id/search_popular_keywords_rv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:overScrollMode="never"
-        android:layout_marginBottom="8dp"/>
+        android:overScrollMode="never" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -117,7 +113,7 @@
         android:text="최근 본 레시피"
         android:textStyle="bold"
         android:textSize="16sp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="20dp"
         android:layout_marginBottom="8dp"/>
 
     <androidx.recyclerview.widget.RecyclerView
@@ -126,5 +122,6 @@
         android:layout_height="wrap_content"
         android:minHeight="100dp"
         android:overScrollMode="never"
-        android:layout_marginBottom="8dp"/>
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"/>
 </LinearLayout>

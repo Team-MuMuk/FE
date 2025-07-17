@@ -20,6 +20,6 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:text="연어 포케"
-        android:textSize="15sp"
+        android:textSize="16sp"
         android:textColor="@color/black" />
 </LinearLayout>
