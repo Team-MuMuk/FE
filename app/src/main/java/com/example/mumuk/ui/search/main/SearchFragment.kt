@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mumuk.R
 import com.example.mumuk.databinding.FragmentSearchBinding
 import com.example.mumuk.databinding.ItemSearchSuggestKeywordChipBinding
-import com.example.mumuk.ui.category.CategoryRecipeCard
+import com.example.mumuk.data.model.Recipe
 
 class SearchFragment : Fragment() {
     private var _binding: FragmentSearchBinding? = null
@@ -23,8 +23,18 @@ class SearchFragment : Fragment() {
     private val popularKeywords = listOf("곤약밥 레시피", "곤약밥 레시피", "곤약밥 레시피", "곤약밥 레시피", "곤약밥 레시피", "곤약밥 레시피", "곤약밥 레시피", "곤약밥 레시피", "곤약밥 레시피", "곤약밥 레시피")
 
     private val recentRecipes = listOf(
-        CategoryRecipeCard("헬스식단", "연어 포케"),
-        CategoryRecipeCard("헬스식단", "바스크치즈케이크")
+        Recipe(
+            imageResId = R.drawable.img_food_sample,
+            title = "연어 포케",
+            subtitle = "신선한 연어와 채소",
+            isLiked = false
+        ),
+        Recipe(
+            imageResId = R.drawable.img_food_sample,
+            title = "바스크치즈케이크",
+            subtitle = "진한 치즈 맛의 디저트",
+            isLiked = false
+        )
     )
 
     override fun onCreateView(
@@ -58,7 +68,7 @@ class SearchFragment : Fragment() {
         val flexbox = binding.searchSuggestKeywordsFl
         flexbox.removeAllViews()
         val keywordsPerRow = 3
-        val keywords = suggestKeywords.take(6) //
+        val keywords = suggestKeywords.take(6)
 
         for (i in keywords.indices step keywordsPerRow) {
             val rowLayout = LinearLayout(requireContext()).apply {
@@ -91,6 +101,8 @@ class SearchFragment : Fragment() {
         binding.searchRecentRecipeRv.layoutManager =
             LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
     }
+
+
 
     override fun onDestroyView() {
         super.onDestroyView()
