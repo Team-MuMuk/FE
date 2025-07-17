@@ -4,7 +4,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_gradient">
+    android:background="#D3FAE1">
 
     <TextView
         android:id="@+id/tv_description"
@@ -13,7 +13,7 @@
         android:text="우리집 냉장고 속 재료로\n맞춤 AI 레시피 제공 서비스,"
         android:textSize="20sp"
         android:textStyle="bold"
-        android:textColor="@color/white"
+        android:textColor="#0D6063"
         android:textAlignment="center"
         android:gravity="center"
         android:layout_marginBottom="25dp"
@@ -25,7 +25,7 @@
         android:id="@+id/line"
         android:layout_width="332dp"
         android:layout_height="2dp"
-        android:background="#004142"
+        android:background="@color/white"
         android:layout_marginBottom="16dp"
         app:layout_constraintBottom_toTopOf="@+id/iv_logo"
         app:layout_constraintStart_toStartOf="parent"

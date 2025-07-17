@@ -10,14 +10,34 @@
         android:name="com.example.mumuk.ui.home.HomeFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_home" >
-        <action
-            android:id="@+id/action_navigation_home_to_recommendFragment"
-            app:destination="@id/recommendFragment"
 
+        <action
+            android:id="@+id/action_navigation_home_to_recipeFragment"
+            app:destination="@id/recipeFragment"
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/hold"
             app:popEnterAnim="@anim/hold"
             app:popExitAnim="@anim/slide_out_right"/>
+
+        <action
+            android:id="@+id/action_navigation_home_to_healthManagementFragment"
+            app:destination="@id/healthManagementFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/hold"
+            app:popEnterAnim="@anim/hold"
+            app:popExitAnim="@anim/slide_out_right"/>
+
+        <action
+            android:id="@+id/action_navigation_home_to_bookmarkRecipeFragment"
+            app:destination="@id/bookmarkRecipeFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/hold"
+            app:popEnterAnim="@anim/hold"
+            app:popExitAnim="@anim/slide_out_right"/>
+
+        <action
+            android:id="@+id/action_navigation_home_to_categoryFragment"
+            app:destination="@id/navigation_category" />
     </fragment>
 
     <fragment
@@ -38,23 +58,31 @@
 
     <fragment
         android:id="@+id/navigation_my_page"
-        android:name="com.example.mumuk.MyPageFragment"
-        android:label="fragment_my_page"
-        tools:layout="@layout/fragment_my_page" />
+        android:name="com.example.mumuk.ui.mypage.MyPageFragment"
+        android:label="마이페이지"
+        tools:layout="@layout/fragment_my_page">
+
+        <action
+            android:id="@+id/action_myPage_to_profile"
+            app:destination="@id/profileFragment"
+            />
+
+        <action
+            android:id="@+id/action_myPage_to_bookmarkRecipe"
+            app:destination="@id/bookmarkRecipeFragment" />
+
+        <action
+            android:id="@+id/action_myPage_to_recipeFragment"
+            app:destination="@id/recipeFragment" />
+
+    </fragment>
+
 
     <fragment
-        android:id="@+id/recommendFragment"
-        android:name="com.example.mumuk.ui.home.RecommendFragment"
-        android:label="fragment_recommend"
-        tools:layout="@layout/fragment_recommend" >
-        <action
-            android:id="@+id/action_recommendFragment_to_recipeFragment"
-            app:destination="@id/recipeFragment"
-            app:enterAnim="@anim/slide_in_right"
-            app:exitAnim="@anim/hold"
-            app:popEnterAnim="@anim/hold"
-            app:popExitAnim="@anim/slide_out_right"/>
-    </fragment>
+        android:id="@+id/profileFragment"
+        android:name="com.example.mumuk.ui.mypage.ProfileFragment"
+        android:label="프로필"
+        tools:layout="@layout/fragment_profile" />
 
     <fragment
         android:id="@+id/recipeFragment"
@@ -91,4 +119,54 @@
             app:destination="@id/recipeFragment" />
     </fragment>
 
+        android:id="@+id/healthManagementFragment"
+        android:name="com.example.mumuk.ui.health.HealthManagementFragment"
+        android:label="HealthManagementFragment"
+        tools:layout="@layout/fragment_health_management">
+        <action
+            android:id="@+id/action_healthManagementFragment_to_navigation_home"
+            app:destination="@id/navigation_home"
+            app:popUpTo="@id/navigation_home"
+            app:popUpToInclusive="true" />
+
+        <action
+            android:id="@+id/action_healthManagement_to_healthComplete"
+            app:destination="@id/healthCompleteFragment"
+            app:popUpTo="@id/healthManagementFragment"
+            app:popUpToInclusive="false"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out"
+            app:popEnterAnim="@android:anim/fade_in"
+            app:popExitAnim="@android:anim/fade_out" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/healthCompleteFragment"
+        android:name="com.example.mumuk.ui.health.HealthCompleteFragment"
+        android:label="HealthCompleteFragment"
+        tools:layout="@layout/fragment_health_complete">
+        <action
+            android:id="@+id/action_healthComplete_to_home"
+            app:destination="@id/navigation_home"
+            app:popUpTo="@id/navigation_home"
+            app:popUpToInclusive="false"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out"
+            app:popEnterAnim="@android:anim/fade_in"
+            app:popExitAnim="@android:anim/fade_out" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/bookmarkRecipeFragment"
+        android:name="com.example.mumuk.ui.bookmark.BookmarkRecipeFragment"
+        android:label="fragment_bookmark_recipe"
+        tools:layout="@layout/fragment_bookmark_recipe" >
+        <action
+            android:id="@+id/action_bookmarkRecipeFragment_to_recipeFragment"
+            app:destination="@id/recipeFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/hold"
+            app:popEnterAnim="@anim/hold"
+            app:popExitAnim="@anim/slide_out_right"/>
+    </fragment>
 </navigation>

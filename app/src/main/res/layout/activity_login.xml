@@ -60,7 +60,7 @@
             android:layout_height="60dp"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="32dp"
-            android:hint="아이디를 입력하세요(이메일)"
+            android:hint="아이디를 입력하세요"
             android:textStyle="bold"
             android:inputType="textEmailAddress"
             android:textColor="@color/black"
