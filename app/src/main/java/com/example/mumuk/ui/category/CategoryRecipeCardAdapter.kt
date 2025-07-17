@@ -14,7 +14,7 @@ class CategoryRecipeCardAdapter(
     inner class ViewHolder(private val binding: ItemRecipeBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: Recipe) {
             binding.recipeTitle.text = item.title
-            binding.recipeImg.setImageResource(item.imageResId)
+            item.img?.let { binding.recipeImg.setImageResource(it) } ?: binding.recipeImg.setImageDrawable(null)
             binding.imageView6.setImageResource(
                 if (item.isLiked) com.example.mumuk.R.drawable.btn_heart_blank else com.example.mumuk.R.drawable.btn_heart_blank
             )

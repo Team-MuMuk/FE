@@ -98,29 +98,25 @@ class CategoryWeightLossFragment : Fragment() {
         val items = when (tabName) {
             "체중 감량" -> listOf(
                 Recipe(
-                    imageResId = R.drawable.img_food_sample,
+                    img = R.drawable.img_food_sample,
                     title = "연어 포케",
-                    subtitle = "고단백 저칼로리 식단",
                     isLiked = false
                 ),
                 Recipe(
-                    imageResId = R.drawable.img_food_sample,
+                    img = R.drawable.img_food_sample,
                     title = "닭가슴살 샐러드",
-                    subtitle = "프레시한 샐러드와 단백질",
                     isLiked = false
                 )
             )
             "근육 증가" -> listOf(
                 Recipe(
-                    imageResId = R.drawable.img_food_sample,
+                    img = R.drawable.img_food_sample,
                     title = "닭가슴살 스테이크",
-                    subtitle = "벌크업에 좋은 단백질 식단",
                     isLiked = false
                 ),
                 Recipe(
-                    imageResId = R.drawable.img_food_sample,
+                    img = R.drawable.img_food_sample,
                     title = "오트밀 스크램블",
-                    subtitle = "근육에 좋은 복합탄수화물",
                     isLiked = false
                 )
             )

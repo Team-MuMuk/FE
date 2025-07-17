@@ -24,15 +24,13 @@ class SearchFragment : Fragment() {
 
     private val recentRecipes = listOf(
         Recipe(
-            imageResId = R.drawable.img_food_sample,
+            img = R.drawable.img_food_sample,
             title = "연어 포케",
-            subtitle = "신선한 연어와 채소",
             isLiked = false
         ),
         Recipe(
-            imageResId = R.drawable.img_food_sample,
+            img = R.drawable.img_food_sample,
             title = "바스크치즈케이크",
-            subtitle = "진한 치즈 맛의 디저트",
             isLiked = false
         )
     )
