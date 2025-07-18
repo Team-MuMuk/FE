@@ -3,18 +3,18 @@ package com.example.mumuk.ui.search.result
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.mumuk.databinding.ItemCategoryRecipeCardBinding
-import com.example.mumuk.ui.category.CategoryRecipeCard
+import com.example.mumuk.data.model.Recipe
+import com.example.mumuk.databinding.ItemRecipeBinding
 
 class SearchResultAdapter(
-    private val items: List<CategoryRecipeCard>
+    private val items: List<Recipe>
 ) : RecyclerView.Adapter<SearchResultAdapter.ViewHolder>() {
 
-    inner class ViewHolder(val binding: ItemCategoryRecipeCardBinding) :
+    inner class ViewHolder(val binding: ItemRecipeBinding) :
         RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding = ItemCategoryRecipeCardBinding.inflate(
+        val binding = ItemRecipeBinding.inflate(
             LayoutInflater.from(parent.context), parent, false
         )
         return ViewHolder(binding)
@@ -23,6 +23,11 @@ class SearchResultAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = items[position]
         holder.binding.recipeTitle.text = item.title
+        item.img?.let { holder.binding.recipeImg.setImageResource(it) } ?: holder.binding.recipeImg.setImageDrawable(null)
+        holder.binding.imageView6.setImageResource(
+            if (item.isLiked) com.example.mumuk.R.drawable.btn_heart_blank
+            else com.example.mumuk.R.drawable.btn_heart_blank
+        )
     }
 
     override fun getItemCount() = items.size

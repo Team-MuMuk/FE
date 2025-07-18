@@ -7,9 +7,10 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
-import com.example.mumuk.ui.category.CategoryRecipeCard
-import com.example.mumuk.ui.category.CategoryRecipeCardAdapter
+import com.example.mumuk.R
+import com.example.mumuk.data.model.Recipe
 import com.example.mumuk.databinding.FragmentCategoryLowSugarBinding
+import com.example.mumuk.ui.category.CategoryRecipeCardAdapter
 import com.google.android.material.tabs.TabLayout
 
 class CategoryLowSugarFragment : Fragment() {
@@ -96,20 +97,52 @@ class CategoryLowSugarFragment : Fragment() {
     private fun updateRecyclerWith(tabName: String) {
         val items = when (tabName) {
             "당 줄이기" -> listOf(
-                CategoryRecipeCard("당줄이기", "연어 포케"),
-                CategoryRecipeCard("당줄이기", "연어 포케")
+                Recipe(
+                    img = R.drawable.img_food_sample,
+                    title = "연어 포케",
+                    isLiked = false
+                ),
+                Recipe(
+                    img = R.drawable.img_food_sample,
+                    title = "두부유부초밥",
+                    isLiked = true
+                )
             )
             "혈압관리" -> listOf(
-                CategoryRecipeCard("혈압관리", "연어 포케"),
-                CategoryRecipeCard("혈압관리", "연어 포케")
+                Recipe(
+                    img = R.drawable.img_food_sample,
+                    title = "닭가슴살 샐러드",
+                    isLiked = false
+                ),
+                Recipe(
+                    img = R.drawable.img_food_sample,
+                    title = "오트밀죽",
+                    isLiked = false
+                )
             )
             "콜레스테롤 관리" -> listOf(
-                CategoryRecipeCard("콜레스테롤", "연어 포케"),
-                CategoryRecipeCard("콜레스테롤", "연어 포케")
+                Recipe(
+                    img = R.drawable.img_food_sample,
+                    title = "아보카도 샐러드",
+                    isLiked = false
+                ),
+                Recipe(
+                    img = R.drawable.img_food_sample,
+                    title = "병아리콩스튜",
+                    isLiked = false
+                )
             )
             "소화 건강" -> listOf(
-                CategoryRecipeCard("소화건강", "연어 포케"),
-                CategoryRecipeCard("소화건강", "연어 포케")
+                Recipe(
+                    img = R.drawable.img_food_sample,
+                    title = "요거트볼",
+                    isLiked = false
+                ),
+                Recipe(
+                    img = R.drawable.img_food_sample,
+                    title = "바나나 오트밀",
+                    isLiked = false
+                )
             )
             else -> emptyList()
         }

@@ -9,7 +9,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.mumuk.R
 import com.example.mumuk.databinding.FragmentSearchResultBinding
-import com.example.mumuk.ui.category.CategoryRecipeCard
+import com.example.mumuk.data.model.Recipe
 
 class SearchResultFragment : Fragment() {
     private var _binding: FragmentSearchResultBinding? = null
@@ -18,10 +18,26 @@ class SearchResultFragment : Fragment() {
     private lateinit var adapter: SearchResultAdapter
 
     private val dummyList = listOf(
-        CategoryRecipeCard(title = "연어 포케", label = "HEALTHY"),
-        CategoryRecipeCard(title = "닭가슴살 포케", label = "PROTEIN"),
-        CategoryRecipeCard(title = "아보카도 포케", label = "VEGAN"),
-        CategoryRecipeCard(title = "참치 포케", label = "HEALTHY")
+        Recipe(
+            img = R.drawable.img_food_sample,
+            title = "연어 포케",
+            isLiked = false
+        ),
+        Recipe(
+            img = R.drawable.img_food_sample,
+            title = "닭가슴살 포케",
+            isLiked = false
+        ),
+        Recipe(
+            img = R.drawable.img_food_sample,
+            title = "아보카도 포케",
+            isLiked = false
+        ),
+        Recipe(
+            img = R.drawable.img_food_sample,
+            title = "참치 포케",
+            isLiked = false
+        )
     )
 
     override fun onCreateView(

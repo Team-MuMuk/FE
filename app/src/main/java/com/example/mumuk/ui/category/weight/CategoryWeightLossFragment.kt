@@ -7,7 +7,8 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
-import com.example.mumuk.ui.category.CategoryRecipeCard
+import com.example.mumuk.R
+import com.example.mumuk.data.model.Recipe
 import com.example.mumuk.ui.category.CategoryRecipeCardAdapter
 import com.example.mumuk.databinding.FragmentCategoryWeightLossBinding
 import com.google.android.material.tabs.TabLayout
@@ -70,8 +71,8 @@ class CategoryWeightLossFragment : Fragment() {
     }
 
     private fun createCustomTabView(title: String, selected: Boolean): View {
-        val view = layoutInflater.inflate(com.example.mumuk.R.layout.category_custom_tab, null)
-        val textView = view.findViewById<TextView>(com.example.mumuk.R.id.tab_text)
+        val view = layoutInflater.inflate(R.layout.category_custom_tab, null)
+        val textView = view.findViewById<TextView>(R.id.tab_text)
         textView.text = title
         textView.isSelected = selected
         return view
@@ -80,13 +81,13 @@ class CategoryWeightLossFragment : Fragment() {
     private fun setupTabSelectionListener() {
         binding.categoryTabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
-                val textView = tab?.customView?.findViewById<TextView>(com.example.mumuk.R.id.tab_text)
+                val textView = tab?.customView?.findViewById<TextView>(R.id.tab_text)
                 textView?.isSelected = true
                 updateRecyclerWith(textView?.text.toString())
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab?) {
-                tab?.customView?.findViewById<TextView>(com.example.mumuk.R.id.tab_text)?.isSelected = false
+                tab?.customView?.findViewById<TextView>(R.id.tab_text)?.isSelected = false
             }
 
             override fun onTabReselected(tab: TabLayout.Tab?) {}
@@ -96,12 +97,28 @@ class CategoryWeightLossFragment : Fragment() {
     private fun updateRecyclerWith(tabName: String) {
         val items = when (tabName) {
             "체중 감량" -> listOf(
-                CategoryRecipeCard("헬스식단", "연어 포케"),
-                CategoryRecipeCard("헬스식단", "연어 포케")
+                Recipe(
+                    img = R.drawable.img_food_sample,
+                    title = "연어 포케",
+                    isLiked = false
+                ),
+                Recipe(
+                    img = R.drawable.img_food_sample,
+                    title = "닭가슴살 샐러드",
+                    isLiked = false
+                )
             )
             "근육 증가" -> listOf(
-                CategoryRecipeCard("벌크업식단", "연어 포케"),
-                CategoryRecipeCard("벌크업식단", "연어 포케")
+                Recipe(
+                    img = R.drawable.img_food_sample,
+                    title = "닭가슴살 스테이크",
+                    isLiked = false
+                ),
+                Recipe(
+                    img = R.drawable.img_food_sample,
+                    title = "오트밀 스크램블",
+                    isLiked = false
+                )
             )
             else -> emptyList()
         }

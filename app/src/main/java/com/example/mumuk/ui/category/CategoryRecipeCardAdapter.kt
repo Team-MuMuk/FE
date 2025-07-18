@@ -3,16 +3,21 @@ package com.example.mumuk.ui.category
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.mumuk.databinding.ItemCategoryRecipeCardBinding
+import com.example.mumuk.data.model.Recipe
+import com.example.mumuk.databinding.ItemRecipeBinding
 
 class CategoryRecipeCardAdapter(
-    private val items: List<CategoryRecipeCard>,
-    private val onItemClick: ((CategoryRecipeCard) -> Unit)? = null
+    private val items: List<Recipe>,
+    private val onItemClick: ((Recipe) -> Unit)? = null
 ) : RecyclerView.Adapter<CategoryRecipeCardAdapter.ViewHolder>() {
 
-    inner class ViewHolder(private val binding: ItemCategoryRecipeCardBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: CategoryRecipeCard) {
+    inner class ViewHolder(private val binding: ItemRecipeBinding) : RecyclerView.ViewHolder(binding.root) {
+        fun bind(item: Recipe) {
             binding.recipeTitle.text = item.title
+            item.img?.let { binding.recipeImg.setImageResource(it) } ?: binding.recipeImg.setImageDrawable(null)
+            binding.imageView6.setImageResource(
+                if (item.isLiked) com.example.mumuk.R.drawable.btn_heart_blank else com.example.mumuk.R.drawable.btn_heart_blank
+            )
 
             binding.root.setOnClickListener {
                 onItemClick?.invoke(item)
@@ -21,7 +26,7 @@ class CategoryRecipeCardAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding = ItemCategoryRecipeCardBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = ItemRecipeBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(binding)
     }
 

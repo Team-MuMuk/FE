@@ -56,7 +56,7 @@
         android:layout_height="90dp"
         android:src="@drawable/ic_user_profile_orange"
         app:layout_constraintTop_toBottomOf="@id/profile_title"
-        android:layout_marginTop="75dp"
+        android:layout_marginTop="80dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -79,7 +79,7 @@
         app:layout_constraintTop_toBottomOf="@id/ic_profile"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="36dp" />
+        android:layout_marginTop="88dp" />
 
     <EditText
         android:id="@+id/edit_name"
