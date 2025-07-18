@@ -62,6 +62,10 @@ class HomeFragment : Fragment() {
             bottomNavSelector?.selectBottomNavItem(R.id.navigation_category)
         }
 
+        binding.addBtn.setOnClickListener {
+            findNavController().navigate(R.id.action_navigation_home_to_addIngredientFragment)
+        }
+
         setupRecyclerView(binding.todayRV, recipeRepository.getTodayRecipes())
         setupRecyclerView(binding.recentRV, recipeRepository.getRecentRecipes())
         setupRecyclerView(binding.healthRV, recipeRepository.getHealthRecipes())

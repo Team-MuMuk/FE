@@ -52,9 +52,10 @@
                 android:orientation="vertical">
 
                 <com.google.android.material.button.MaterialButton
+                    style="@style/CustomMaterialButton"
                     android:id="@+id/btn_shellfish"
                     android:layout_width="match_parent"
-                    android:layout_height="55dp"
+                    android:layout_height="49dp"
                     android:layout_marginBottom="8dp"
                     android:backgroundTint="@color/health_button_background_selector"
                     android:checkable="true"
@@ -70,9 +71,10 @@
                     app:strokeWidth="2dp" />
 
                 <com.google.android.material.button.MaterialButton
+                    style="@style/CustomMaterialButton"
                     android:id="@+id/btn_nuts"
                     android:layout_width="match_parent"
-                    android:layout_height="55dp"
+                    android:layout_height="49dp"
                     android:layout_marginBottom="8dp"
                     android:backgroundTint="@color/health_button_background_selector"
                     android:checkable="true"
@@ -88,9 +90,10 @@
                     app:strokeWidth="2dp" />
 
                 <com.google.android.material.button.MaterialButton
+                    style="@style/CustomMaterialButton"
                     android:id="@+id/btn_dairy"
                     android:layout_width="match_parent"
-                    android:layout_height="55dp"
+                    android:layout_height="49dp"
                     android:layout_marginBottom="8dp"
                     android:backgroundTint="@color/health_button_background_selector"
                     android:checkable="true"
@@ -106,9 +109,10 @@
                     app:strokeWidth="2dp" />
 
                 <com.google.android.material.button.MaterialButton
+                    style="@style/CustomMaterialButton"
                     android:id="@+id/btn_wheat"
                     android:layout_width="match_parent"
-                    android:layout_height="55dp"
+                    android:layout_height="49dp"
                     android:layout_marginBottom="8dp"
                     android:backgroundTint="@color/health_button_background_selector"
                     android:checkable="true"
@@ -124,9 +128,10 @@
                     app:strokeWidth="2dp" />
 
                 <com.google.android.material.button.MaterialButton
+                    style="@style/CustomMaterialButton"
                     android:id="@+id/btn_egg"
                     android:layout_width="match_parent"
-                    android:layout_height="55dp"
+                    android:layout_height="49dp"
                     android:layout_marginBottom="8dp"
                     android:backgroundTint="@color/health_button_background_selector"
                     android:checkable="true"
@@ -142,9 +147,10 @@
                     app:strokeWidth="2dp" />
 
                 <com.google.android.material.button.MaterialButton
+                    style="@style/CustomMaterialButton"
                     android:id="@+id/btn_fish"
                     android:layout_width="match_parent"
-                    android:layout_height="55dp"
+                    android:layout_height="49dp"
                     android:layout_marginBottom="8dp"
                     android:backgroundTint="@color/health_button_background_selector"
                     android:checkable="true"
@@ -160,9 +166,10 @@
                     app:strokeWidth="2dp" />
 
                 <com.google.android.material.button.MaterialButton
+                    style="@style/CustomMaterialButton"
                     android:id="@+id/btn_soy"
                     android:layout_width="match_parent"
-                    android:layout_height="55dp"
+                    android:layout_height="49dp"
                     android:layout_marginBottom="8dp"
                     android:backgroundTint="@color/health_button_background_selector"
                     android:checkable="true"
@@ -178,9 +185,10 @@
                     app:strokeWidth="2dp" />
 
                 <com.google.android.material.button.MaterialButton
+                    style="@style/CustomMaterialButton"
                     android:id="@+id/btn_none"
                     android:layout_width="match_parent"
-                    android:layout_height="55dp"
+                    android:layout_height="49dp"
                     android:layout_marginBottom="8dp"
                     android:backgroundTint="@color/health_button_background_selector"
                     android:checkable="true"
