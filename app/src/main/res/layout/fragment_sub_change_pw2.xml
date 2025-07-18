@@ -49,7 +49,7 @@
                 android:id="@+id/et_pw"
                 android:layout_width="263dp"
                 android:layout_height="48dp"
-                android:layout_marginTop="60dp"
+                android:layout_marginTop="100dp"
                 android:background="@android:color/transparent"
                 android:gravity="bottom"
                 android:hint="새로운 비밀번호를 입력하세요"
