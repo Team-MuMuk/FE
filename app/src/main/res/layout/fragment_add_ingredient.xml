@@ -124,7 +124,6 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="12dp"
                 android:background="@drawable/bg_edittext_rounded_thin"
-                android:drawableEnd="@drawable/btn_calander"
                 android:hint="YYYY-MM-DD 형식으로 입력"
                 android:paddingLeft="20dp"
                 android:paddingTop="12dp"
@@ -133,8 +132,20 @@
                 android:textColor="@color/black_400"
                 android:textSize="12sp"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_chainStyle="packed"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView27" />
+
+            <ImageView
+                android:id="@+id/calendarBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="12dp"
+                android:contentDescription="달력 열기"
+                android:src="@drawable/btn_calander"
+                app:layout_constraintBottom_toBottomOf="@+id/editTextDate"
+                app:layout_constraintEnd_toEndOf="@+id/editTextDate"
+                app:layout_constraintTop_toTopOf="@+id/editTextDate" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/saveBtn"
@@ -191,11 +202,13 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/ingredientRV"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView28" />
+                app:layout_constraintTop_toBottomOf="@+id/textView28"
+                android:overScrollMode="never"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
