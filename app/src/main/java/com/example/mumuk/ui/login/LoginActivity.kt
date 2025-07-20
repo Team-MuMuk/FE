@@ -53,7 +53,7 @@ class LoginActivity : AppCompatActivity() {
                 ) {
                     if (response.isSuccessful) {
                         val loginResponse = response.body()
-                        if (loginResponse?.status == "100 CONTINUE" && loginResponse.data != null) {
+                        if (loginResponse?.status == "OK" && loginResponse.data != null) {
                             val accessToken = loginResponse.data.accessToken
                             val refreshToken = loginResponse.data.refreshToken
 
@@ -124,4 +124,6 @@ class LoginActivity : AppCompatActivity() {
             }
         }
     }
+
+
 }
