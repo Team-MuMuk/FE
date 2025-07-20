@@ -7,17 +7,26 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
     private const val BASE_URL = "https://api.mumuk.site"
+    private var retrofit: Retrofit? = null
 
-    fun getInstance(context: Context): AuthApiService {
-        val client = OkHttpClient.Builder()
-            .addInterceptor(AuthInterceptor(context))
-            .build()
+    private fun getRetrofit(context: Context): Retrofit {
+        if (retrofit == null) {
+            val client = OkHttpClient.Builder()
+                .addInterceptor(AuthInterceptor(context))
+                .build()
 
-        val retrofit = Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .client(client)
-            .build()
-        return retrofit.create(AuthApiService::class.java)
+            retrofit = Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(client)
+                .build()
+        }
+        return retrofit!!
     }
+
+    fun getAuthApi(context: Context): AuthApiService {
+        return getRetrofit(context).create(AuthApiService::class.java)
+    }
+
+    //TODO: 다른 api도 getAuthApi처럼 get~~Api 와 같이 추가해서 쓰기
 }

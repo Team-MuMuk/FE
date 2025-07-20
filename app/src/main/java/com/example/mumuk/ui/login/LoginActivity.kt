@@ -45,7 +45,7 @@ class LoginActivity : AppCompatActivity() {
             val password = binding.etPassword.text.toString()
             val request = LoginRequest(loginId, password)
 
-            val api = RetrofitClient.getInstance(this)
+            val api = RetrofitClient.getAuthApi(this)
             api.login(request).enqueue(object : Callback<LoginResponse> {
                 override fun onResponse(
                     call: Call<LoginResponse>,
