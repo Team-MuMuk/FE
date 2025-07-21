@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -16,10 +17,16 @@ import androidx.fragment.app.commit
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mumuk.R
+import com.example.mumuk.data.api.RetrofitClient
+import com.example.mumuk.data.api.TokenManager
+import com.example.mumuk.data.model.auth.CommonResponse
 import com.example.mumuk.databinding.DialogDeleteAccountBinding
 import com.example.mumuk.databinding.DialogLogoutBinding
 import com.example.mumuk.databinding.FragmentMyPageBinding
 import com.example.mumuk.ui.login.LoginActivity
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class MyPageFragment : Fragment() {
     private var _binding: FragmentMyPageBinding? = null
@@ -50,13 +57,38 @@ class MyPageFragment : Fragment() {
             dialog.show()
 
             logoutBinding.btnDialogOk.setOnClickListener {
-                Toast.makeText(requireContext(), "로그아웃 처리 진행", Toast.LENGTH_SHORT).show()
-                dialog.dismiss()
+                val refreshToken = TokenManager.getRefreshToken(requireContext()) ?: ""
+                val loginType = "LOCAL"
 
-                val intent = Intent(requireContext(), LoginActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                startActivity(intent)
+                RetrofitClient.getAuthApi(requireContext()).logout(refreshToken, loginType)
+                    .enqueue(object : Callback<CommonResponse> {
+                        override fun onResponse(
+                            call: Call<CommonResponse>,
+                            response: Response<CommonResponse>
+                        ) {
+                            val body = response.body()
+                            if (response.isSuccessful && body?.message?.contains("성공") == true) {
+                                TokenManager.clearTokens(requireContext())
+
+                                Log.d("Logout", "AccessToken after logout: ${TokenManager.getAccessToken(requireContext())}")
+
+                                val intent = Intent(requireContext(), LoginActivity::class.java)
+                                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                startActivity(intent)
+                            } else {
+                                Toast.makeText(requireContext(), "로그아웃 실패: ${body?.message ?: "알 수 없는 오류"}", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+
+                        override fun onFailure(call: Call<CommonResponse>, t: Throwable) {
+                            Toast.makeText(requireContext(), "네트워크 오류: ${t.message}", Toast.LENGTH_SHORT).show()
+                        }
+                    })
+
+                dialog.dismiss()
             }
+
+
 
             val widthInPx = TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP,
