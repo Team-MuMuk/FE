@@ -1,6 +1,6 @@
-package com.example.mumuk.data.model
+package com.example.mumuk.data.model.auth
 
-data class SignUpRequest(
+data class SignupRequest(
     val name: String,
     val nickname: String,
     val phoneNumber: String,

@@ -8,14 +8,15 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import com.example.mumuk.R
-import com.example.mumuk.data.model.SignUpRequest
+import com.example.mumuk.data.api.RetrofitClient
+import com.example.mumuk.data.model.auth.SignupRequest
+import com.example.mumuk.data.model.auth.SignupResponse
 import com.example.mumuk.databinding.FragmentSignupStep6Binding
-import kotlinx.coroutines.launch
+import retrofit2.Call
+import retrofit2.Response
 
 class SignupStep6Fragment : Fragment() {
 
@@ -77,7 +78,7 @@ class SignupStep6Fragment : Fragment() {
             if (statusText == "비밀번호가 일치합니다") {
                 activity.confirmPassword = confirmPw
 
-                val request = SignUpRequest(
+                val request = SignupRequest(
                     name = activity.name,
                     nickname = activity.nickname,
                     phoneNumber = activity.phoneNumber,
@@ -85,12 +86,38 @@ class SignupStep6Fragment : Fragment() {
                     password = activity.password,
                     confirmPassword = activity.confirmPassword
                 )
-                parentFragmentManager.beginTransaction()
-                    .replace(R.id.signup_container, SignupCompleteFragment())
-                    .addToBackStack(null)
-                    .commit()
+
+                RetrofitClient.getAuthApi(requireContext()).signUp(request)
+                    .enqueue(object : retrofit2.Callback<com.example.mumuk.data.model.auth.SignupResponse> {
+                        override fun onResponse(
+                            call: Call<SignupResponse>,
+                            response: Response<SignupResponse>
+                        ) {
+                            if (response.isSuccessful) {
+                                val body = response.body()
+                                Log.d("Signup", "회원가입 성공: ${body?.message}")
+                                // 성공하면 완료 화면으로 이동
+                                parentFragmentManager.beginTransaction()
+                                    .replace(R.id.signup_container, SignupCompleteFragment())
+                                    .addToBackStack(null)
+                                    .commit()
+                            } else {
+                                Log.e("Signup", "회원가입 실패: ${response.code()}")
+
+                            }
+                        }
+
+                        override fun onFailure(
+                            call: retrofit2.Call<com.example.mumuk.data.model.auth.SignupResponse>,
+                            t: Throwable
+                        ) {
+                            Log.e("Signup", "네트워크 오류: ${t.message}")
+
+                        }
+                    })
             }
         }
+
 
         binding.btnBack.setOnClickListener {
             parentFragmentManager.beginTransaction()
