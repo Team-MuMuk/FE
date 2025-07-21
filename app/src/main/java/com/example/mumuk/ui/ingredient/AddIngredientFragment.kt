@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.PopupWindow
 import androidx.core.content.ContextCompat
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.mumuk.R
@@ -39,6 +40,10 @@ class AddIngredientFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.backBtn.setOnClickListener {
             requireActivity().onBackPressedDispatcher.onBackPressed()
+        }
+
+        binding.imageView2.setOnClickListener {
+            findNavController().navigate(R.id.action_addIngredientFragment_to_ingredientDetailFragment)
         }
 
         val ingredientList = ingredientRepository.getIngredients()
