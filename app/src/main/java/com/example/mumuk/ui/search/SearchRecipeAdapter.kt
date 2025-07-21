@@ -1,4 +1,4 @@
-package com.example.mumuk.ui.category
+package com.example.mumuk.ui.search
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -7,10 +7,10 @@ import com.example.mumuk.R
 import com.example.mumuk.data.model.Recipe
 import com.example.mumuk.databinding.ItemRecipeBinding
 
-class CategoryRecipeCardAdapter(
+class SearchRecipeAdapter(
     private val recipes: List<Recipe>,
     private val onItemClick: (Recipe) -> Unit
-) : RecyclerView.Adapter<CategoryRecipeCardAdapter.RecipeViewHolder>() {
+) : RecyclerView.Adapter<SearchRecipeAdapter.RecipeViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecipeViewHolder {
         val binding = ItemRecipeBinding.inflate(LayoutInflater.from(parent.context), parent, false)

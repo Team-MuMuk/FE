@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.mumuk.R
 import com.example.mumuk.data.model.Recipe
@@ -19,16 +20,6 @@ class CategoryLowSugarFragment : Fragment() {
     private val binding get() = _binding!!
 
     private var selectedTabTitle: String? = null
-
-    companion object {
-        fun newInstance(selectedTab: String): CategoryLowSugarFragment {
-            val fragment = CategoryLowSugarFragment()
-            val args = Bundle()
-            args.putString("selected_tab", selectedTab)
-            fragment.arguments = args
-            return fragment
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,7 +37,7 @@ class CategoryLowSugarFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.categoryBackBtn.setOnClickListener {
-            parentFragmentManager.popBackStack()
+            findNavController().navigateUp()
         }
 
         binding.categoryRecipeRecyclerView.layoutManager = GridLayoutManager(context, 2)
@@ -71,8 +62,8 @@ class CategoryLowSugarFragment : Fragment() {
     }
 
     private fun createCustomTabView(title: String, selected: Boolean): View {
-        val view = layoutInflater.inflate(com.example.mumuk.R.layout.category_custom_tab, null)
-        val textView = view.findViewById<TextView>(com.example.mumuk.R.id.tab_text)
+        val view = layoutInflater.inflate(R.layout.category_custom_tab, null)
+        val textView = view.findViewById<TextView>(R.id.tab_text)
         textView.text = title
         textView.isSelected = selected
         return view
@@ -81,13 +72,13 @@ class CategoryLowSugarFragment : Fragment() {
     private fun setupTabSelectionListener() {
         binding.categoryTabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
-                val textView = tab?.customView?.findViewById<TextView>(com.example.mumuk.R.id.tab_text)
+                val textView = tab?.customView?.findViewById<TextView>(R.id.tab_text)
                 textView?.isSelected = true
                 updateRecyclerWith(textView?.text.toString())
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab?) {
-                tab?.customView?.findViewById<TextView>(com.example.mumuk.R.id.tab_text)?.isSelected = false
+                tab?.customView?.findViewById<TextView>(R.id.tab_text)?.isSelected = false
             }
 
             override fun onTabReselected(tab: TabLayout.Tab?) {}
@@ -147,7 +138,14 @@ class CategoryLowSugarFragment : Fragment() {
             else -> emptyList()
         }
 
-        binding.categoryRecipeRecyclerView.adapter = CategoryRecipeCardAdapter(items)
+        binding.categoryRecipeRecyclerView.adapter = CategoryRecipeCardAdapter(items) { recipe ->
+            val bundle = Bundle().apply {
+                putString("title", recipe.title)
+                putInt("img", recipe.img ?: 0)
+                putBoolean("isLiked", recipe.isLiked)
+            }
+            findNavController().navigate(R.id.action_categoryLowSugarFragment_to_recipeFragment, bundle)
+        }
     }
 
     override fun onDestroyView() {
