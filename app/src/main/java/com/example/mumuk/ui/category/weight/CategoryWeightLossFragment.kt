@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.mumuk.R
 import com.example.mumuk.data.model.Recipe
@@ -19,16 +20,6 @@ class CategoryWeightLossFragment : Fragment() {
     private val binding get() = _binding!!
 
     private var selectedTabTitle: String? = null
-
-    companion object {
-        fun newInstance(selectedTab: String): CategoryWeightLossFragment {
-            val fragment = CategoryWeightLossFragment()
-            val args = Bundle()
-            args.putString("selected_tab", selectedTab)
-            fragment.arguments = args
-            return fragment
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,11 +37,10 @@ class CategoryWeightLossFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.categoryBackBtn.setOnClickListener {
-            parentFragmentManager.popBackStack()
+            findNavController().navigateUp()
         }
 
         binding.categoryRecipeRecyclerView.layoutManager = GridLayoutManager(context, 2)
-
         setupCustomTabs()
         setupTabSelectionListener()
     }
@@ -123,7 +113,14 @@ class CategoryWeightLossFragment : Fragment() {
             else -> emptyList()
         }
 
-        binding.categoryRecipeRecyclerView.adapter = CategoryRecipeCardAdapter(items)
+        binding.categoryRecipeRecyclerView.adapter = CategoryRecipeCardAdapter(items) { recipe ->
+            val bundle = Bundle().apply {
+                putString("title", recipe.title)
+                putInt("img", recipe.img ?: 0)
+                putBoolean("isLiked", recipe.isLiked)
+            }
+            findNavController().navigate(R.id.action_categoryWeightLossFragment_to_recipeFragment, bundle)
+        }
     }
 
     override fun onDestroyView() {

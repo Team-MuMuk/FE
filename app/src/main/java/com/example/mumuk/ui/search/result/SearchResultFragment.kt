@@ -46,7 +46,15 @@ class SearchResultFragment : Fragment() {
     ): View {
         _binding = FragmentSearchResultBinding.inflate(inflater, container, false)
 
-        adapter = SearchResultAdapter(dummyList)
+        adapter = SearchResultAdapter(dummyList) { recipe ->
+            val bundle = Bundle().apply {
+                putString("recipeTitle", recipe.title)
+            }
+            findNavController().navigate(
+                R.id.action_searchResultFragment_to_recipeFragment,
+                bundle
+            )
+        }
         binding.searchResultRv.layoutManager = GridLayoutManager(context, 2)
         binding.searchResultRv.adapter = adapter
 

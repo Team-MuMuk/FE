@@ -13,6 +13,7 @@ import com.example.mumuk.R
 import com.example.mumuk.databinding.FragmentSearchBinding
 import com.example.mumuk.databinding.ItemSearchSuggestKeywordChipBinding
 import com.example.mumuk.data.model.Recipe
+import com.example.mumuk.ui.search.SearchRecentRecipeAdapter
 
 class SearchFragment : Fragment() {
     private var _binding: FragmentSearchBinding? = null
@@ -94,13 +95,18 @@ class SearchFragment : Fragment() {
     }
 
     private fun setupRecentRecipeList() {
-        val adapter = SearchRecentRecipeAdapter(recentRecipes)
+        val adapter = SearchRecentRecipeAdapter(recentRecipes) { recipe ->
+            val bundle = Bundle().apply {
+                putString("title", recipe.title)
+                putInt("img", recipe.img ?: 0)
+                putBoolean("isLiked", recipe.isLiked)
+            }
+            findNavController().navigate(R.id.action_searchFragment_to_recipeFragment, bundle)
+        }
         binding.searchRecentRecipeRv.adapter = adapter
         binding.searchRecentRecipeRv.layoutManager =
             LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
     }
-
-
 
     override fun onDestroyView() {
         super.onDestroyView()
