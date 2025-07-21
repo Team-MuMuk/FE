@@ -29,7 +29,6 @@ class CategoryFragment : Fragment() {
             binding.categoryHealthTypeBtn,
             binding.categoryRandomBtn
         )
-        // ViewModel에서 인덱스 복원
         btns.forEachIndexed { i, btn -> btn.isSelected = (i == viewModel.selectedCategoryIdx) }
         showMiddleFragment(viewModel.selectedCategoryIdx)
 
