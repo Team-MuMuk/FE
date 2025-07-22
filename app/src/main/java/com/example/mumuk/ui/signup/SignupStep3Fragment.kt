@@ -4,65 +4,92 @@ import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
-import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.example.mumuk.R
-import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
+import com.example.mumuk.databinding.FragmentSignupStep3Binding
 
 class SignupStep3Fragment : Fragment() {
+
+    private var _binding: FragmentSignupStep3Binding? = null
+    private val binding get() = _binding!!
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.fragment_signup_step3, container, false)
+    ): View {
+        _binding = FragmentSignupStep3Binding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-        val btnNext = view.findViewById<ImageButton>(R.id.btn_next)
-        val btnBack = view.findViewById<ImageButton>(R.id.btn_back)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        val etId = view.findViewById<TextInputEditText>(R.id.et_id)
-        val layoutId = view.findViewById<TextInputLayout>(R.id.layout_id)
-        val tvStatus = view.findViewById<TextView>(R.id.tv_id_status)
-
-        val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$".toRegex()
-
-        etId.addTextChangedListener(object : TextWatcher {
+        binding.etNumber.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun afterTextChanged(s: Editable?) {}
 
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                val idInput = s.toString()
-                val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$".toRegex()
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                val number = s.toString()
+                val isAllDigits = number.all { it.isDigit() }
+                val isLengthValid = number.length == 11
 
-                when {
-                    idInput.isBlank() -> {
-                        tvStatus.text = "아이디를 입력해주세요."
-                        tvStatus.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
-                    }
-                    !emailRegex.matches(idInput) -> {
-                        tvStatus.text = "이메일 형식이 아닙니다. 다시 시도해주세요."
-                        tvStatus.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
-                    }
-                    else -> {
-                        tvStatus.text = "정상적으로 확인되었습니다 :)"
-                        tvStatus.setTextColor(Color.parseColor("#306AF2"))
-                    }
-                }
+                // 조건 1: 숫자만 입력
+                binding.numberConditionContainer1.visibility = View.VISIBLE
+                binding.ivNumberConditionIcon1.setImageResource(
+                    if (isAllDigits) R.drawable.ic_check else R.drawable.ic_error
+                )
+                binding.tvNumberConditionMsg1.text =
+                    if (isAllDigits) "숫자만 입력됨" else "숫자만 입력해주세요"
+                binding.tvNumberConditionMsg1.setTextColor(
+                    if (isAllDigits)
+                        Color.parseColor("#306AF2")
+                    else
+                        ContextCompat.getColor(requireContext(), R.color.red)
+                )
+
+                // 조건 2: 11자리 입력
+                binding.numberConditionContainer2.visibility = View.VISIBLE
+                binding.ivNumberConditionIcon2.setImageResource(
+                    if (isLengthValid) R.drawable.ic_check else R.drawable.ic_error
+                )
+                binding.tvNumberConditionMsg2.text =
+                    if (isLengthValid) "11자리 입력" else "11자리를 입력해주세요"
+                binding.tvNumberConditionMsg2.setTextColor(
+                    if (isLengthValid)
+                        Color.parseColor("#306AF2")
+                    else
+                        ContextCompat.getColor(requireContext(), R.color.red)
+                )
+
+                // 조건 충족 시 버튼 활성화 (선택)
+                binding.btnNext.isEnabled = isAllDigits && isLengthValid
             }
         })
 
+        binding.etNumber.setOnKeyListener { _, _, event ->
+            if (event.action == KeyEvent.ACTION_DOWN) {
+                val capsOn = event.metaState and KeyEvent.META_CAPS_LOCK_ON != 0
+                val numOn = event.metaState and KeyEvent.META_NUM_LOCK_ON != 0
 
-        btnNext.setOnClickListener {
-            val input = etId.text.toString()
-            val statusText = tvStatus.text.toString()
+                binding.layoutCapsLockWarning.visibility = if (capsOn) View.VISIBLE else View.GONE
+                binding.layoutNumLockWarning.visibility = if (numOn) View.VISIBLE else View.GONE
+            }
+            false
+        }
 
-            if (statusText == "정상적으로 확인되었습니다 :)") {
+        binding.btnNext.setOnClickListener {
+            val number = binding.etNumber.text.toString()
+            val isValid = number.length == 11 && number.all { it.isDigit() }
+
+            if (isValid) {
+                (requireActivity() as SignupActivity).phoneNumber = number
+
                 parentFragmentManager.beginTransaction()
                     .replace(R.id.signup_container, SignupStep4Fragment())
                     .addToBackStack(null)
@@ -70,14 +97,16 @@ class SignupStep3Fragment : Fragment() {
             }
         }
 
-
-        btnBack.setOnClickListener {
+        binding.btnBack.setOnClickListener {
             parentFragmentManager.beginTransaction()
                 .replace(R.id.signup_container, SignupStep2Fragment())
                 .addToBackStack(null)
                 .commit()
         }
+    }
 
-        return view
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

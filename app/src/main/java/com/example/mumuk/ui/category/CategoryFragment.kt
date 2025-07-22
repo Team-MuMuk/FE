@@ -4,16 +4,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import androidx.fragment.app.Fragment
-import com.example.mumuk.ui.category.health.CategoryHealthFragment
-import com.example.mumuk.ui.category.random.CategoryRandomFragment
-import com.example.mumuk.ui.category.weight.CategoryWeightFragment
+import androidx.fragment.app.activityViewModels
 import com.example.mumuk.databinding.FragmentCategoryBinding
-import com.example.mumuk.R
 
 class CategoryFragment : Fragment() {
     private var _binding: FragmentCategoryBinding? = null
     private val binding get() = _binding!!
+
+    private val viewModel: CategoryViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -29,51 +29,29 @@ class CategoryFragment : Fragment() {
             binding.categoryHealthTypeBtn,
             binding.categoryRandomBtn
         )
+        btns.forEachIndexed { i, btn -> btn.isSelected = (i == viewModel.selectedCategoryIdx) }
+        showMiddleFragment(viewModel.selectedCategoryIdx)
 
-        replaceCategoryFragment(CategoryWeightFragment())
-        btns.forEachIndexed { i, btn -> btn.isSelected = (i == 0) }
-
-        btns[0].setOnClickListener {
-            replaceCategoryFragment(CategoryWeightFragment())
-            btns.forEachIndexed { i, b -> b.isSelected = (i == 0) }
-        }
-        btns[1].setOnClickListener {
-            replaceCategoryFragment(CategoryHealthFragment())
-            btns.forEachIndexed { i, b -> b.isSelected = (i == 1) }
-        }
-        btns[2].setOnClickListener {
-            replaceCategoryFragment(CategoryRandomFragment())
-            btns.forEachIndexed { i, b -> b.isSelected = (i == 2) }
-        }
-
-        childFragmentManager.addOnBackStackChangedListener {
-            val fullscreenFragment = childFragmentManager.findFragmentById(R.id.category_fullscreen_container)
-            if (fullscreenFragment == null) {
-                binding.categoryButtonArea.visibility = View.VISIBLE
-                binding.categoryContentContainerFl.visibility = View.VISIBLE
-                binding.categoryFullscreenContainer.visibility = View.GONE
-            }
-        }
+        binding.categoryWeightTypeBtn.setOnClickListener { selectCategory(0, btns) }
+        binding.categoryHealthTypeBtn.setOnClickListener { selectCategory(1, btns) }
+        binding.categoryRandomBtn.setOnClickListener { selectCategory(2, btns) }
     }
 
-    private fun replaceCategoryFragment(fragment: Fragment) {
-        binding.categoryButtonArea.visibility = View.VISIBLE
-        binding.categoryContentContainerFl.visibility = View.VISIBLE
-        binding.categoryFullscreenContainer.visibility = View.GONE
-
-        childFragmentManager.beginTransaction()
-            .replace(R.id.category_content_container_fl, fragment)
-            .commit()
+    private fun selectCategory(idx: Int, btns: List<Button>) {
+        viewModel.selectedCategoryIdx = idx
+        btns.forEachIndexed { i, btn -> btn.isSelected = (i == idx) }
+        showMiddleFragment(idx)
     }
 
-    fun showFullScreenFragment(fragment: Fragment) {
-        binding.categoryButtonArea.visibility = View.GONE
-        binding.categoryContentContainerFl.visibility = View.GONE
-        binding.categoryFullscreenContainer.visibility = View.VISIBLE
-
+    private fun showMiddleFragment(idx: Int) {
+        val fragment = when (idx) {
+            0 -> com.example.mumuk.ui.category.weight.CategoryWeightFragment()
+            1 -> com.example.mumuk.ui.category.health.CategoryHealthFragment()
+            2 -> com.example.mumuk.ui.category.random.CategoryRandomFragment()
+            else -> com.example.mumuk.ui.category.weight.CategoryWeightFragment()
+        }
         childFragmentManager.beginTransaction()
-            .replace(R.id.category_fullscreen_container, fragment)
-            .addToBackStack(null)
+            .replace(com.example.mumuk.R.id.category_content_container_fl, fragment)
             .commit()
     }
 

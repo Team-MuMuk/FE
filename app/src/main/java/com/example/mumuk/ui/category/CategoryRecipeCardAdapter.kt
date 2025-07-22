@@ -3,31 +3,44 @@ package com.example.mumuk.ui.category
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.mumuk.databinding.ItemCategoryRecipeCardBinding
+import com.example.mumuk.R
+import com.example.mumuk.data.model.Recipe
+import com.example.mumuk.databinding.ItemRecipeBinding
 
 class CategoryRecipeCardAdapter(
-    private val items: List<CategoryRecipeCard>,
-    private val onItemClick: ((CategoryRecipeCard) -> Unit)? = null
-) : RecyclerView.Adapter<CategoryRecipeCardAdapter.ViewHolder>() {
+    private val recipes: List<Recipe>,
+    private val onItemClick: (Recipe) -> Unit
+) : RecyclerView.Adapter<CategoryRecipeCardAdapter.RecipeViewHolder>() {
 
-    inner class ViewHolder(private val binding: ItemCategoryRecipeCardBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: CategoryRecipeCard) {
-            binding.recipeTitle.text = item.title
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecipeViewHolder {
+        val binding = ItemRecipeBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return RecipeViewHolder(binding)
+    }
 
-            binding.root.setOnClickListener {
-                onItemClick?.invoke(item)
-            }
+    override fun onBindViewHolder(holder: RecipeViewHolder, position: Int) {
+        val recipe = recipes[position]
+        holder.bind(recipe)
+        holder.itemView.setOnClickListener {
+            onItemClick(recipe)
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding = ItemCategoryRecipeCardBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return ViewHolder(binding)
-    }
+    override fun getItemCount(): Int = recipes.size
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(items[position])
+    class RecipeViewHolder(private val binding: ItemRecipeBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        fun bind(recipe: Recipe) {
+            if (recipe.img != null) {
+                binding.recipeImg.setImageResource(recipe.img)
+            } else {
+                binding.recipeImg.setImageResource(R.drawable.bg_mosaic)
+            }
+            binding.recipeTitle.text = recipe.title
+            if (recipe.isLiked) {
+                binding.imageView6.setImageResource(R.drawable.btn_heart_fill)
+            } else {
+                binding.imageView6.setImageResource(R.drawable.btn_heart_blank)
+            }
+        }
     }
-
-    override fun getItemCount(): Int = items.size
 }

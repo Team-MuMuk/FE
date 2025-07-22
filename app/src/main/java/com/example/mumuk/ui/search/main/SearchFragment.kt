@@ -12,7 +12,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mumuk.R
 import com.example.mumuk.databinding.FragmentSearchBinding
 import com.example.mumuk.databinding.ItemSearchSuggestKeywordChipBinding
-import com.example.mumuk.ui.category.CategoryRecipeCard
+import com.example.mumuk.data.model.Recipe
+import com.example.mumuk.ui.search.SearchRecentRecipeAdapter
 
 class SearchFragment : Fragment() {
     private var _binding: FragmentSearchBinding? = null
@@ -23,8 +24,16 @@ class SearchFragment : Fragment() {
     private val popularKeywords = listOf("곤약밥 레시피", "곤약밥 레시피", "곤약밥 레시피", "곤약밥 레시피", "곤약밥 레시피", "곤약밥 레시피", "곤약밥 레시피", "곤약밥 레시피", "곤약밥 레시피", "곤약밥 레시피")
 
     private val recentRecipes = listOf(
-        CategoryRecipeCard("헬스식단", "연어 포케"),
-        CategoryRecipeCard("헬스식단", "바스크치즈케이크")
+        Recipe(
+            img = R.drawable.img_food_sample,
+            title = "연어 포케",
+            isLiked = false
+        ),
+        Recipe(
+            img = R.drawable.img_food_sample,
+            title = "바스크치즈케이크",
+            isLiked = false
+        )
     )
 
     override fun onCreateView(
@@ -58,7 +67,7 @@ class SearchFragment : Fragment() {
         val flexbox = binding.searchSuggestKeywordsFl
         flexbox.removeAllViews()
         val keywordsPerRow = 3
-        val keywords = suggestKeywords.take(6) //
+        val keywords = suggestKeywords.take(6)
 
         for (i in keywords.indices step keywordsPerRow) {
             val rowLayout = LinearLayout(requireContext()).apply {
@@ -86,7 +95,14 @@ class SearchFragment : Fragment() {
     }
 
     private fun setupRecentRecipeList() {
-        val adapter = SearchRecentRecipeAdapter(recentRecipes)
+        val adapter = SearchRecentRecipeAdapter(recentRecipes) { recipe ->
+            val bundle = Bundle().apply {
+                putString("title", recipe.title)
+                putInt("img", recipe.img ?: 0)
+                putBoolean("isLiked", recipe.isLiked)
+            }
+            findNavController().navigate(R.id.action_searchFragment_to_recipeFragment, bundle)
+        }
         binding.searchRecentRecipeRv.adapter = adapter
         binding.searchRecentRecipeRv.layoutManager =
             LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)

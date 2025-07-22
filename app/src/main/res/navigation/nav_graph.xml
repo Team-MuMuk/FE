@@ -10,7 +10,6 @@
         android:name="com.example.mumuk.ui.home.HomeFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_home" >
-
         <action
             android:id="@+id/action_navigation_home_to_recipeFragment"
             app:destination="@id/recipeFragment"
@@ -18,7 +17,6 @@
             app:exitAnim="@anim/hold"
             app:popEnterAnim="@anim/hold"
             app:popExitAnim="@anim/slide_out_right"/>
-
         <action
             android:id="@+id/action_navigation_home_to_healthManagementFragment"
             app:destination="@id/healthManagementFragment"
@@ -26,7 +24,6 @@
             app:exitAnim="@anim/hold"
             app:popEnterAnim="@anim/hold"
             app:popExitAnim="@anim/slide_out_right"/>
-
         <action
             android:id="@+id/action_navigation_home_to_bookmarkRecipeFragment"
             app:destination="@id/bookmarkRecipeFragment"
@@ -34,7 +31,6 @@
             app:exitAnim="@anim/hold"
             app:popEnterAnim="@anim/hold"
             app:popExitAnim="@anim/slide_out_right"/>
-
         <action
             android:id="@+id/action_navigation_home_to_categoryFragment"
             app:destination="@id/navigation_category" />
@@ -52,7 +48,53 @@
         android:id="@+id/navigation_category"
         android:name="com.example.mumuk.ui.category.CategoryFragment"
         android:label="fragment_category"
-        tools:layout="@layout/fragment_category" />
+        tools:layout="@layout/fragment_category" >
+        <action
+            android:id="@+id/action_categoryFragment_to_categoryWeightLossFragment"
+            app:destination="@id/categoryWeightLossFragment" />
+        <action
+            android:id="@+id/action_categoryFragment_to_categoryLowSugarFragment"
+            app:destination="@id/categoryLowSugarFragment" />
+        <action
+            android:id="@+id/action_categoryFragment_to_categoryRandomRecipeFragment"
+            app:destination="@id/categoryRandomRecipeFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/categoryWeightLossFragment"
+        android:name="com.example.mumuk.ui.category.weight.CategoryWeightLossFragment"
+        android:label="fragment_category_weight_loss"
+        tools:layout="@layout/fragment_category_weight_loss">
+        <action
+            android:id="@+id/action_categoryWeightLossFragment_to_recipeFragment"
+            app:destination="@id/recipeFragment"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/categoryLowSugarFragment"
+        android:name="com.example.mumuk.ui.category.health.CategoryLowSugarFragment"
+        android:label="fragment_category_low_sugar"
+        tools:layout="@layout/fragment_category_low_sugar">
+        <action
+            android:id="@+id/action_categoryLowSugarFragment_to_recipeFragment"
+            app:destination="@id/recipeFragment"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/categoryRandomRecipeFragment"
+        android:name="com.example.mumuk.ui.category.random.CategoryRandomRecipeFragment"
+        android:label="fragment_category_random_recipe"
+        tools:layout="@layout/fragment_category_random_recipe" >
+        <action
+            android:id="@+id/action_categoryRandomRecipeFragment_to_recipeFragment"
+            app:destination="@id/recipeFragment"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/recipeFragment"
+        android:name="com.example.mumuk.ui.recipe.RecipeFragment"
+        android:label="fragment_recipe"
+        tools:layout="@layout/fragment_recipe" />
 
     <fragment
         android:id="@+id/navigation_search"
@@ -62,6 +104,9 @@
         <action
             android:id="@+id/action_searchFragment_to_searchAutocompleteFragment"
             app:destination="@id/searchAutocompleteFragment"/>
+        <action
+            android:id="@+id/action_searchFragment_to_recipeFragment"
+            app:destination="@id/recipeFragment" />
     </fragment>
 
     <fragment
@@ -69,46 +114,26 @@
         android:name="com.example.mumuk.ui.mypage.MyPageFragment"
         android:label="마이페이지"
         tools:layout="@layout/fragment_my_page">
-
-        <action
-            android:id="@+id/action_myPage_to_settings"
-            app:destination="@id/settingsFragment"
-            />
-
         <action
             android:id="@+id/action_myPage_to_profile"
-            app:destination="@id/profileFragment"
-            />
-
+            app:destination="@id/profileFragment"/>
         <action
-            android:id="@+id/action_myPage_to_favorites"
-            app:destination="@id/favoriteRecipeFragment"
-            />
+            android:id="@+id/action_myPage_to_bookmarkRecipe"
+            app:destination="@id/bookmarkRecipeFragment" />
+        <action
+            android:id="@+id/action_myPage_to_recipeFragment"
+            app:destination="@id/recipeFragment" />
     </fragment>
-
-    <fragment
-        android:id="@+id/settingsFragment"
-        android:name="com.example.mumuk.ui.mypage.SettingsFragment"
-        android:label="설정"
-        tools:layout="@layout/fragment_settings" />
 
     <fragment
         android:id="@+id/profileFragment"
         android:name="com.example.mumuk.ui.mypage.ProfileFragment"
         android:label="프로필"
-        tools:layout="@layout/fragment_profile" />
-
-    <fragment
-        android:id="@+id/favoriteRecipeFragment"
-        android:name="com.example.mumuk.ui.mypage.FavoriteRecipeFragment"
-        android:label="찜한 레시피"
-        tools:layout="@layout/fragment_favorite_recipe" />
-
-    <fragment
-        android:id="@+id/recipeFragment"
-        android:name="com.example.mumuk.ui.recipe.RecipeFragment"
-        android:label="fragment_recipe"
-        tools:layout="@layout/fragment_recipe" />
+        tools:layout="@layout/fragment_profile">
+        <action
+            android:id="@+id/action_profile_to_myPage_with_updated_profile"
+            app:destination="@id/navigation_my_page" />
+    </fragment>
 
     <fragment
         android:id="@+id/searchAutocompleteFragment"
@@ -128,6 +153,21 @@
         <action
             android:id="@+id/action_searchResultFragment_to_searchFragment"
             app:destination="@id/navigation_search" />
+        <action
+            android:id="@+id/action_searchResultFragment_to_recipeFragment"
+            app:destination="@id/recipeFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/searchFragment"
+        android:name="com.example.mumuk.ui.search.main.SearchFragment"
+        tools:layout="@layout/fragment_search">
+        <action
+            android:id="@+id/action_searchFragment_to_recipeFragment"
+            app:destination="@id/recipeFragment" />
+        <action
+            android:id="@+id/action_searchResultFragment_to_recipeFragment"
+            app:destination="@id/recipeFragment" />
     </fragment>
 
     <fragment
@@ -140,7 +180,6 @@
             app:destination="@id/navigation_home"
             app:popUpTo="@id/navigation_home"
             app:popUpToInclusive="true" />
-
         <action
             android:id="@+id/action_healthManagement_to_healthComplete"
             app:destination="@id/healthCompleteFragment"
