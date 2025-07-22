@@ -189,8 +189,16 @@
         tools:layout="@layout/fragment_add_ingredient">
 
         <action
-            android:id="@+id/action_addIngredientFragment_to_ingredientDetailFragment"
+            android:id="@+id/action_addIngredientFragment_to_ingredientListFragment"
             app:destination="@id/ingredientListFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/hold"
+            app:popEnterAnim="@anim/hold"
+            app:popExitAnim="@anim/slide_out_right"/>
+
+        <action
+            android:id="@+id/action_addIngredientFragment_to_ingredientDetailFragment"
+            app:destination="@id/ingredientDetailFragment"
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/hold"
             app:popEnterAnim="@anim/hold"
@@ -200,6 +208,20 @@
     <fragment
         android:id="@+id/ingredientListFragment"
         android:name="com.example.mumuk.ui.ingredient.IngredientListFragment"
+        android:label="fragment_ingredient_list"
+        tools:layout="@layout/fragment_ingredient_list">
+        <action
+            android:id="@+id/action_ingredientListFragment_to_ingredientDetailFragment"
+            app:destination="@id/ingredientDetailFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/hold"
+            app:popEnterAnim="@anim/hold"
+            app:popExitAnim="@anim/slide_out_right"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/ingredientDetailFragment"
+        android:name="com.example.mumuk.ui.ingredient.IngredientDetailFragment"
         android:label="fragment_ingredient_detail"
-        tools:layout="@layout/fragment_ingredient_list" />
+        tools:layout="@layout/fragment_ingredient_detail" />
 </navigation>

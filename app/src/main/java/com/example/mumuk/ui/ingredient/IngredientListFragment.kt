@@ -11,6 +11,8 @@ import com.example.mumuk.databinding.FragmentIngredientListBinding
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
+import androidx.navigation.fragment.findNavController
+import com.example.mumuk.R
 
 class IngredientListFragment : Fragment() {
     private var _binding: FragmentIngredientListBinding? = null
@@ -31,7 +33,15 @@ class IngredientListFragment : Fragment() {
 
         val ingredientList = ingredientRepository.getIngredients()
         binding.ingredientRV.layoutManager = LinearLayoutManager(requireContext())
-        binding.ingredientRV.adapter = IngredientAdapter(ingredientList)
+        binding.ingredientRV.adapter = IngredientAdapter(ingredientList) { ingredient ->
+            val bundle = Bundle().apply {
+                putSerializable("ingredient", ingredient)
+            }
+            findNavController().navigate(
+                R.id.action_ingredientListFragment_to_ingredientDetailFragment,
+                bundle
+            )
+        }
 
         val allIngredients = ingredientRepository.getIngredients()
         val expiringList = allIngredients.filter {
@@ -40,7 +50,15 @@ class IngredientListFragment : Fragment() {
             ChronoUnit.DAYS.between(today, expiry) in 0..3
         }
         binding.expiringRV.layoutManager = LinearLayoutManager(requireContext())
-        binding.expiringRV.adapter = ExpiringIngredientAdapter(expiringList)
+        binding.expiringRV.adapter = ExpiringIngredientAdapter(expiringList) { ingredient ->
+            val bundle = Bundle().apply {
+                putSerializable("ingredient", ingredient)
+            }
+            findNavController().navigate(
+                R.id.action_ingredientListFragment_to_ingredientDetailFragment,
+                bundle
+            )
+        }
 
         binding.backBtn.setOnClickListener {
             requireActivity().onBackPressedDispatcher.onBackPressed()

@@ -43,12 +43,20 @@ class AddIngredientFragment : Fragment() {
         }
 
         binding.imageView2.setOnClickListener {
-            findNavController().navigate(R.id.action_addIngredientFragment_to_ingredientDetailFragment)
+            findNavController().navigate(R.id.action_addIngredientFragment_to_ingredientListFragment)
         }
 
         val ingredientList = ingredientRepository.getIngredients()
         binding.ingredientRV.layoutManager = LinearLayoutManager(requireContext())
-        binding.ingredientRV.adapter = IngredientAdapter(ingredientList)
+        binding.ingredientRV.adapter = IngredientAdapter(ingredientList) { ingredient ->
+            val bundle = Bundle().apply {
+                putSerializable("ingredient", ingredient)
+            }
+            findNavController().navigate(
+                R.id.action_addIngredientFragment_to_ingredientDetailFragment,
+                bundle
+            )
+        }
 
         binding.calendarBtn.setOnClickListener {
             binding.calendarBtn.setColorFilter(ContextCompat.getColor(requireContext(), R.color.blue_default))
