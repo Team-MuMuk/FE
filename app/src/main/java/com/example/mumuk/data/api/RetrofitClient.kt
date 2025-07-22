@@ -29,4 +29,9 @@ object RetrofitClient {
     }
 
     //TODO: 다른 api도 getAuthApi처럼 get~~Api 와 같이 추가해서 쓰기
+
+    fun getUserApi(context: Context): UserApiService {
+        return getRetrofit(context).create(UserApiService::class.java)
+    }
+
 }
