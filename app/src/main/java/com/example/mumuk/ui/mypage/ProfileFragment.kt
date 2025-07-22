@@ -35,7 +35,6 @@ class ProfileFragment : Fragment() {
     private var isEditingProfileImage = false
     private var selectedProfileImageResId: Int = R.drawable.ic_user_profile_orange
 
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -47,7 +46,6 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // accessToken에서 userId 추출
         val accessToken = TokenManager.getAccessToken(requireContext())
         if (accessToken.isNullOrBlank()) {
             Log.e("Profile", "accessToken 없음")
@@ -61,7 +59,6 @@ class ProfileFragment : Fragment() {
         } else {
             Log.d("Profile", "추출된 userId: $userId")
 
-            // userId로 프로필 조회 API 호출
             RetrofitClient.getUserApi(requireContext()).getUserProfile(userId)
                 .enqueue(object : Callback<UserProfileResponse> {
                     override fun onResponse(
@@ -74,9 +71,26 @@ class ProfileFragment : Fragment() {
                             response.body()?.data?.let { profile ->
                                 Log.d("Profile", "프로필 정보 수신 성공: $profile")
 
-                                binding.editName.setText(profile.name)
-                                binding.editNickname.setText(profile.nickName)
-                                binding.editStatus.setText(profile.statusMessage)
+                                if (profile.name.isNullOrBlank()) {
+                                    binding.editName.setText("")
+                                    binding.editName.hint = "이름을 입력하세요"
+                                } else {
+                                    binding.editName.setText(profile.name)
+                                }
+
+                                if (profile.nickName.isNullOrBlank()) {
+                                    binding.editNickname.setText("")
+                                    binding.editNickname.hint = "닉네임을 입력하세요"
+                                } else {
+                                    binding.editNickname.setText(profile.nickName)
+                                }
+
+                                if (profile.statusMessage.isNullOrBlank()) {
+                                    binding.editStatus.setText("")
+                                    binding.editStatus.hint = "상태 메시지를 입력하세요"
+                                } else {
+                                    binding.editStatus.setText(profile.statusMessage)
+                                }
                             }
                         } else {
                             Log.e("Profile", "프로필 응답 실패: ${response.code()} / ${response.message()}")
@@ -158,18 +172,13 @@ class ProfileFragment : Fragment() {
                     }
                 })
         }
-
     }
-
-
-
 
     private fun showProfileImageDialog() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_select_profile_image, null)
         val dialog = android.app.AlertDialog.Builder(requireContext())
             .setView(dialogView)
             .create()
-
 
         val ivOrange = dialogView.findViewById<ImageView>(R.id.iv_profile_orange)
         val ivWhite = dialogView.findViewById<ImageView>(R.id.iv_profile_white)
@@ -181,7 +190,6 @@ class ProfileFragment : Fragment() {
             resetProfileEditPen()
             dialog.dismiss()
         }
-
 
         ivWhite.setOnClickListener {
             selectedProfileImageResId = R.drawable.ic_user_profile_white
@@ -207,7 +215,7 @@ class ProfileFragment : Fragment() {
 
         val params = window?.attributes
         params?.gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL
-        params?.y = 640 // 값 줄이면 더 위로 감
+        params?.y = 640
         window?.attributes = params
 
         dialog.show()
@@ -215,7 +223,6 @@ class ProfileFragment : Fragment() {
         dialog.setOnDismissListener {
             resetProfileEditPen()
         }
-
     }
 
     private fun resetProfileEditPen() {
@@ -245,7 +252,6 @@ class ProfileFragment : Fragment() {
             }
         }
     }
-
 
     override fun onDestroyView() {
         super.onDestroyView()
