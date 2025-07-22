@@ -234,7 +234,6 @@ class MyPageFragment : Fragment() {
             RecentRecipe("아보카도 포케", R.drawable.bg_mosaic, liked = false)
         )
 
-        // ㄹRecyclerView 연결
         binding.rvRecentRecipes.apply {
             adapter = RecentRecipeAdapter(recentList) { recipe ->
                 findNavController().navigate(R.id.recipeFragment)
@@ -242,30 +241,51 @@ class MyPageFragment : Fragment() {
             layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         }
 
-        arguments?.let { bundle ->
-            bundle.getString("nickname")?.let { nickname ->
-                binding.tvNickname.text = buildString {
-                    append(nickname)
-                    append("님!")
-                }
-            }
+        // 서버에서 프로필 정보 불러오기
+        loadUserProfile()
+    }
 
-            bundle.getString("status")?.let { status ->
-                binding.tvSubtitle.text = status
-            }
+    private fun loadUserProfile() {
+        val accessToken = TokenManager.getAccessToken(requireContext())
+        val userId = com.example.mumuk.utils.JwtUtils.getUserIdFromToken(accessToken ?: "")
 
-            bundle.getString("name")?.let { name ->
-            }
-
-            val profileImageResId = bundle.getInt(
-                "profileImageResId",
-                R.drawable.ic_user_profile_orange
-            )
-            binding.imgProfile.setImageResource(profileImageResId)
+        if (userId == null) {
+            Log.e("MyPage", "userId 추출 실패")
+            return
         }
 
+        RetrofitClient.getUserApi(requireContext()).getUserProfile(userId)
+            .enqueue(object : Callback<com.example.mumuk.data.model.mypage.UserProfileResponse> {
+                override fun onResponse(
+                    call: Call<com.example.mumuk.data.model.mypage.UserProfileResponse>,
+                    response: Response<com.example.mumuk.data.model.mypage.UserProfileResponse>
+                ) {
+                    if (response.isSuccessful) {
+                        val profile = response.body()?.data ?: return
+                        Log.d("MyPage", "✅ 프로필 불러오기 성공: $profile")
 
+                        binding.tvNickname.text = "${profile.nickName}님!"
+                        binding.tvSubtitle.text = profile.statusMessage
+
+                        val profileRes = when (profile.profileImage ?: "orange") {
+                            "orange" -> R.drawable.ic_user_profile_orange
+                            "white" -> R.drawable.ic_user_profile_white
+                            "green" -> R.drawable.ic_user_profile_green
+                            else -> R.drawable.ic_user_profile_orange
+                        }
+                        binding.imgProfile.setImageResource(profileRes)
+
+                    } else {
+                        Log.e("MyPage", "프로필 API 실패: ${response.code()}")
+                    }
+                }
+
+                override fun onFailure(call: Call<com.example.mumuk.data.model.mypage.UserProfileResponse>, t: Throwable) {
+                    Log.e("MyPage", "네트워크 오류", t)
+                }
+            })
     }
+
 
 
 }
