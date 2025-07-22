@@ -60,6 +60,8 @@ class MyPageFragment : Fragment() {
                 val refreshToken = TokenManager.getRefreshToken(requireContext()) ?: ""
                 val loginType = "LOCAL"
 
+                Log.d("LogoutRequest", "Sending logout with refreshToken: $refreshToken, loginType: $loginType")
+
                 RetrofitClient.getAuthApi(requireContext()).logout(refreshToken, loginType)
                     .enqueue(object : Callback<CommonResponse> {
                         override fun onResponse(
@@ -67,6 +69,11 @@ class MyPageFragment : Fragment() {
                             response: Response<CommonResponse>
                         ) {
                             val body = response.body()
+
+                            Log.d("LogoutResponse", "isSuccessful: ${response.isSuccessful}")
+                            Log.d("LogoutResponse", "code: ${response.code()}, message: ${response.message()}")
+                            Log.d("LogoutResponse", "body: $body")
+
                             if (response.isSuccessful && body?.message?.contains("성공") == true) {
                                 TokenManager.clearTokens(requireContext())
 
@@ -81,12 +88,14 @@ class MyPageFragment : Fragment() {
                         }
 
                         override fun onFailure(call: Call<CommonResponse>, t: Throwable) {
+                            Log.e("LogoutFailure", "네트워크 오류", t)
                             Toast.makeText(requireContext(), "네트워크 오류: ${t.message}", Toast.LENGTH_SHORT).show()
                         }
                     })
 
                 dialog.dismiss()
             }
+
 
 
 
@@ -111,7 +120,41 @@ class MyPageFragment : Fragment() {
             }
 
             deleteBinding.btnDialogLogin.setOnClickListener {
-                Toast.makeText(requireContext(), "탈퇴 처리 진행", Toast.LENGTH_SHORT).show()
+                RetrofitClient.getAuthApi(requireContext()).withdraw()
+                    .enqueue(object : Callback<CommonResponse> {
+                        override fun onResponse(
+                            call: Call<CommonResponse>,
+                            response: Response<CommonResponse>
+                        ) {
+                            val result = response.body()
+                            Log.d("Withdraw", "response: $result")
+
+                            if (response.isSuccessful && result?.message?.contains("성공") == true) {
+                                Toast.makeText(requireContext(), "회원탈퇴가 완료되었습니다.", Toast.LENGTH_SHORT).show()
+
+                                TokenManager.clearTokens(requireContext())
+
+                                val intent = Intent(requireContext(), LoginActivity::class.java)
+                                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                startActivity(intent)
+                            } else {
+                                Toast.makeText(
+                                    requireContext(),
+                                    "회원탈퇴 실패: ${result?.message ?: "서버 오류"}",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+
+                        override fun onFailure(call: Call<CommonResponse>, t: Throwable) {
+                            Toast.makeText(
+                                requireContext(),
+                                "네트워크 오류: ${t.message}",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    })
+
                 dialog.dismiss()
             }
 
@@ -122,6 +165,7 @@ class MyPageFragment : Fragment() {
             ).toInt()
             dialog.window?.setLayout(widthInPx, ViewGroup.LayoutParams.WRAP_CONTENT)
         }
+
 
         binding.itemVersion.setOnClickListener {
             showSimpleConfirmDialog(

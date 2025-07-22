@@ -1,16 +1,22 @@
 package com.example.mumuk.ui.login
 
 import android.app.Dialog
-import android.content.Intent
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import com.example.mumuk.R
+import com.example.mumuk.data.api.RetrofitClient
+import com.example.mumuk.data.model.auth.CommonResponse
+import com.example.mumuk.data.model.auth.FindIdRequest
+import com.example.mumuk.data.model.auth.FindPwRequest
 import com.example.mumuk.databinding.FragmentFindAccountBinding
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class FindAccountFragment : Fragment() {
 
@@ -49,17 +55,82 @@ class FindAccountFragment : Fragment() {
         }
 
         binding.btnConfirmCode.setOnClickListener {
-            showCustomDialog(
-                message = "인증코드가 확인되었습니다.",
-                layoutResId = R.layout.dialog_confirm,
-                buttonText = "아이디 확인하기"
-            ) {
-                showIdDialog("mumuk123")
-            }
+            val name = binding.etName.text.toString().trim()
+            val phoneNumber = binding.etNum.text.toString().trim()
+
+            val request = FindIdRequest(name, phoneNumber)
+
+            Log.d("FindId", "Request: name=$name, phone=$phoneNumber")
+
+            RetrofitClient.getAuthApi(requireContext()).findId(request)
+                .enqueue(object : Callback<CommonResponse> {
+                    override fun onResponse(call: Call<CommonResponse>, response: Response<CommonResponse>) {
+                        val result = response.body()
+
+                        Log.d("FindId", "HTTP code: ${response.code()}")
+                        Log.d("FindId", "Raw response: ${response.raw()}")
+                        Log.d("FindId", "Response body: $result")
+
+                        if (response.isSuccessful && result?.message?.contains("성공") == true) {
+                            val userId = result.data ?: ""
+                            Log.d("FindId", "아이디 찾기 성공 - userId: $userId")
+                            showIdDialog(userId)
+                        } else {
+                            Log.d("FindId", "아이디 찾기 실패 - message: ${result?.message}")
+                            showCustomDialog(
+                                message = "아이디 찾기에 실패했습니다.\n입력 정보를 확인해 주세요.",
+                                layoutResId = R.layout.dialog_confirm
+                            )
+                        }
+                    }
+
+                    override fun onFailure(call: Call<CommonResponse>, t: Throwable) {
+                        Log.e("FindId", "네트워크 오류: ${t.message}", t)
+                        showCustomDialog(
+                            message = "네트워크 오류가 발생했습니다.\n다시 시도해 주세요.",
+                            layoutResId = R.layout.dialog_confirm
+                        )
+                    }
+                })
         }
 
+
+
         binding.btnSendCodePw.setOnClickListener {
-            showCustomDialog("임시 비밀번호가 발송되었습니다.", R.layout.dialog_code_sent)
+            binding.btnSendCodePw.setOnClickListener {
+                val loginId = binding.etIdPw.text.toString().trim()
+                val name = binding.etNamePw.text.toString().trim()
+                val phone = binding.etPhonePw.text.toString().trim()
+
+                val request = FindPwRequest(loginId, name, phone)
+
+                RetrofitClient.getAuthApi(requireContext()).findPassword(request)
+                    .enqueue(object : Callback<CommonResponse> {
+                        override fun onResponse(call: Call<CommonResponse>, response: Response<CommonResponse>) {
+                            Log.d("FindPwResponse", "response: ${response.body()}")
+                            Log.d("FindPwResponse", "code: ${response.code()}, msg: ${response.message()}")
+
+                            val result = response.body()
+                            if (response.isSuccessful && result?.message?.contains("성공") == true) {
+                                showCustomDialog(
+                                    message = "임시 비밀번호가 발송되었습니다.",
+                                    layoutResId = R.layout.dialog_code_sent
+                                )
+                            } else {
+                                showCustomDialog(
+                                    message = "비밀번호 찾기에 실패했습니다.\n입력 정보를 확인해 주세요.",
+                                    layoutResId = R.layout.dialog_confirm
+                                )
+                            }
+                        }
+
+
+                        override fun onFailure(call: Call<CommonResponse>, t: Throwable) {
+                            showCustomDialog("네트워크 오류가 발생했습니다.\n다시 시도해 주세요.", R.layout.dialog_confirm)
+                        }
+                    })
+            }
+
         }
 
 
