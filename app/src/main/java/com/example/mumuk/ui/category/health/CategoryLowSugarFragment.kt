@@ -113,24 +113,24 @@ class CategoryLowSugarFragment : Fragment() {
             )
             "콜레스테롤 관리" -> listOf(
                 Recipe(
-                    img = R.drawable.img_food_sample,
+                    img = R.drawable.bg_mosaic,
                     title = "아보카도 샐러드",
                     isLiked = false
                 ),
                 Recipe(
-                    img = R.drawable.img_food_sample,
+                    img = R.drawable.bg_mosaic,
                     title = "병아리콩스튜",
                     isLiked = false
                 )
             )
             "소화 건강" -> listOf(
                 Recipe(
-                    img = R.drawable.img_food_sample,
+                    img = R.drawable.bg_mosaic,
                     title = "요거트볼",
                     isLiked = false
                 ),
                 Recipe(
-                    img = R.drawable.img_food_sample,
+                    img = R.drawable.bg_mosaic,
                     title = "바나나 오트밀",
                     isLiked = false
                 )
