@@ -19,22 +19,22 @@ class SearchResultFragment : Fragment() {
 
     private val dummyList = listOf(
         Recipe(
-            img = R.drawable.img_food_sample,
+            img = R.drawable.bg_mosaic,
             title = "연어 포케",
             isLiked = false
         ),
         Recipe(
-            img = R.drawable.img_food_sample,
+            img = R.drawable.bg_mosaic,
             title = "닭가슴살 포케",
             isLiked = false
         ),
         Recipe(
-            img = R.drawable.img_food_sample,
+            img = R.drawable.bg_mosaic,
             title = "아보카도 포케",
             isLiked = false
         ),
         Recipe(
-            img = R.drawable.img_food_sample,
+            img = R.drawable.bg_mosaic,
             title = "참치 포케",
             isLiked = false
         )

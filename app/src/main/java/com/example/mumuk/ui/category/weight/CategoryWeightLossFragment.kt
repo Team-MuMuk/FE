@@ -88,24 +88,24 @@ class CategoryWeightLossFragment : Fragment() {
         val items = when (tabName) {
             "체중 감량" -> listOf(
                 Recipe(
-                    img = R.drawable.img_food_sample,
+                    img = R.drawable.bg_mosaic,
                     title = "연어 포케",
                     isLiked = false
                 ),
                 Recipe(
-                    img = R.drawable.img_food_sample,
+                    img = R.drawable.bg_mosaic,
                     title = "닭가슴살 샐러드",
                     isLiked = false
                 )
             )
             "근육 증가" -> listOf(
                 Recipe(
-                    img = R.drawable.img_food_sample,
+                    img = R.drawable.bg_mosaic,
                     title = "닭가슴살 스테이크",
                     isLiked = false
                 ),
                 Recipe(
-                    img = R.drawable.img_food_sample,
+                    img = R.drawable.bg_mosaic,
                     title = "오트밀 스크램블",
                     isLiked = false
                 )
