@@ -11,9 +11,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.mumuk.R
+import com.example.mumuk.data.api.RetrofitClient
+import com.example.mumuk.data.model.auth.ReissuePwRequest
+import com.example.mumuk.data.model.auth.ReissuePwResponse
 import com.example.mumuk.databinding.FragmentChangePwBinding
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class ChangePwFragment : Fragment() {
 
@@ -62,8 +69,28 @@ class ChangePwFragment : Fragment() {
                 binding.tvPwStatus.text = "비밀번호가 일치하지 않습니다"
             } else {
                 binding.tvPwStatus.text = ""
-                showPasswordChangedDialog()
+
+                val request = ReissuePwRequest(passWord = pw, confirmPassWord = pwNew)
+
+                RetrofitClient.getAuthApi(requireContext()).reissuePassword(request)
+                    .enqueue(object : Callback<ReissuePwResponse> {
+                        override fun onResponse(
+                            call: Call<ReissuePwResponse>,
+                            response: Response<ReissuePwResponse>
+                        ) {
+                            if (response.isSuccessful && response.body()?.status == "100 CONTINUE") {
+                                showPasswordChangedDialog()
+                            } else {
+                                Toast.makeText(requireContext(), "비밀번호 재설정 실패: ${response.body()?.message}", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+
+                        override fun onFailure(call: Call<ReissuePwResponse>, t: Throwable) {
+                            Toast.makeText(requireContext(), "네트워크 오류: ${t.message}", Toast.LENGTH_SHORT).show()
+                        }
+                    })
             }
+
         }
 
     }

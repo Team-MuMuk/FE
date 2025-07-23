@@ -1,5 +1,6 @@
 package com.example.mumuk.ui.signup
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
@@ -12,10 +13,15 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.example.mumuk.R
 import com.example.mumuk.data.api.RetrofitClient
+import com.example.mumuk.data.api.TokenManager
+import com.example.mumuk.data.model.auth.LoginRequest
+import com.example.mumuk.data.model.auth.LoginResponse
 import com.example.mumuk.data.model.auth.SignupRequest
 import com.example.mumuk.data.model.auth.SignupResponse
 import com.example.mumuk.databinding.FragmentSignupStep6Binding
+import com.example.mumuk.ui.MainActivity
 import retrofit2.Call
+import retrofit2.Callback
 import retrofit2.Response
 
 class SignupStep6Fragment : Fragment() {
@@ -87,36 +93,74 @@ class SignupStep6Fragment : Fragment() {
                     confirmPassword = activity.confirmPassword
                 )
 
+                Log.d("Signup", "📦 요청 객체: $request")
+
                 RetrofitClient.getAuthApi(requireContext()).signUp(request)
-                    .enqueue(object : retrofit2.Callback<com.example.mumuk.data.model.auth.SignupResponse> {
+                    .enqueue(object : retrofit2.Callback<SignupResponse> {
                         override fun onResponse(
                             call: Call<SignupResponse>,
                             response: Response<SignupResponse>
                         ) {
+                            Log.d("Signup", "📡 응답 코드: ${response.code()}")
+
                             if (response.isSuccessful) {
                                 val body = response.body()
                                 Log.d("Signup", "회원가입 성공: ${body?.message}")
-                                // 성공하면 완료 화면으로 이동
-                                parentFragmentManager.beginTransaction()
-                                    .replace(R.id.signup_container, SignupCompleteFragment())
-                                    .addToBackStack(null)
-                                    .commit()
+
+                                // 회원가입 성공 후 바로 로그인 요청
+                                val loginRequest = LoginRequest(
+                                    loginId = activity.loginId,
+                                    password = activity.password
+                                )
+
+                                RetrofitClient.getAuthApi(requireContext()).login(loginRequest)
+                                    .enqueue(object : Callback<LoginResponse> {
+                                        override fun onResponse(
+                                            call: Call<LoginResponse>,
+                                            response: Response<LoginResponse>
+                                        ) {
+                                            if (response.isSuccessful) {
+                                                val loginBody = response.body()
+                                                val tokenData = loginBody?.data
+
+                                                if (tokenData != null) {
+                                                    val accessToken = tokenData.accessToken
+                                                    val refreshToken = tokenData.refreshToken
+                                                    TokenManager.saveTokens(requireContext(), accessToken, refreshToken)
+                                                    Log.d("Login", "자동 로그인 성공 - accessToken: $accessToken")
+
+                                                    // MainActivity로 이동
+                                                    parentFragmentManager.beginTransaction()
+                                                        .replace(R.id.signup_container, SignupCompleteFragment())
+                                                        .addToBackStack(null)
+                                                        .commit()
+                                                } else {
+                                                    Log.e("Login", "로그인 응답에 토큰 없음")
+                                                }
+                                            } else {
+                                                Log.e("Login", "자동 로그인 실패: ${response.code()}")
+                                            }
+                                        }
+
+                                        override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
+                                            Log.e("Login", "자동 로그인 네트워크 오류: ${t.message}")
+                                        }
+                                    })
                             } else {
                                 Log.e("Signup", "회원가입 실패: ${response.code()}")
-
+                                val errorBody = response.errorBody()?.string()
+                                Log.e("Signup", "에러 내용: $errorBody")
                             }
+
                         }
 
-                        override fun onFailure(
-                            call: retrofit2.Call<com.example.mumuk.data.model.auth.SignupResponse>,
-                            t: Throwable
-                        ) {
+                        override fun onFailure(call: Call<SignupResponse>, t: Throwable) {
                             Log.e("Signup", "네트워크 오류: ${t.message}")
-
                         }
                     })
             }
         }
+
 
 
         binding.btnBack.setOnClickListener {
