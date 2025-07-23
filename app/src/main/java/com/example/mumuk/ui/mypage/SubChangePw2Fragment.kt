@@ -26,6 +26,8 @@ class SubChangePw2Fragment : Fragment() {
 
     private var _binding: FragmentChangePwBinding? = null
     private val binding get() = _binding!!
+    private var currentPassword: String = ""
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -40,6 +42,9 @@ class SubChangePw2Fragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        currentPassword = arguments?.getString("currentPassWord") ?: ""
+
+
         binding.btnBack.setOnClickListener {
             parentFragmentManager.popBackStack()
         }
@@ -47,6 +52,7 @@ class SubChangePw2Fragment : Fragment() {
         binding.btnConfirmChangePw.setOnClickListener {
             val pw = binding.etPw.text.toString()
             val pwNew = binding.etPwNew.text.toString()
+
 
             val pwPattern =
                 Regex("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@\$!%*#?&])[A-Za-z\\d@\$!%*#?&]{8,15}$")
@@ -70,7 +76,12 @@ class SubChangePw2Fragment : Fragment() {
             } else {
                 binding.tvPwStatus.text = ""
 
-                val request = ReissuePwRequest(passWord = pw, confirmPassWord = pwNew)
+                val request = ReissuePwRequest(
+                    currentPassWord = currentPassword,
+                    passWord = pw,
+                    confirmPassWord = pwNew
+                )
+
 
                 RetrofitClient.getAuthApi(requireContext()).reissuePassword(request)
                     .enqueue(object : Callback<ReissuePwResponse> {
