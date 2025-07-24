@@ -3,25 +3,26 @@ package com.example.mumuk.ui.search.main
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.mumuk.data.model.search.RecentSearch
 import com.example.mumuk.databinding.ItemSearchRecentKeywordChipBinding
 
 class SearchRecentKeywordAdapter(
-    private val keywords: MutableList<String>,
-    private val onKeywordClick: (String) -> Unit
+    private val keywords: MutableList<RecentSearch>,
+    private val onKeywordClick: (String) -> Unit,
+    private val onDeleteClick: (RecentSearch, Int) -> Unit
 ) : RecyclerView.Adapter<SearchRecentKeywordAdapter.ViewHolder>() {
 
     inner class ViewHolder(val binding: ItemSearchRecentKeywordChipBinding)
         : RecyclerView.ViewHolder(binding.root) {
-        fun bind(keyword: String) {
-            binding.searchRecentKeywordTv.text = keyword
+        fun bind(item: RecentSearch) {
+            binding.searchRecentKeywordTv.text = item.title
             binding.searchRecentKeywordTv.setOnClickListener {
-                onKeywordClick(keyword)
+                onKeywordClick(item.title ?: "")
             }
             binding.searchRecentKeywordDeleteBtn.setOnClickListener {
                 val position = adapterPosition
                 if (position != RecyclerView.NO_POSITION) {
-                    keywords.removeAt(position)
-                    notifyItemRemoved(position)
+                    onDeleteClick(item, position)
                 }
             }
         }
@@ -38,5 +39,10 @@ class SearchRecentKeywordAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(keywords[position])
+    }
+
+    fun removeAt(position: Int) {
+        keywords.removeAt(position)
+        notifyItemRemoved(position)
     }
 }

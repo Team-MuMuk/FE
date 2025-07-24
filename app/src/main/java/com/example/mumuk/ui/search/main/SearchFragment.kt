@@ -5,21 +5,30 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mumuk.R
+import com.example.mumuk.data.api.RetrofitClient
+import com.example.mumuk.data.model.search.RecentSearch
+import com.example.mumuk.data.model.search.RecentSearchResponse
 import com.example.mumuk.databinding.FragmentSearchBinding
 import com.example.mumuk.databinding.ItemSearchSuggestKeywordChipBinding
 import com.example.mumuk.data.model.Recipe
 import com.example.mumuk.ui.search.SearchRecentRecipeAdapter
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class SearchFragment : Fragment() {
     private var _binding: FragmentSearchBinding? = null
     private val binding get() = _binding!!
 
-    private val recentKeywords = mutableListOf("포케", "샐러드", "스테이크", "파스타", "닭가슴살 도시락", "아보카도", "연어", "볶음밥")
+    private val recentKeywords = mutableListOf<RecentSearch>()
+    private lateinit var recentKeywordAdapter: SearchRecentKeywordAdapter
+
     private val suggestKeywords = listOf("포케", "아보카도 샐러드", "샐러드", "닭가슴살", "건강주스", "키토김밥")
     private val popularKeywords = listOf("곤약밥 레시피", "곤약밥 레시피", "곤약밥 레시피", "곤약밥 레시피", "곤약밥 레시피", "곤약밥 레시피", "곤약밥 레시피", "곤약밥 레시피", "곤약밥 레시피", "곤약밥 레시피")
 
@@ -46,6 +55,7 @@ class SearchFragment : Fragment() {
         setupSuggestKeywordChips(inflater)
         setupPopularKeywordList()
         setupRecentRecipeList()
+        fetchRecentKeywordsFromApi()
 
         binding.searchEditEt.setOnClickListener {
             findNavController().navigate(R.id.action_searchFragment_to_searchAutocompleteFragment)
@@ -54,13 +64,114 @@ class SearchFragment : Fragment() {
         return binding.root
     }
 
+    override fun onResume() {
+        super.onResume()
+        fetchRecentKeywordsFromApi()
+    }
+
     private fun setupRecentKeywordList() {
-        val adapter = SearchRecentKeywordAdapter(recentKeywords) { keyword ->
-            binding.searchEditEt.setText(keyword)
-        }
-        binding.searchRecentKeywordsRv.adapter = adapter
+        recentKeywordAdapter = SearchRecentKeywordAdapter(
+            recentKeywords,
+            onKeywordClick = { keyword ->
+                binding.searchEditEt.setText(keyword)
+            },
+            onDeleteClick = { item, position ->
+                deleteRecentKeyword(item.title ?: "", item.createdAt)
+                recentKeywordAdapter.removeAt(position)
+                if (recentKeywords.isEmpty()) {
+                    setRecentKeywordEmptyView(true)
+                }
+            }
+        )
+        binding.searchRecentKeywordsRv.adapter = recentKeywordAdapter
         binding.searchRecentKeywordsRv.layoutManager =
             LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+    }
+
+    private fun fetchRecentKeywordsFromApi() {
+        val context = context ?: return
+        val api = RetrofitClient.getRecentSearchApi(context)
+        api.getRecentSearches().enqueue(object : Callback<RecentSearchResponse> {
+            override fun onResponse(
+                call: Call<RecentSearchResponse>,
+                response: Response<RecentSearchResponse>
+            ) {
+                if (response.isSuccessful) {
+                    val body = response.body()
+                    if (body?.status == "OK" && body.data != null) {
+                        recentKeywords.clear()
+                        recentKeywords.addAll(body.data)
+                        recentKeywordAdapter.notifyDataSetChanged()
+                        setRecentKeywordEmptyView(false)
+                    } else if (body?.code == "SEARCH_404") {
+                        recentKeywords.clear()
+                        recentKeywordAdapter.notifyDataSetChanged()
+                        setRecentKeywordEmptyView(true)
+                    }
+                } else {
+                    recentKeywords.clear()
+                    recentKeywordAdapter.notifyDataSetChanged()
+                    setRecentKeywordEmptyView(true)
+                }
+            }
+            override fun onFailure(call: Call<RecentSearchResponse>, t: Throwable) {
+                recentKeywords.clear()
+                recentKeywordAdapter.notifyDataSetChanged()
+                setRecentKeywordEmptyView(true)
+            }
+        })
+    }
+
+    private fun setRecentKeywordEmptyView(isEmpty: Boolean) {
+        val parent = binding.searchRecentKeywordsRv.parent as ViewGroup
+        var emptyView = parent.findViewWithTag<TextView>("recent_empty_tv")
+        if (isEmpty) {
+            binding.searchRecentKeywordsRv.visibility = View.GONE
+            if (emptyView == null) {
+                emptyView = TextView(requireContext()).apply {
+                    text = "최근 검색어가 없습니다."
+                    textSize = 14f
+                    setTextColor(resources.getColor(android.R.color.darker_gray, null))
+                    setPadding(0, 8, 0, 8)
+                    tag = "recent_empty_tv"
+                }
+                parent.addView(emptyView, parent.indexOfChild(binding.searchRecentKeywordsRv))
+            } else {
+                emptyView.visibility = View.VISIBLE
+            }
+        } else {
+            binding.searchRecentKeywordsRv.visibility = View.VISIBLE
+            emptyView?.visibility = View.GONE
+        }
+    }
+
+    fun saveRecentKeyword(keyword: String) {
+        val context = context ?: return
+        val api = RetrofitClient.getRecentSearchApi(context)
+        api.saveRecentSearch(keyword).enqueue(object : Callback<RecentSearchResponse> {
+            override fun onResponse(
+                call: Call<RecentSearchResponse>,
+                response: Response<RecentSearchResponse>
+            ) {
+            }
+            override fun onFailure(call: Call<RecentSearchResponse>, t: Throwable) {
+            }
+        })
+    }
+
+    fun deleteRecentKeyword(title: String, createdAt: String?) {
+        val context = context ?: return
+        val api = RetrofitClient.getRecentSearchApi(context)
+        val request = RecentSearch(title, createdAt)
+        api.deleteRecentSearch(request).enqueue(object : Callback<RecentSearchResponse> {
+            override fun onResponse(
+                call: Call<RecentSearchResponse>,
+                response: Response<RecentSearchResponse>
+            ) {
+            }
+            override fun onFailure(call: Call<RecentSearchResponse>, t: Throwable) {
+            }
+        })
     }
 
     private fun setupSuggestKeywordChips(inflater: LayoutInflater) {
