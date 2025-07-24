@@ -25,7 +25,8 @@ class SearchAutocompleteAdapter(
         val item = keywords[position]
         holder.binding.autocompleteKeywordTv.text = item.text
         holder.binding.autocompleteKeywordTv.setTextColor(
-            if (item.isHighlight) Color.BLACK else ContextCompat.getColor(holder.itemView.context, android.R.color.darker_gray)
+            if (item.isHighlight) Color.BLACK
+            else ContextCompat.getColor(holder.itemView.context, android.R.color.darker_gray)
         )
     }
 

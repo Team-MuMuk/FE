@@ -34,4 +34,7 @@ object RetrofitClient {
         return getRetrofit(context).create(UserApiService::class.java)
     }
 
+    fun getRecentSearchApi(context: Context): RecentSearchApiService {
+        return getRetrofit(context).create(RecentSearchApiService::class.java)
+    }
 }

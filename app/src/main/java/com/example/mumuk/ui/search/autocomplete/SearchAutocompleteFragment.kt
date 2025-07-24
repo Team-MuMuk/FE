@@ -12,8 +12,13 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mumuk.R
+import com.example.mumuk.data.api.RetrofitClient
+import com.example.mumuk.data.model.search.RecentSearchResponse
 import com.example.mumuk.databinding.FragmentSearchAutocompleteBinding
 import com.example.mumuk.ui.MainActivity
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class SearchAutocompleteFragment : Fragment() {
     private var _binding: FragmentSearchAutocompleteBinding? = null
@@ -56,7 +61,7 @@ class SearchAutocompleteFragment : Fragment() {
                 || actionId == EditorInfo.IME_ACTION_DONE
                 || actionId == EditorInfo.IME_NULL
             ) {
-                navigateToResult()
+                handleSearchAndNavigate()
                 true
             } else {
                 false
@@ -64,12 +69,7 @@ class SearchAutocompleteFragment : Fragment() {
         }
 
         binding.searchAutocompleteBtn.setOnClickListener {
-            navigateToResult()
-        }
-
-
-        binding.searchAutocompleteBtn.setOnClickListener {
-            navigateToResult()
+            handleSearchAndNavigate()
         }
 
         binding.searchAutocompleteEditEt.addTextChangedListener {
@@ -77,11 +77,32 @@ class SearchAutocompleteFragment : Fragment() {
         }
     }
 
-    private fun navigateToResult() {
+    private fun handleSearchAndNavigate() {
+        val keyword = binding.searchAutocompleteEditEt.text.toString().trim()
+        if (keyword.isEmpty()) return
+        saveRecentKeyword(keyword)
+
+        val bundle = Bundle().apply {
+            putString("keyword", keyword)
+        }
         val navController = findNavController()
         if (navController.currentDestination?.id == R.id.searchAutocompleteFragment) {
-            navController.navigate(R.id.action_searchAutocompleteFragment_to_searchResultFragment)
+            navController.navigate(R.id.action_searchAutocompleteFragment_to_searchResultFragment, bundle)
         }
+    }
+
+    private fun saveRecentKeyword(keyword: String) {
+        val context = context ?: return
+        val api = RetrofitClient.getRecentSearchApi(context)
+        api.saveRecentSearch(keyword).enqueue(object : Callback<RecentSearchResponse> {
+            override fun onResponse(
+                call: Call<RecentSearchResponse>,
+                response: Response<RecentSearchResponse>
+            ) {
+            }
+            override fun onFailure(call: Call<RecentSearchResponse>, t: Throwable) {
+            }
+        })
     }
 
     override fun onResume() {
