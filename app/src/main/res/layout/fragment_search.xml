@@ -112,6 +112,18 @@
         android:overScrollMode="never" />
 
     <TextView
+        android:id="@+id/popularEmptyTv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="인기 검색어가 없습니다."
+        android:textSize="16sp"
+        android:textColor="@android:color/darker_gray"
+        android:gravity="center"
+        android:visibility="gone"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp" />
+
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="최근 본 레시피"

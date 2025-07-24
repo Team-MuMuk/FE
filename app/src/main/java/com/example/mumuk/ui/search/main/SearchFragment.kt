@@ -14,6 +14,7 @@ import com.example.mumuk.R
 import com.example.mumuk.data.api.RetrofitClient
 import com.example.mumuk.data.model.search.RecentSearch
 import com.example.mumuk.data.model.search.RecentSearchResponse
+import com.example.mumuk.data.model.search.PopularKeywordResponse
 import com.example.mumuk.databinding.FragmentSearchBinding
 import com.example.mumuk.databinding.ItemSearchSuggestKeywordChipBinding
 import com.example.mumuk.data.model.Recipe
@@ -21,6 +22,7 @@ import com.example.mumuk.ui.search.SearchRecentRecipeAdapter
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import android.util.Log
 
 class SearchFragment : Fragment() {
     private var _binding: FragmentSearchBinding? = null
@@ -30,7 +32,7 @@ class SearchFragment : Fragment() {
     private lateinit var recentKeywordAdapter: SearchRecentKeywordAdapter
 
     private val suggestKeywords = listOf("포케", "아보카도 샐러드", "샐러드", "닭가슴살", "건강주스", "키토김밥")
-    private val popularKeywords = listOf("곤약밥 레시피", "곤약밥 레시피", "곤약밥 레시피", "곤약밥 레시피", "곤약밥 레시피", "곤약밥 레시피", "곤약밥 레시피", "곤약밥 레시피", "곤약밥 레시피", "곤약밥 레시피")
+    private var popularKeywords = listOf<String>()
 
     private val recentRecipes = listOf(
         Recipe(
@@ -53,7 +55,7 @@ class SearchFragment : Fragment() {
 
         setupRecentKeywordList()
         setupSuggestKeywordChips(inflater)
-        setupPopularKeywordList()
+        fetchPopularKeywordsFromApi()
         setupRecentRecipeList()
         fetchRecentKeywordsFromApi()
 
@@ -67,6 +69,7 @@ class SearchFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         fetchRecentKeywordsFromApi()
+        fetchPopularKeywordsFromApi()
     }
 
     private fun setupRecentKeywordList() {
@@ -199,10 +202,44 @@ class SearchFragment : Fragment() {
         }
     }
 
+    private fun fetchPopularKeywordsFromApi() {
+        val context = context ?: return
+        val api = RetrofitClient.getPopularKeywordApi(context)
+        api.getPopularKeywords().enqueue(object : Callback<PopularKeywordResponse> {
+            override fun onResponse(
+                call: Call<PopularKeywordResponse>,
+                response: Response<PopularKeywordResponse>
+            ) {
+                if (response.isSuccessful) {
+                    val body = response.body()
+                    Log.d("SearchFragment", "popularKeywords API data: ${body?.data}")
+                    if (body?.status == "OK" && body.data != null) {
+                        popularKeywords = body.data
+                        setupPopularKeywordList()
+                    }
+                } else {
+                    Log.d("SearchFragment", "popularKeywords API failed: ${response.code()} ${response.message()}")
+                }
+            }
+            override fun onFailure(call: Call<PopularKeywordResponse>, t: Throwable) {
+                Log.e("SearchFragment", "popularKeywords API error", t)
+            }
+        })
+    }
+
     private fun setupPopularKeywordList() {
-        val adapter = SearchPopularAdapter(popularKeywords)
-        binding.searchPopularKeywordsRv.adapter = adapter
-        binding.searchPopularKeywordsRv.layoutManager = GridLayoutManager(context, 2)
+        if (popularKeywords.isEmpty()) {
+            binding.searchPopularKeywordsRv.visibility = View.GONE
+            binding.popularEmptyTv.visibility = View.VISIBLE
+        } else {
+            binding.searchPopularKeywordsRv.visibility = View.VISIBLE
+            binding.popularEmptyTv.visibility = View.GONE
+            val adapter = SearchPopularAdapter(popularKeywords) { keyword ->
+                binding.searchEditEt.setText(keyword)
+            }
+            binding.searchPopularKeywordsRv.adapter = adapter
+            binding.searchPopularKeywordsRv.layoutManager = GridLayoutManager(context, 2)
+        }
     }
 
     private fun setupRecentRecipeList() {
