@@ -13,6 +13,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mumuk.R
 import com.example.mumuk.data.api.RetrofitClient
+import com.example.mumuk.data.model.search.RecipeAutocompleteResponse
 import com.example.mumuk.data.model.search.RecentSearchResponse
 import com.example.mumuk.databinding.FragmentSearchAutocompleteBinding
 import com.example.mumuk.ui.MainActivity
@@ -26,11 +27,7 @@ class SearchAutocompleteFragment : Fragment() {
 
     private lateinit var adapter: SearchAutocompleteAdapter
 
-    private var keywordList = listOf(
-        SearchAutocompleteKeyword("포케", true),
-        SearchAutocompleteKeyword("연어포케", false),
-        SearchAutocompleteKeyword("훈제오리포케", false)
-    )
+    private var keywordList = mutableListOf<SearchAutocompleteKeyword>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -43,6 +40,8 @@ class SearchAutocompleteFragment : Fragment() {
         binding.searchAutocompleteRv.layoutManager = LinearLayoutManager(context)
 
         binding.searchAutocompleteEditEt.setText("")
+
+        binding.noRecipeTv.visibility = View.GONE
 
         return binding.root
     }
@@ -74,7 +73,46 @@ class SearchAutocompleteFragment : Fragment() {
 
         binding.searchAutocompleteEditEt.addTextChangedListener {
             val query = it?.toString() ?: ""
+            fetchAutocompleteKeywords(query)
         }
+    }
+
+    private fun fetchAutocompleteKeywords(query: String) {
+        if (query.isBlank()) {
+            keywordList.clear()
+            adapter.notifyDataSetChanged()
+            binding.noRecipeTv.visibility = View.GONE
+            return
+        }
+        val context = context ?: return
+        val api = RetrofitClient.getRecipeAutocompleteApi(context)
+        api.getRecipeAutocomplete(query).enqueue(object : Callback<RecipeAutocompleteResponse> {
+            override fun onResponse(
+                call: Call<RecipeAutocompleteResponse>,
+                response: Response<RecipeAutocompleteResponse>
+            ) {
+                val body = response.body()
+                val keywords = body?.data ?: emptyList()
+                keywordList.clear()
+                keywords.forEachIndexed { idx, keyword ->
+                    keywordList.add(
+                        SearchAutocompleteKeyword(keyword, idx == 0)
+                    )
+                }
+                adapter.notifyDataSetChanged()
+
+                if (keywordList.isEmpty()) {
+                    binding.noRecipeTv.visibility = View.VISIBLE
+                } else {
+                    binding.noRecipeTv.visibility = View.GONE
+                }
+            }
+            override fun onFailure(call: Call<RecipeAutocompleteResponse>, t: Throwable) {
+                keywordList.clear()
+                adapter.notifyDataSetChanged()
+                binding.noRecipeTv.visibility = View.VISIBLE
+            }
+        })
     }
 
     private fun handleSearchAndNavigate() {
