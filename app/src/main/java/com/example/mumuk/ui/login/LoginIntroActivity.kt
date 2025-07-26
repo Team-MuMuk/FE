@@ -1,7 +1,6 @@
 package com.example.mumuk.ui.login
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -19,6 +18,8 @@ import com.example.mumuk.ui.MainActivity
 import com.example.mumuk.ui.signup.SignupActivity
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.user.UserApiClient
+import com.navercorp.nid.NaverIdLoginSDK
+import com.navercorp.nid.oauth.OAuthLoginCallback
 import kotlinx.coroutines.launch
 
 class LoginIntroActivity : AppCompatActivity() {
@@ -48,27 +49,28 @@ class LoginIntroActivity : AppCompatActivity() {
             finish()
         }
 
+        // 네이버 로그인 버튼 클릭 시
         binding.btnLoginNaver.setOnClickListener {
-            val clientId = "ELOxdm170OLtWxzA7nlr"
-            val redirectUri = "mumuk://login/oauth2/code/naver"
-            val state = "mumukDefaultState"
+            NaverIdLoginSDK.authenticate(this, object : OAuthLoginCallback {
+                override fun onSuccess() {
+                    val accessToken = NaverIdLoginSDK.getAccessToken()
+                    // TODO: accessToken을 서버로 넘기기 등 처리
+                    Log.d("NaverLogin", "네이버 로그인 성공, accessToken: $accessToken")
+                }
 
-            val loginUrl = "https://nid.naver.com/oauth2.0/authorize" +
-                    "?response_type=code" +
-                    "&client_id=$clientId" +
-                    "&redirect_uri=$redirectUri" +
-                    "&state=$state"
+                override fun onFailure(httpStatus: Int, message: String) {
+                    Log.e("NaverLogin", "네이버 로그인 실패: $httpStatus, $message")
+                }
 
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(loginUrl))
-            startActivity(intent)
+                override fun onError(errorCode: Int, message: String) {
+                    Log.e("NaverLogin", "네이버 로그인 에러: $errorCode, $message")
+                }
+            })
         }
-
-
 
         binding.btnLoginKakao.setOnClickListener {
             openKakaoLoginPage(this)
         }
-
 
         binding.btnLoginSamsung.setOnClickListener {
             startActivity(Intent(this, MainActivity::class.java))
@@ -86,6 +88,7 @@ class LoginIntroActivity : AppCompatActivity() {
             }
         }
     }
+
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
 
@@ -109,7 +112,6 @@ class LoginIntroActivity : AppCompatActivity() {
         }
     }
 
-
     private fun loginWithNaverCode(code: String, state: String) {
         lifecycleScope.launch {
             try {
@@ -118,7 +120,6 @@ class LoginIntroActivity : AppCompatActivity() {
                     val userData = response.body()?.data
 
                     Log.d("NaverLogin", "로그인 성공: ${userData?.email}")
-
 
                     startActivity(Intent(this@LoginIntroActivity, MainActivity::class.java))
                     finish()
@@ -130,7 +131,4 @@ class LoginIntroActivity : AppCompatActivity() {
             }
         }
     }
-
-
-
 }
