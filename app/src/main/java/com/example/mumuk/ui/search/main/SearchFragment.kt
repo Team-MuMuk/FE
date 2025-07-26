@@ -14,6 +14,7 @@ import com.example.mumuk.R
 import com.example.mumuk.data.api.RetrofitClient
 import com.example.mumuk.data.model.search.RecentSearch
 import com.example.mumuk.data.model.search.RecentSearchResponse
+import com.example.mumuk.data.model.search.PopularKeywordResponse
 import com.example.mumuk.databinding.FragmentSearchBinding
 import com.example.mumuk.databinding.ItemSearchSuggestKeywordChipBinding
 import com.example.mumuk.data.model.Recipe
@@ -21,6 +22,8 @@ import com.example.mumuk.ui.search.SearchRecentRecipeAdapter
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.text.SimpleDateFormat
+import java.util.*
 
 class SearchFragment : Fragment() {
     private var _binding: FragmentSearchBinding? = null
@@ -30,7 +33,7 @@ class SearchFragment : Fragment() {
     private lateinit var recentKeywordAdapter: SearchRecentKeywordAdapter
 
     private val suggestKeywords = listOf("포케", "아보카도 샐러드", "샐러드", "닭가슴살", "건강주스", "키토김밥")
-    private val popularKeywords = listOf("곤약밥 레시피", "곤약밥 레시피", "곤약밥 레시피", "곤약밥 레시피", "곤약밥 레시피", "곤약밥 레시피", "곤약밥 레시피", "곤약밥 레시피", "곤약밥 레시피", "곤약밥 레시피")
+    private var popularKeywords = listOf<String>()
 
     private val recentRecipes = listOf(
         Recipe(
@@ -53,7 +56,7 @@ class SearchFragment : Fragment() {
 
         setupRecentKeywordList()
         setupSuggestKeywordChips(inflater)
-        setupPopularKeywordList()
+        fetchPopularKeywordsFromApi()
         setupRecentRecipeList()
         fetchRecentKeywordsFromApi()
 
@@ -67,6 +70,7 @@ class SearchFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         fetchRecentKeywordsFromApi()
+        fetchPopularKeywordsFromApi()
     }
 
     private fun setupRecentKeywordList() {
@@ -199,10 +203,61 @@ class SearchFragment : Fragment() {
         }
     }
 
+    private fun fetchPopularKeywordsFromApi() {
+        val context = context ?: return
+        val api = RetrofitClient.getPopularKeywordApi(context)
+        api.getPopularKeywords().enqueue(object : Callback<PopularKeywordResponse> {
+            override fun onResponse(
+                call: Call<PopularKeywordResponse>,
+                response: Response<PopularKeywordResponse>
+            ) {
+                val body = response.body()
+                val keywords = body?.data?.trendKeywordList
+                val timeRaw = body?.data?.localDateTime
+
+                popularKeywords = keywords ?: emptyList()
+                setupPopularKeywordList()
+
+                if (!timeRaw.isNullOrBlank() && !popularKeywords.isNullOrEmpty()) {
+                    val displayTime = formatPopularTime(timeRaw)
+                    binding.searchPopularTimeTv.text = "$displayTime 기준"
+                } else {
+                    binding.searchPopularTimeTv.text = "없음"
+                }
+            }
+            override fun onFailure(call: Call<PopularKeywordResponse>, t: Throwable) {
+                popularKeywords = emptyList()
+                setupPopularKeywordList()
+                binding.searchPopularTimeTv.text = "없음"
+            }
+        })
+    }
+
+    private fun formatPopularTime(localDateTime: String): String {
+        return try {
+            val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+            inputFormat.timeZone = TimeZone.getTimeZone("UTC")
+            val date = inputFormat.parse(localDateTime)
+            val outputFormat = SimpleDateFormat("yyyy.MM.dd HH:mm", Locale.getDefault())
+            outputFormat.format(date!!)
+        } catch (e: Exception) {
+            ""
+        }
+    }
+
     private fun setupPopularKeywordList() {
-        val adapter = SearchPopularAdapter(popularKeywords)
-        binding.searchPopularKeywordsRv.adapter = adapter
-        binding.searchPopularKeywordsRv.layoutManager = GridLayoutManager(context, 2)
+        if (popularKeywords.isEmpty()) {
+            binding.searchPopularKeywordsRv.visibility = View.GONE
+            binding.popularEmptyTv.visibility = View.VISIBLE
+        } else {
+            binding.searchPopularKeywordsRv.visibility = View.VISIBLE
+            binding.popularEmptyTv.visibility = View.GONE
+            val adapter = SearchPopularAdapter(popularKeywords) { keyword ->
+                binding.searchEditEt.setText(keyword)
+            }
+            binding.searchPopularKeywordsRv.adapter = adapter
+            binding.searchPopularKeywordsRv.layoutManager = GridLayoutManager(context, 2)
+        }
     }
 
     private fun setupRecentRecipeList() {
