@@ -18,19 +18,4 @@ class HomeRecipeRepository {
             Recipe(R.drawable.bg_mosaic, "아보카도 샐러드", true)
         )
     }
-
-    fun getHealthRecipes(): List<Recipe> {
-        return listOf(
-            Recipe(R.drawable.bg_mosaic, "샐러드 파스타", true),
-            Recipe(R.drawable.bg_mosaic, "단호박 에그슬럿", false)
-        )
-    }
-
-    fun getRecommendedRecipes(): List<Recipe> {
-        return listOf(
-            Recipe(R.drawable.bg_mosaic, "토마토 스튜", false),
-            Recipe(R.drawable.bg_mosaic, "버섯 크림 리조또", true),
-            Recipe(R.drawable.bg_mosaic, "가지 덮밥", false)
-        )
-    }
 }
