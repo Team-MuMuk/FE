@@ -2,6 +2,7 @@ package com.example.mumuk.ui.login
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -9,9 +10,12 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.commit
 import com.example.mumuk.R
+import com.example.mumuk.data.model.login.openKakaoLoginPage
 import com.example.mumuk.databinding.ActivityLoginIntroBinding
 import com.example.mumuk.ui.MainActivity
 import com.example.mumuk.ui.signup.SignupActivity
+import com.kakao.sdk.auth.model.OAuthToken
+import com.kakao.sdk.user.UserApiClient
 
 class LoginIntroActivity : AppCompatActivity() {
 
@@ -46,9 +50,9 @@ class LoginIntroActivity : AppCompatActivity() {
         }
 
         binding.btnLoginKakao.setOnClickListener {
-            startActivity(Intent(this, MainActivity::class.java))
-            finish()
+            openKakaoLoginPage(this)
         }
+
 
         binding.btnLoginSamsung.setOnClickListener {
             startActivity(Intent(this, MainActivity::class.java))
@@ -65,7 +69,8 @@ class LoginIntroActivity : AppCompatActivity() {
                 addToBackStack(null)
             }
         }
-
-
     }
+
+
+
 }

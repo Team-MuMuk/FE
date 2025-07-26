@@ -1,6 +1,7 @@
 package com.example.mumuk.ui.mypage
 
 import android.app.Dialog
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -60,7 +61,9 @@ class MyPageFragment : Fragment() {
                 val refreshToken = TokenManager.getRefreshToken(requireContext()) ?: ""
                 val loginType = "LOCAL"
 
-                Log.d("LogoutRequest", "Sending logout with refreshToken: $refreshToken, loginType: $loginType")
+                Log.d("LogoutRequest", "Sending logout request")
+                Log.d("LogoutRequest", "Header - X-Refresh-Token: $refreshToken")
+                Log.d("LogoutRequest", "Header - X-Login-Type: $loginType")
 
                 RetrofitClient.getAuthApi(requireContext()).logout(refreshToken, loginType)
                     .enqueue(object : Callback<CommonResponse> {
@@ -68,22 +71,39 @@ class MyPageFragment : Fragment() {
                             call: Call<CommonResponse>,
                             response: Response<CommonResponse>
                         ) {
-                            val body = response.body()
-
+                            Log.d("LogoutResponse", "Response received")
                             Log.d("LogoutResponse", "isSuccessful: ${response.isSuccessful}")
                             Log.d("LogoutResponse", "code: ${response.code()}, message: ${response.message()}")
-                            Log.d("LogoutResponse", "body: $body")
+                            Log.d("LogoutResponse", "raw: ${response.raw()}")
+                            Log.d("LogoutResponse", "headers: ${response.headers()}")
+                            Log.d("LogoutResponse", "body: ${response.body()}")
+                            Log.d("LogoutResponse", "errorBody: ${response.errorBody()?.string()}")
 
-                            if (response.isSuccessful && body?.message?.contains("성공") == true) {
+                            if (response.code() == 401) {
+                                Log.w("Logout", "RefreshToken 만료로 로그아웃 실패. 강제 로그아웃 처리")
+
                                 TokenManager.clearTokens(requireContext())
-
-                                Log.d("Logout", "AccessToken after logout: ${TokenManager.getAccessToken(requireContext())}")
+                                val prefs = requireContext().getSharedPreferences("auth", Context.MODE_PRIVATE)
+                                prefs.edit().clear().apply()
 
                                 val intent = Intent(requireContext(), LoginActivity::class.java)
                                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                                 startActivity(intent)
+                                return
+                            }
+
+                            if (response.isSuccessful && response.body()?.message?.contains("성공") == true) {
+                                TokenManager.clearTokens(requireContext())
+
+                                val prefs = requireContext().getSharedPreferences("auth", Context.MODE_PRIVATE)
+                                prefs.edit().clear().apply()
+
+                                Log.d("Logout", "로그아웃 성공. 토큰 삭제됨")
+                                val intent = Intent(requireContext(), LoginActivity::class.java)
+                                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                startActivity(intent)
                             } else {
-                                Toast.makeText(requireContext(), "로그아웃 실패: ${body?.message ?: "알 수 없는 오류"}", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(requireContext(), "로그아웃 실패: ${response.body()?.message ?: "알 수 없는 오류"}", Toast.LENGTH_SHORT).show()
                             }
                         }
 
@@ -96,9 +116,6 @@ class MyPageFragment : Fragment() {
                 dialog.dismiss()
             }
 
-
-
-
             val widthInPx = TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP,
                 220f,
@@ -106,6 +123,7 @@ class MyPageFragment : Fragment() {
             ).toInt()
             dialog.window?.setLayout(widthInPx, ViewGroup.LayoutParams.WRAP_CONTENT)
         }
+
 
         binding.itemDeleteAccount.setOnClickListener {
             val deleteBinding = DialogDeleteAccountBinding.inflate(layoutInflater)
@@ -133,6 +151,12 @@ class MyPageFragment : Fragment() {
                                 Toast.makeText(requireContext(), "회원탈퇴가 완료되었습니다.", Toast.LENGTH_SHORT).show()
 
                                 TokenManager.clearTokens(requireContext())
+
+                                // SharedPreferences("auth")의 카카오 로그인 정보도 삭제
+                                val prefs = requireContext().getSharedPreferences("auth", Context.MODE_PRIVATE)
+                                prefs.edit().clear().apply()
+
+                                Log.d("Logout", "AccessToken after logout: ${TokenManager.getAccessToken(requireContext())}")
 
                                 val intent = Intent(requireContext(), LoginActivity::class.java)
                                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK

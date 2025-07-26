@@ -3,6 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.mumuk">
+
+    <!-- 인터넷 권한-->
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
@@ -20,14 +22,29 @@
         <activity android:name=".ui.MainActivity" android:exported="false" />
         <activity android:name=".ui.login.LoginIntroActivity" android:exported="false" />
         <activity android:name=".ui.login.LoginActivity" android:exported="false" />
+
         <activity
             android:name=".IntroActivity"
+            android:launchMode="singleTop"
             android:exported="true">
+
+            <!-- 기본 런처 인텐트 필터 -->
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+
+            <!-- 카카오 리다이렉트 URI 처리 -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data
+                    android:scheme="kakao7950bf906fc9e8123a3832cb5378ae1b"
+                    android:host="oauth"/>
             </intent-filter>
         </activity>
+
 
     </application>
 </manifest>
