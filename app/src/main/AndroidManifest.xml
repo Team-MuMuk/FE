@@ -20,31 +20,48 @@
 
         <activity android:name=".ui.signup.SignupActivity" android:exported="false" />
         <activity android:name=".ui.MainActivity" android:exported="false" />
-        <activity android:name=".ui.login.LoginIntroActivity" android:exported="false" />
         <activity android:name=".ui.login.LoginActivity" android:exported="false" />
 
+        <!-- ✅ 네이버 로그인 Redirect 받는 곳 -->
+        <activity
+            android:name=".ui.login.LoginIntroActivity"
+            android:exported="true"
+            android:launchMode="singleTop">
+
+            <!-- 네이버 로그인 redirect URI 처리 -->
+            <intent-filter android:label="naver_login">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="mumuk"
+                    android:host="login"
+                    android:path="/oauth2/code/naver" />
+            </intent-filter>
+        </activity>
+
+        <!-- 앱 시작 액티비티 -->
         <activity
             android:name=".IntroActivity"
             android:launchMode="singleTop"
             android:exported="true">
 
-            <!-- 기본 런처 인텐트 필터 -->
+            <!-- 기본 런처 -->
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <!-- 카카오 리다이렉트 URI 처리 -->
+            <!-- 카카오 로그인 redirect 처리 -->
             <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
                 <data
                     android:scheme="kakao7950bf906fc9e8123a3832cb5378ae1b"
-                    android:host="oauth"/>
+                    android:host="oauth" />
             </intent-filter>
         </activity>
-
 
     </application>
 </manifest>

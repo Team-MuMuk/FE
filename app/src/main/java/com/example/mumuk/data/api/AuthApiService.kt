@@ -7,6 +7,7 @@ import com.example.mumuk.data.model.auth.FindPwRequest
 import com.example.mumuk.data.model.auth.KakaoLoginResponse
 import com.example.mumuk.data.model.auth.LoginRequest
 import com.example.mumuk.data.model.auth.LoginResponse
+import com.example.mumuk.data.model.auth.NaverLoginResponse
 import com.example.mumuk.data.model.auth.ReissuePwRequest
 import com.example.mumuk.data.model.auth.ReissuePwResponse
 import com.example.mumuk.data.model.auth.SignupRequest
@@ -43,5 +44,11 @@ interface AuthApiService {
         @Query("code") code: String,
         @Query("state") state: String = "mumukDefaultState"
     ): Response<KakaoLoginResponse>
+    @POST("/api/auth/naver-login")
+    suspend fun naverLogin(
+        @Query("code") code: String,
+        @Query("state") state: String = "mumukDefaultState"
+    ): Response<NaverLoginResponse>
+
 
 }

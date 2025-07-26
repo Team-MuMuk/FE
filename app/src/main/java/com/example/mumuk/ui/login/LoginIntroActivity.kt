@@ -1,6 +1,7 @@
 package com.example.mumuk.ui.login
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -9,13 +10,16 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.commit
+import androidx.lifecycle.lifecycleScope
 import com.example.mumuk.R
+import com.example.mumuk.data.api.RetrofitClient
 import com.example.mumuk.data.model.login.openKakaoLoginPage
 import com.example.mumuk.databinding.ActivityLoginIntroBinding
 import com.example.mumuk.ui.MainActivity
 import com.example.mumuk.ui.signup.SignupActivity
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.user.UserApiClient
+import kotlinx.coroutines.launch
 
 class LoginIntroActivity : AppCompatActivity() {
 
@@ -45,9 +49,21 @@ class LoginIntroActivity : AppCompatActivity() {
         }
 
         binding.btnLoginNaver.setOnClickListener {
-            startActivity(Intent(this, MainActivity::class.java))
-            finish()
+            val clientId = "ELOxdm170OLtWxzA7nlr"
+            val redirectUri = "mumuk://login/oauth2/code/naver"
+            val state = "mumukDefaultState"
+
+            val loginUrl = "https://nid.naver.com/oauth2.0/authorize" +
+                    "?response_type=code" +
+                    "&client_id=$clientId" +
+                    "&redirect_uri=$redirectUri" +
+                    "&state=$state"
+
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(loginUrl))
+            startActivity(intent)
         }
+
+
 
         binding.btnLoginKakao.setOnClickListener {
             openKakaoLoginPage(this)
@@ -67,6 +83,50 @@ class LoginIntroActivity : AppCompatActivity() {
                 setReorderingAllowed(true)
                 replace(R.id.login_intro_fragment_container, FindAccountFragment())
                 addToBackStack(null)
+            }
+        }
+    }
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+
+        val uri = intent.data
+        Log.d("NaverLogin", "Intent URI: $uri")
+
+        if (uri?.scheme == "mumuk" &&
+            uri.host == "login" &&
+            uri.path == "/oauth2/code/naver") {
+
+            val code = uri.getQueryParameter("code")
+            val state = uri.getQueryParameter("state")
+
+            Log.d("NaverLogin", "code=$code, state=$state")
+
+            if (!code.isNullOrEmpty()) {
+                loginWithNaverCode(code, state ?: "")
+            } else {
+                Log.e("NaverLogin", "code가 비어있음 - 로그인 시도 안함")
+            }
+        }
+    }
+
+
+    private fun loginWithNaverCode(code: String, state: String) {
+        lifecycleScope.launch {
+            try {
+                val response = RetrofitClient.getAuthApi(this@LoginIntroActivity).naverLogin(code, state)
+                if (response.isSuccessful) {
+                    val userData = response.body()?.data
+
+                    Log.d("NaverLogin", "로그인 성공: ${userData?.email}")
+
+
+                    startActivity(Intent(this@LoginIntroActivity, MainActivity::class.java))
+                    finish()
+                } else {
+                    Log.e("NaverLogin", "로그인 실패: ${response.errorBody()?.string()}")
+                }
+            } catch (e: Exception) {
+                Log.e("NaverLogin", "예외 발생: ${e.message}")
             }
         }
     }
