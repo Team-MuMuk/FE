@@ -22,7 +22,8 @@ import com.example.mumuk.ui.search.SearchRecentRecipeAdapter
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import android.util.Log
+import java.text.SimpleDateFormat
+import java.util.*
 
 class SearchFragment : Fragment() {
     private var _binding: FragmentSearchBinding? = null
@@ -210,21 +211,38 @@ class SearchFragment : Fragment() {
                 call: Call<PopularKeywordResponse>,
                 response: Response<PopularKeywordResponse>
             ) {
-                if (response.isSuccessful) {
-                    val body = response.body()
-                    Log.d("SearchFragment", "popularKeywords API data: ${body?.data}")
-                    if (body?.status == "OK" && body.data != null) {
-                        popularKeywords = body.data
-                        setupPopularKeywordList()
-                    }
+                val body = response.body()
+                val keywords = body?.data?.trendKeywordList
+                val timeRaw = body?.data?.localDateTime
+
+                popularKeywords = keywords ?: emptyList()
+                setupPopularKeywordList()
+
+                if (!timeRaw.isNullOrBlank() && !popularKeywords.isNullOrEmpty()) {
+                    val displayTime = formatPopularTime(timeRaw)
+                    binding.searchPopularTimeTv.text = "$displayTime 기준"
                 } else {
-                    Log.d("SearchFragment", "popularKeywords API failed: ${response.code()} ${response.message()}")
+                    binding.searchPopularTimeTv.text = "없음"
                 }
             }
             override fun onFailure(call: Call<PopularKeywordResponse>, t: Throwable) {
-                Log.e("SearchFragment", "popularKeywords API error", t)
+                popularKeywords = emptyList()
+                setupPopularKeywordList()
+                binding.searchPopularTimeTv.text = "없음"
             }
         })
+    }
+
+    private fun formatPopularTime(localDateTime: String): String {
+        return try {
+            val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+            inputFormat.timeZone = TimeZone.getTimeZone("UTC")
+            val date = inputFormat.parse(localDateTime)
+            val outputFormat = SimpleDateFormat("yyyy.MM.dd HH:mm", Locale.getDefault())
+            outputFormat.format(date!!)
+        } catch (e: Exception) {
+            ""
+        }
     }
 
     private fun setupPopularKeywordList() {

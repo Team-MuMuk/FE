@@ -4,5 +4,5 @@ data class PopularKeywordResponse(
     val status: String?,
     val code: String?,
     val message: String?,
-    val data: List<String>?
+    val data: PopularKeywordData?
 )
