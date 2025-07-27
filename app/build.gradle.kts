@@ -83,4 +83,7 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.9.0")
+
+    //스와이프
+    implementation("com.github.chthai64:SwipeRevealLayout:1.4.0")
 }

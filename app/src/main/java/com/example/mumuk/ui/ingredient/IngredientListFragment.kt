@@ -43,12 +43,13 @@ class IngredientListFragment : Fragment() {
             )
         }
 
+        // MutableList로 변경
         val allIngredients = ingredientRepository.getIngredients()
         val expiringList = allIngredients.filter {
             val today = LocalDate.now()
             val expiry = LocalDate.parse(it.expiryDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
             ChronoUnit.DAYS.between(today, expiry) in 0..3
-        }
+        }.toMutableList()
         binding.expiringRV.layoutManager = LinearLayoutManager(requireContext())
         binding.expiringRV.adapter = ExpiringIngredientAdapter(expiringList) { ingredient ->
             val bundle = Bundle().apply {
