@@ -1,12 +1,17 @@
 package com.example.mumuk.ui.ingredient
 
+import android.app.Dialog
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.TextView
 import android.widget.PopupWindow
+import android.graphics.Color
+import android.os.Build
 import androidx.core.content.ContextCompat
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -61,6 +66,19 @@ class AddIngredientFragment : Fragment() {
         binding.calendarBtn.setOnClickListener {
             binding.calendarBtn.setColorFilter(ContextCompat.getColor(requireContext(), R.color.blue_default))
             showCalendarPopup(binding.editTextDate)
+        }
+
+        binding.addBtn.setOnClickListener {
+            val ingredient = binding.editTextIngredient.text.toString().trim()
+            val date = binding.editTextDate.text.toString().trim()
+
+            // 재료명과 날짜가 모두 입력된 경우에만
+            if (ingredient.isNotEmpty() && date.isNotEmpty()) {
+                // TODO: 재료 추가 로직 (예: ingredientRepository.addIngredient ...)
+
+                showIngredientAddedDialog()
+                // 입력값 초기화 등 필요하면 추가
+            }
         }
     }
 
@@ -152,6 +170,23 @@ class AddIngredientFragment : Fragment() {
         popupWindow.setOnDismissListener {
             binding.calendarBtn.setColorFilter(ContextCompat.getColor(requireContext(), R.color.black_400))
         }
+    }
+
+    private fun showIngredientAddedDialog() {
+        val dialog = Dialog(requireContext())
+        dialog.setContentView(R.layout.dialog_ingredient_added)
+        dialog.setCancelable(false)
+
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.window?.setDimAmount(0f)
+        dialog.window?.setLayout(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
+
+        val btnOk = dialog.findViewById<TextView>(R.id.btnOk)
+        btnOk.setOnClickListener { dialog.dismiss() }
+        dialog.show()
     }
 
     override fun onDestroyView() {
