@@ -49,6 +49,15 @@ interface AuthApiService {
         @Query("code") code: String,
         @Query("state") state: String = "mumukDefaultState"
     ): Response<NaverLoginResponse>
+    @POST("/api/auth/naver-login")
+    suspend fun naverLoginWithToken(
+        @Header("Authorization") token: String
+    ): Response<NaverLoginResponse>
+
+
+
+
+
 
 
 }

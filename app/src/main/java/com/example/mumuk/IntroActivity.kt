@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.mumuk.data.api.RetrofitClient
+import com.example.mumuk.data.api.TokenManager
 import com.example.mumuk.ui.MainActivity
 import com.example.mumuk.ui.login.LoginIntroActivity
 import kotlinx.coroutines.CoroutineScope
@@ -20,6 +21,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class IntroActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -28,11 +30,10 @@ class IntroActivity : AppCompatActivity() {
         val prefs = getSharedPreferences("auth", MODE_PRIVATE)
         val refreshToken = prefs.getString("refreshToken", null)
 
+        // 자동 로그인 처리
         if (refreshToken != null) {
             Log.d("AutoLogin", "저장된 refreshToken 발견 → 자동 로그인")
-
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, MainActivity::class.java))
             finish()
             return
         }
@@ -44,48 +45,35 @@ class IntroActivity : AppCompatActivity() {
         }
 
         handleKakaoRedirect(intent)
+        handleNaverRedirect(intent)
     }
-
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         handleKakaoRedirect(intent)
+        handleNaverRedirect(intent)
     }
 
-
+    // 카카오 로그인 처리
     private fun handleKakaoRedirect(intent: Intent?) {
         val uri: Uri? = intent?.data
         if (uri != null && uri.toString().startsWith("kakao7950bf906fc9e8123a3832cb5378ae1b://oauth")) {
             val code = uri.getQueryParameter("code")
             if (!code.isNullOrEmpty()) {
                 Log.d("KakaoAuth", "인가코드 수신 완료: $code")
-                sendCodeToBackend(code)
-                return
+                sendKakaoCodeToBackend(code)
             }
         }
-
-        // 인가코드가 없으면 → 3초 후 로그인 화면으로 이동
-        Handler(Looper.getMainLooper()).postDelayed({
-            val intent = Intent(this, LoginIntroActivity::class.java)
-            startActivity(intent)
-            finish()
-        }, 3000)
     }
 
-
-    private fun sendCodeToBackend(code: String) {
-        Log.d("KakaoAuth", "백엔드로 인가코드 전송: $code")
-
+    private fun sendKakaoCodeToBackend(code: String) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val response = RetrofitClient.getAuthApi(this@IntroActivity).kakaoLogin(code)
-
                 if (response.isSuccessful) {
-                    val body = response.body()
-                    Log.d("KakaoAuth", "로그인 성공: ${body?.data?.nickName}")
-
+                    val user = response.body()?.data
                     withContext(Dispatchers.Main) {
-                        body?.data?.let { user ->
+                        if (user != null) {
                             val prefs = getSharedPreferences("auth", MODE_PRIVATE)
                             prefs.edit().apply {
                                 putString("refreshToken", user.refreshToken)
@@ -94,40 +82,89 @@ class IntroActivity : AppCompatActivity() {
                                 putString("profileImage", user.profileImage)
                                 apply()
                             }
-
                             startActivity(Intent(this@IntroActivity, MainActivity::class.java))
                             finish()
-                        } ?: run {
-                            fallbackToLogin("로그인 실패: 사용자 정보 없음")
+                        } else {
+                            fallbackToLogin("카카오 로그인 실패: 사용자 정보 없음")
                         }
                     }
                 } else {
-                    val errorMsg = response.errorBody()?.string()
-                    Log.e("KakaoAuth", "로그인 실패: $errorMsg")
-
+                    val msg = response.errorBody()?.string()
+                    Log.e("KakaoAuth", "로그인 실패: $msg")
                     withContext(Dispatchers.Main) {
-                        fallbackToLogin("로그인 실패\n${
-                            response.code()
-                        }: ${errorMsg ?: "서버 오류"}")
+                        fallbackToLogin("카카오 로그인 실패\n${response.code()}: $msg")
                     }
                 }
             } catch (e: Exception) {
                 Log.e("KakaoAuth", "예외 발생: ${e.message}")
                 withContext(Dispatchers.Main) {
-                    fallbackToLogin("예외 발생: ${e.message}")
+                    fallbackToLogin("카카오 로그인 예외: ${e.message}")
                 }
             }
         }
     }
-    private fun fallbackToLogin(message: String) {
-        Log.w("KakaoAuth", "로그인 실패 fallback → LoginIntroActivity 이동")
-        val intent = Intent(this@IntroActivity, LoginIntroActivity::class.java)
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-        startActivity(intent)
-        finish()
+
+    // 네이버 로그인 처리 추가
+    private fun handleNaverRedirect(intent: Intent?) {
+        val uri = intent?.data
+        if (uri?.scheme == "mumuk" &&
+            uri.host == "login" &&
+            uri.path == "/oauth2/code/naver") {
+
+            val code = uri.getQueryParameter("code")
+            val state = uri.getQueryParameter("state")
+            Log.d("NaverLogin", "IntroActivity: 네이버 redirect 감지됨 → code=$code, state=$state")
+
+            if (!code.isNullOrEmpty()) {
+                sendNaverCodeToBackend(code, state ?: "")
+            }
+        } else {
+            // 네이버가 아닐 경우에도 로그인 화면으로 진입
+            Handler(Looper.getMainLooper()).postDelayed({
+                startActivity(Intent(this, LoginIntroActivity::class.java))
+                finish()
+            }, 3000)
+        }
     }
 
+    private fun sendNaverCodeToBackend(code: String, state: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val response = RetrofitClient.getAuthApi(this@IntroActivity).naverLogin(code, state)
+                if (response.isSuccessful) {
+                    val user = response.body()?.data
+                    withContext(Dispatchers.Main) {
+                        if (user != null) {
+                            TokenManager.saveLoginType(this@IntroActivity, "NAVER")
+                            TokenManager.saveTokens(this@IntroActivity, "", user.refreshToken)
+                            TokenManager.saveUserInfo(this@IntroActivity, user.email, user.nickName, user.profileImage)
 
+                            startActivity(Intent(this@IntroActivity, MainActivity::class.java))
+                            finish()
+                        } else {
+                            fallbackToLogin("네이버 로그인 실패: 사용자 정보 없음")
+                        }
+                    }
+                } else {
+                    val msg = response.errorBody()?.string()
+                    Log.e("NaverLogin", "로그인 실패: $msg")
+                    withContext(Dispatchers.Main) {
+                        fallbackToLogin("네이버 로그인 실패\n${response.code()}: $msg")
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("NaverLogin", "예외 발생: ${e.message}")
+                withContext(Dispatchers.Main) {
+                    fallbackToLogin("네이버 로그인 예외: ${e.message}")
+                }
+            }
+        }
+    }
 
-
+    private fun fallbackToLogin(message: String) {
+        Log.w("Intro", "로그인 실패 fallback → LoginIntroActivity 이동")
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        startActivity(Intent(this, LoginIntroActivity::class.java))
+        finish()
+    }
 }

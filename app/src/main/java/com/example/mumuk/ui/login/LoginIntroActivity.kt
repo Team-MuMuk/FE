@@ -56,6 +56,10 @@ class LoginIntroActivity : AppCompatActivity() {
                     val accessToken = NaverIdLoginSDK.getAccessToken()
                     // TODO: accessToken을 서버로 넘기기 등 처리
                     Log.d("NaverLogin", "네이버 로그인 성공, accessToken: $accessToken")
+                    if (accessToken != null) {
+                        loginWithNaverToken(accessToken)
+                    }
+
                 }
 
                 override fun onFailure(httpStatus: Int, message: String) {
@@ -93,24 +97,59 @@ class LoginIntroActivity : AppCompatActivity() {
         super.onNewIntent(intent)
 
         val uri = intent.data
-        Log.d("NaverLogin", "Intent URI: $uri")
+        Log.d("LoginIntro", "Intent URI: $uri")
 
-        if (uri?.scheme == "mumuk" &&
-            uri.host == "login" &&
-            uri.path == "/oauth2/code/naver") {
-
+        // 네이버 로그인 콜백 처리
+        if (uri?.scheme == "mumuk" && uri.host == "login" && uri.path == "/oauth2/code/naver") {
             val code = uri.getQueryParameter("code")
             val state = uri.getQueryParameter("state")
-
             Log.d("NaverLogin", "code=$code, state=$state")
-
             if (!code.isNullOrEmpty()) {
                 loginWithNaverCode(code, state ?: "")
             } else {
                 Log.e("NaverLogin", "code가 비어있음 - 로그인 시도 안함")
             }
         }
+
+        // 카카오 로그인 콜백 처리 추가
+        else if (uri?.scheme == "kakao7950bf906fc9e8123a3832cb5378ae1b") {
+            val code = uri.getQueryParameter("code")
+            Log.d("KakaoLogin", "카카오 인가코드 수신: $code")
+
+            if (!code.isNullOrEmpty()) {
+                loginWithKakaoCode(code)
+            } else {
+                Log.e("KakaoLogin", "code가 비어있음 - 로그인 시도 안함")
+            }
+        }
     }
+
+    private fun loginWithKakaoCode(code: String) {
+        lifecycleScope.launch {
+            try {
+                Log.d("KakaoLogin", "loginWithKakaoCode() 호출됨, code=$code")
+
+                val response = RetrofitClient.getAuthApi(this@LoginIntroActivity).kakaoLogin(code)
+
+                Log.d("KakaoLogin", "HTTP 상태 코드: ${response.code()}")
+                Log.d("KakaoLogin", "isSuccessful: ${response.isSuccessful}")
+
+                if (response.isSuccessful) {
+                    val userData = response.body()?.data
+                    Log.d("KakaoLogin", "로그인 성공 - 이메일: ${userData?.email}, 닉네임: ${userData?.nickName}")
+
+                    startActivity(Intent(this@LoginIntroActivity, MainActivity::class.java))
+                    finish()
+                } else {
+                    val errorBody = response.errorBody()?.string()
+                    Log.e("KakaoLogin", "로그인 실패 - errorBody: $errorBody")
+                }
+            } catch (e: Exception) {
+                Log.e("KakaoLogin", "예외 발생: ${e.message}", e)
+            }
+        }
+    }
+
 
     private fun loginWithNaverCode(code: String, state: String) {
         lifecycleScope.launch {
@@ -131,4 +170,25 @@ class LoginIntroActivity : AppCompatActivity() {
             }
         }
     }
+    private fun loginWithNaverToken(token: String) {
+        lifecycleScope.launch {
+            try {
+                val response = RetrofitClient.getAuthApi(this@LoginIntroActivity)
+                    .naverLoginWithToken("Bearer $token")
+
+                if (response.isSuccessful) {
+                    val userData = response.body()?.data
+                    Log.d("NaverLogin", "로그인 성공 - 이메일: ${userData?.email}, 닉네임: ${userData?.nickName}")
+                    startActivity(Intent(this@LoginIntroActivity, MainActivity::class.java))
+                    finish()
+                } else {
+                    val error = response.errorBody()?.string()
+                    Log.e("NaverLogin", "로그인 실패 - error: $error")
+                }
+            } catch (e: Exception) {
+                Log.e("NaverLogin", "예외 발생: ${e.message}", e)
+            }
+        }
+    }
+
 }

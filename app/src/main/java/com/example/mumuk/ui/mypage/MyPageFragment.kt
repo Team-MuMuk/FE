@@ -21,10 +21,12 @@ import com.example.mumuk.R
 import com.example.mumuk.data.api.RetrofitClient
 import com.example.mumuk.data.api.TokenManager
 import com.example.mumuk.data.model.auth.CommonResponse
+import com.example.mumuk.data.model.mypage.UserProfileResponse
 import com.example.mumuk.databinding.DialogDeleteAccountBinding
 import com.example.mumuk.databinding.DialogLogoutBinding
 import com.example.mumuk.databinding.FragmentMyPageBinding
 import com.example.mumuk.ui.login.LoginActivity
+import com.example.mumuk.utils.JwtUtils
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -270,45 +272,69 @@ class MyPageFragment : Fragment() {
     }
 
     private fun loadUserProfile() {
-        val accessToken = TokenManager.getAccessToken(requireContext())
-        val userId = com.example.mumuk.utils.JwtUtils.getUserIdFromToken(accessToken ?: "")
+        val loginType = TokenManager.getLoginType(requireContext()) ?: "LOCAL"
 
-        if (userId == null) {
-            Log.e("MyPage", "userId 추출 실패")
-            return
-        }
+        if (loginType == "KAKAO" || loginType == "NAVER") {
+            // ✅ SNS 로그인: SharedPreferences에 저장된 정보 사용
+            val savedNickname = TokenManager.getNickName(requireContext())
+            val savedProfileImage = TokenManager.getProfileImage(requireContext())
 
-        RetrofitClient.getUserApi(requireContext()).getUserProfile(userId)
-            .enqueue(object : Callback<com.example.mumuk.data.model.mypage.UserProfileResponse> {
-                override fun onResponse(
-                    call: Call<com.example.mumuk.data.model.mypage.UserProfileResponse>,
-                    response: Response<com.example.mumuk.data.model.mypage.UserProfileResponse>
-                ) {
-                    if (response.isSuccessful) {
-                        val profile = response.body()?.data ?: return
-                        Log.d("MyPage", "✅ 프로필 불러오기 성공: $profile")
+            binding.tvNickname.text = if (!savedNickname.isNullOrBlank()) {
+                "${savedNickname}님!"
+            } else {
+                "사용자님!"
+            }
 
-                        binding.tvNickname.text = "${profile.nickName}님!"
-                        binding.tvSubtitle.text = profile.statusMessage
+            val profileRes = when (savedProfileImage ?: "orange") {
+                "orange" -> R.drawable.ic_user_profile_orange
+                "white" -> R.drawable.ic_user_profile_white
+                "green" -> R.drawable.ic_user_profile_green
+                else -> R.drawable.ic_user_profile_orange
+            }
+            binding.imgProfile.setImageResource(profileRes)
 
-                        val profileRes = when (profile.profileImage ?: "orange") {
-                            "orange" -> R.drawable.ic_user_profile_orange
-                            "white" -> R.drawable.ic_user_profile_white
-                            "green" -> R.drawable.ic_user_profile_green
-                            else -> R.drawable.ic_user_profile_orange
+        } else {
+            // ✅ 일반 로그인: 서버에서 유저 정보 요청
+            val accessToken = TokenManager.getAccessToken(requireContext())
+            val userId = JwtUtils.getUserIdFromToken(accessToken ?: "")
+
+            if (userId == null) {
+                Log.e("MyPage", "userId 추출 실패")
+                return
+            }
+
+            RetrofitClient.getUserApi(requireContext()).getUserProfile(userId)
+                .enqueue(object : Callback<UserProfileResponse> {
+                    override fun onResponse(
+                        call: Call<UserProfileResponse>,
+                        response: Response<UserProfileResponse>
+                    ) {
+                        if (response.isSuccessful) {
+                            val profile = response.body()?.data ?: return
+
+                            binding.tvNickname.text = "${profile.nickName}님!"
+                            binding.tvSubtitle.text = profile.statusMessage
+
+                            val profileRes = when (profile.profileImage ?: "orange") {
+                                "orange" -> R.drawable.ic_user_profile_orange
+                                "white" -> R.drawable.ic_user_profile_white
+                                "green" -> R.drawable.ic_user_profile_green
+                                else -> R.drawable.ic_user_profile_orange
+                            }
+                            binding.imgProfile.setImageResource(profileRes)
+                        } else {
+                            Log.e("MyPage", "프로필 API 실패: ${response.code()}")
                         }
-                        binding.imgProfile.setImageResource(profileRes)
-
-                    } else {
-                        Log.e("MyPage", "프로필 API 실패: ${response.code()}")
                     }
-                }
 
-                override fun onFailure(call: Call<com.example.mumuk.data.model.mypage.UserProfileResponse>, t: Throwable) {
-                    Log.e("MyPage", "네트워크 오류", t)
-                }
-            })
+                    override fun onFailure(call: Call<UserProfileResponse>, t: Throwable) {
+                        Log.e("MyPage", "네트워크 오류", t)
+                    }
+                })
+        }
     }
+
+
 
 
 
