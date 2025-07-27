@@ -8,7 +8,6 @@
     app:mode="normal"
     app:dragEdge="right">
 
-    <!-- Back View: 삭제 버튼 (오른쪽에만 딱 맞게!) -->
     <FrameLayout
         android:layout_width="80dp"
         android:layout_height="match_parent"
@@ -26,7 +25,6 @@
             android:textStyle="bold" />
     </FrameLayout>
 
-    <!-- Front View: 기존 카드 내용 -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="75dp"
@@ -38,12 +36,12 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginTop="8dp"
-            android:backgroundTint="@color/white"
-            app:cardCornerRadius="5dp"
+            android:backgroundTint="@color/beige_300"
+            app:cardCornerRadius="100dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:strokeColor="@color/black_300"
-            app:strokeWidth="1dp">
+            app:strokeWidth="0dp">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -54,12 +52,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
-                    android:layout_marginTop="3dp"
+                    android:layout_marginTop="5dp"
                     android:layout_marginEnd="10dp"
-                    android:layout_marginBottom="3dp"
-                    android:text="아보카도 샐러드"
+                    android:layout_marginBottom="5dp"
+                    android:text="아보카도"
                     android:textColor="@color/black_400"
-                    android:textSize="14sp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -72,14 +69,12 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginStart="20dp"
-            android:layout_marginTop="8dp"
             android:layout_marginEnd="20dp"
-            android:background="#CFCFCF"
+            android:background="@color/black_100"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/date" />
+            app:layout_constraintStart_toStartOf="parent" />
 
         <TextView
             android:id="@+id/date"
@@ -88,6 +83,7 @@
             android:layout_marginStart="20dp"
             android:layout_marginTop="8dp"
             android:text="유통기한: 2023-10-30"
+            android:fontFamily="@font/pretendard_regular"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/materialCardView" />
 
