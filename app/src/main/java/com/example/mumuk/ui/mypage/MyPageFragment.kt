@@ -43,8 +43,18 @@ class MyPageFragment : Fragment() {
 
 
         binding.btnProfile.setOnClickListener {
-            findNavController().navigate(R.id.action_myPage_to_profile)
+            val loginType = TokenManager.getLoginType(requireContext()) ?: "LOCAL"
+
+            if (loginType == "NAVER") {
+                showSimpleConfirmDialog(
+                    message = "소셜로그인 이용자는\n프로필 수정이 불가합니다.",
+                    buttonText = "확인"
+                )
+            } else {
+                findNavController().navigate(R.id.action_myPage_to_profile)
+            }
         }
+
 
         binding.btnFavorites.setOnClickListener {
             findNavController().navigate(R.id.bookmarkRecipeFragment)
@@ -57,6 +67,8 @@ class MyPageFragment : Fragment() {
             val dialog = Dialog(requireContext())
             dialog.setContentView(logoutBinding.root)
             dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            dialog.window?.setDimAmount(0.3f)
+
             dialog.show()
 
             logoutBinding.btnDialogOk.setOnClickListener {
@@ -133,6 +145,8 @@ class MyPageFragment : Fragment() {
             val dialog = Dialog(requireContext())
             dialog.setContentView(deleteBinding.root)
             dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            dialog.window?.setDimAmount(0.3f)
+
             dialog.show()
 
             deleteBinding.btnDialogCancel.setOnClickListener {
@@ -228,6 +242,8 @@ class MyPageFragment : Fragment() {
         val dialog = Dialog(requireContext())
         dialog.setContentView(R.layout.dialog_confirm)
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.window?.setDimAmount(0.3f)
+
 
         val tvMessage = dialog.findViewById<TextView>(R.id.tv_dialog_message)
         val btnOk = dialog.findViewById<TextView>(R.id.btn_dialog_ok)
@@ -275,9 +291,7 @@ class MyPageFragment : Fragment() {
         val loginType = TokenManager.getLoginType(requireContext()) ?: "LOCAL"
 
         if (loginType == "KAKAO" || loginType == "NAVER") {
-            // ✅ SNS 로그인: SharedPreferences에 저장된 정보 사용
             val savedNickname = TokenManager.getNickName(requireContext())
-            val savedProfileImage = TokenManager.getProfileImage(requireContext())
 
             binding.tvNickname.text = if (!savedNickname.isNullOrBlank()) {
                 "${savedNickname}님!"
@@ -285,13 +299,9 @@ class MyPageFragment : Fragment() {
                 "사용자님!"
             }
 
-            val profileRes = when (savedProfileImage ?: "orange") {
-                "orange" -> R.drawable.ic_user_profile_orange
-                "white" -> R.drawable.ic_user_profile_white
-                "green" -> R.drawable.ic_user_profile_green
-                else -> R.drawable.ic_user_profile_orange
-            }
-            binding.imgProfile.setImageResource(profileRes)
+            binding.tvSubtitle.text = ""
+
+            binding.imgProfile.setImageResource(R.drawable.ic_user_profile_orange)
 
         } else {
             // ✅ 일반 로그인: 서버에서 유저 정보 요청

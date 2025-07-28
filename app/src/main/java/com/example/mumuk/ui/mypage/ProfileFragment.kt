@@ -47,6 +47,8 @@ class ProfileFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val accessToken = TokenManager.getAccessToken(requireContext())
+
+
         if (accessToken.isNullOrBlank()) {
             Log.e("Profile", "accessToken 없음")
             return
