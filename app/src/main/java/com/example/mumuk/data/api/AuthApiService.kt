@@ -4,17 +4,22 @@ package com.example.mumuk.data.api
 import com.example.mumuk.data.model.auth.CommonResponse
 import com.example.mumuk.data.model.auth.FindIdRequest
 import com.example.mumuk.data.model.auth.FindPwRequest
+import com.example.mumuk.data.model.auth.KakaoLoginResponse
 import com.example.mumuk.data.model.auth.LoginRequest
 import com.example.mumuk.data.model.auth.LoginResponse
+import com.example.mumuk.data.model.auth.NaverLoginResponse
 import com.example.mumuk.data.model.auth.ReissuePwRequest
 import com.example.mumuk.data.model.auth.ReissuePwResponse
 import com.example.mumuk.data.model.auth.SignupRequest
 import com.example.mumuk.data.model.auth.SignupResponse
 import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
+import retrofit2.http.Header
 import retrofit2.http.PATCH
 import retrofit2.http.POST
+import retrofit2.http.Query
 
 interface AuthApiService {
     @POST("/api/auth/login")
@@ -25,8 +30,8 @@ interface AuthApiService {
     fun reissuePassword(@Body request: ReissuePwRequest): Call<ReissuePwResponse>
     @PATCH("/api/auth/logout")
     fun logout(
-        @retrofit2.http.Header("X-Refresh-Token") refreshToken: String,
-        @retrofit2.http.Header("X-Login-Type") loginType: String = "LOCAL"
+        @Header("X-Refresh-Token") refreshToken: String,
+        @Header("X-Login-Type") loginType: String
     ): Call<CommonResponse>
     @PATCH("/api/auth/find-pw")
     fun findPassword(@Body request: FindPwRequest): Call<CommonResponse>
@@ -34,5 +39,25 @@ interface AuthApiService {
     fun findId(@Body request: FindIdRequest): Call<CommonResponse>
     @DELETE("/api/auth/withdraw")
     fun withdraw(): Call<CommonResponse>
+    @POST("/api/auth/kakao-login")
+    suspend fun kakaoLogin(
+        @Query("code") code: String,
+        @Query("state") state: String = "mumukDefaultState"
+    ): Response<KakaoLoginResponse>
+    @POST("/api/auth/naver-login")
+    suspend fun naverLogin(
+        @Query("code") code: String,
+        @Query("state") state: String = "mumukDefaultState"
+    ): Response<NaverLoginResponse>
+    @POST("/api/auth/naver-login")
+    suspend fun naverLoginWithToken(
+        @Header("Authorization") token: String
+    ): Response<NaverLoginResponse>
+
+
+
+
+
+
 
 }

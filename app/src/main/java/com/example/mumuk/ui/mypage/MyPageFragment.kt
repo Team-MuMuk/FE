@@ -1,6 +1,7 @@
 package com.example.mumuk.ui.mypage
 
 import android.app.Dialog
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -20,10 +21,12 @@ import com.example.mumuk.R
 import com.example.mumuk.data.api.RetrofitClient
 import com.example.mumuk.data.api.TokenManager
 import com.example.mumuk.data.model.auth.CommonResponse
+import com.example.mumuk.data.model.mypage.UserProfileResponse
 import com.example.mumuk.databinding.DialogDeleteAccountBinding
 import com.example.mumuk.databinding.DialogLogoutBinding
 import com.example.mumuk.databinding.FragmentMyPageBinding
 import com.example.mumuk.ui.login.LoginActivity
+import com.example.mumuk.utils.JwtUtils
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -40,8 +43,18 @@ class MyPageFragment : Fragment() {
 
 
         binding.btnProfile.setOnClickListener {
-            findNavController().navigate(R.id.action_myPage_to_profile)
+            val loginType = TokenManager.getLoginType(requireContext()) ?: "LOCAL"
+
+            if (loginType == "NAVER") {
+                showSimpleConfirmDialog(
+                    message = "소셜로그인 이용자는\n프로필 수정이 불가합니다.",
+                    buttonText = "확인"
+                )
+            } else {
+                findNavController().navigate(R.id.action_myPage_to_profile)
+            }
         }
+
 
         binding.btnFavorites.setOnClickListener {
             findNavController().navigate(R.id.bookmarkRecipeFragment)
@@ -54,13 +67,17 @@ class MyPageFragment : Fragment() {
             val dialog = Dialog(requireContext())
             dialog.setContentView(logoutBinding.root)
             dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            dialog.window?.setDimAmount(0.3f)
+
             dialog.show()
 
             logoutBinding.btnDialogOk.setOnClickListener {
                 val refreshToken = TokenManager.getRefreshToken(requireContext()) ?: ""
                 val loginType = "LOCAL"
 
-                Log.d("LogoutRequest", "Sending logout with refreshToken: $refreshToken, loginType: $loginType")
+                Log.d("LogoutRequest", "Sending logout request")
+                Log.d("LogoutRequest", "Header - X-Refresh-Token: $refreshToken")
+                Log.d("LogoutRequest", "Header - X-Login-Type: $loginType")
 
                 RetrofitClient.getAuthApi(requireContext()).logout(refreshToken, loginType)
                     .enqueue(object : Callback<CommonResponse> {
@@ -68,22 +85,39 @@ class MyPageFragment : Fragment() {
                             call: Call<CommonResponse>,
                             response: Response<CommonResponse>
                         ) {
-                            val body = response.body()
-
+                            Log.d("LogoutResponse", "Response received")
                             Log.d("LogoutResponse", "isSuccessful: ${response.isSuccessful}")
                             Log.d("LogoutResponse", "code: ${response.code()}, message: ${response.message()}")
-                            Log.d("LogoutResponse", "body: $body")
+                            Log.d("LogoutResponse", "raw: ${response.raw()}")
+                            Log.d("LogoutResponse", "headers: ${response.headers()}")
+                            Log.d("LogoutResponse", "body: ${response.body()}")
+                            Log.d("LogoutResponse", "errorBody: ${response.errorBody()?.string()}")
 
-                            if (response.isSuccessful && body?.message?.contains("성공") == true) {
+                            if (response.code() == 401) {
+                                Log.w("Logout", "RefreshToken 만료로 로그아웃 실패. 강제 로그아웃 처리")
+
                                 TokenManager.clearTokens(requireContext())
-
-                                Log.d("Logout", "AccessToken after logout: ${TokenManager.getAccessToken(requireContext())}")
+                                val prefs = requireContext().getSharedPreferences("auth", Context.MODE_PRIVATE)
+                                prefs.edit().clear().apply()
 
                                 val intent = Intent(requireContext(), LoginActivity::class.java)
                                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                                 startActivity(intent)
+                                return
+                            }
+
+                            if (response.isSuccessful && response.body()?.message?.contains("성공") == true) {
+                                TokenManager.clearTokens(requireContext())
+
+                                val prefs = requireContext().getSharedPreferences("auth", Context.MODE_PRIVATE)
+                                prefs.edit().clear().apply()
+
+                                Log.d("Logout", "로그아웃 성공. 토큰 삭제됨")
+                                val intent = Intent(requireContext(), LoginActivity::class.java)
+                                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                startActivity(intent)
                             } else {
-                                Toast.makeText(requireContext(), "로그아웃 실패: ${body?.message ?: "알 수 없는 오류"}", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(requireContext(), "로그아웃 실패: ${response.body()?.message ?: "알 수 없는 오류"}", Toast.LENGTH_SHORT).show()
                             }
                         }
 
@@ -96,9 +130,6 @@ class MyPageFragment : Fragment() {
                 dialog.dismiss()
             }
 
-
-
-
             val widthInPx = TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP,
                 220f,
@@ -107,12 +138,15 @@ class MyPageFragment : Fragment() {
             dialog.window?.setLayout(widthInPx, ViewGroup.LayoutParams.WRAP_CONTENT)
         }
 
+
         binding.itemDeleteAccount.setOnClickListener {
             val deleteBinding = DialogDeleteAccountBinding.inflate(layoutInflater)
 
             val dialog = Dialog(requireContext())
             dialog.setContentView(deleteBinding.root)
             dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            dialog.window?.setDimAmount(0.3f)
+
             dialog.show()
 
             deleteBinding.btnDialogCancel.setOnClickListener {
@@ -133,6 +167,12 @@ class MyPageFragment : Fragment() {
                                 Toast.makeText(requireContext(), "회원탈퇴가 완료되었습니다.", Toast.LENGTH_SHORT).show()
 
                                 TokenManager.clearTokens(requireContext())
+
+                                // SharedPreferences("auth")의 카카오 로그인 정보도 삭제
+                                val prefs = requireContext().getSharedPreferences("auth", Context.MODE_PRIVATE)
+                                prefs.edit().clear().apply()
+
+                                Log.d("Logout", "AccessToken after logout: ${TokenManager.getAccessToken(requireContext())}")
 
                                 val intent = Intent(requireContext(), LoginActivity::class.java)
                                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -202,6 +242,8 @@ class MyPageFragment : Fragment() {
         val dialog = Dialog(requireContext())
         dialog.setContentView(R.layout.dialog_confirm)
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.window?.setDimAmount(0.3f)
+
 
         val tvMessage = dialog.findViewById<TextView>(R.id.tv_dialog_message)
         val btnOk = dialog.findViewById<TextView>(R.id.btn_dialog_ok)
@@ -246,45 +288,63 @@ class MyPageFragment : Fragment() {
     }
 
     private fun loadUserProfile() {
-        val accessToken = TokenManager.getAccessToken(requireContext())
-        val userId = com.example.mumuk.utils.JwtUtils.getUserIdFromToken(accessToken ?: "")
+        val loginType = TokenManager.getLoginType(requireContext()) ?: "LOCAL"
 
-        if (userId == null) {
-            Log.e("MyPage", "userId 추출 실패")
-            return
-        }
+        if (loginType == "KAKAO" || loginType == "NAVER") {
+            val savedNickname = TokenManager.getNickName(requireContext())
 
-        RetrofitClient.getUserApi(requireContext()).getUserProfile(userId)
-            .enqueue(object : Callback<com.example.mumuk.data.model.mypage.UserProfileResponse> {
-                override fun onResponse(
-                    call: Call<com.example.mumuk.data.model.mypage.UserProfileResponse>,
-                    response: Response<com.example.mumuk.data.model.mypage.UserProfileResponse>
-                ) {
-                    if (response.isSuccessful) {
-                        val profile = response.body()?.data ?: return
-                        Log.d("MyPage", "✅ 프로필 불러오기 성공: $profile")
+            binding.tvNickname.text = if (!savedNickname.isNullOrBlank()) {
+                "${savedNickname}님!"
+            } else {
+                "사용자님!"
+            }
 
-                        binding.tvNickname.text = "${profile.nickName}님!"
-                        binding.tvSubtitle.text = profile.statusMessage
+            binding.tvSubtitle.text = ""
 
-                        val profileRes = when (profile.profileImage ?: "orange") {
-                            "orange" -> R.drawable.ic_user_profile_orange
-                            "white" -> R.drawable.ic_user_profile_white
-                            "green" -> R.drawable.ic_user_profile_green
-                            else -> R.drawable.ic_user_profile_orange
+            binding.imgProfile.setImageResource(R.drawable.ic_user_profile_orange)
+
+        } else {
+            // ✅ 일반 로그인: 서버에서 유저 정보 요청
+            val accessToken = TokenManager.getAccessToken(requireContext())
+            val userId = JwtUtils.getUserIdFromToken(accessToken ?: "")
+
+            if (userId == null) {
+                Log.e("MyPage", "userId 추출 실패")
+                return
+            }
+
+            RetrofitClient.getUserApi(requireContext()).getUserProfile(userId)
+                .enqueue(object : Callback<UserProfileResponse> {
+                    override fun onResponse(
+                        call: Call<UserProfileResponse>,
+                        response: Response<UserProfileResponse>
+                    ) {
+                        if (response.isSuccessful) {
+                            val profile = response.body()?.data ?: return
+
+                            binding.tvNickname.text = "${profile.nickName}님!"
+                            binding.tvSubtitle.text = profile.statusMessage
+
+                            val profileRes = when (profile.profileImage ?: "orange") {
+                                "orange" -> R.drawable.ic_user_profile_orange
+                                "white" -> R.drawable.ic_user_profile_white
+                                "green" -> R.drawable.ic_user_profile_green
+                                else -> R.drawable.ic_user_profile_orange
+                            }
+                            binding.imgProfile.setImageResource(profileRes)
+                        } else {
+                            Log.e("MyPage", "프로필 API 실패: ${response.code()}")
                         }
-                        binding.imgProfile.setImageResource(profileRes)
-
-                    } else {
-                        Log.e("MyPage", "프로필 API 실패: ${response.code()}")
                     }
-                }
 
-                override fun onFailure(call: Call<com.example.mumuk.data.model.mypage.UserProfileResponse>, t: Throwable) {
-                    Log.e("MyPage", "네트워크 오류", t)
-                }
-            })
+                    override fun onFailure(call: Call<UserProfileResponse>, t: Throwable) {
+                        Log.e("MyPage", "네트워크 오류", t)
+                    }
+                })
+        }
     }
+
+
 
 
 
