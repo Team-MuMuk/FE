@@ -1,6 +1,7 @@
 package com.example.mumuk.ui.search.main
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +16,7 @@ import com.example.mumuk.data.api.RetrofitClient
 import com.example.mumuk.data.model.search.RecentSearch
 import com.example.mumuk.data.model.search.RecentSearchResponse
 import com.example.mumuk.data.model.search.PopularKeywordResponse
+import com.example.mumuk.data.model.search.SuggestKeywordResponse
 import com.example.mumuk.databinding.FragmentSearchBinding
 import com.example.mumuk.databinding.ItemSearchSuggestKeywordChipBinding
 import com.example.mumuk.data.model.Recipe
@@ -32,7 +34,7 @@ class SearchFragment : Fragment() {
     private val recentKeywords = mutableListOf<RecentSearch>()
     private lateinit var recentKeywordAdapter: SearchRecentKeywordAdapter
 
-    private val suggestKeywords = listOf("포케", "아보카도 샐러드", "샐러드", "닭가슴살", "건강주스", "키토김밥")
+    private var suggestKeywords = listOf<String>()
     private var popularKeywords = listOf<String>()
 
     private val recentRecipes = listOf(
@@ -55,7 +57,7 @@ class SearchFragment : Fragment() {
         _binding = FragmentSearchBinding.inflate(inflater, container, false)
 
         setupRecentKeywordList()
-        setupSuggestKeywordChips(inflater)
+        fetchSuggestKeywordsFromApi(inflater)
         fetchPopularKeywordsFromApi()
         setupRecentRecipeList()
         fetchRecentKeywordsFromApi()
@@ -178,11 +180,48 @@ class SearchFragment : Fragment() {
         })
     }
 
+    private fun fetchSuggestKeywordsFromApi(inflater: LayoutInflater) {
+        val context = context ?: return
+        val api = RetrofitClient.getSuggestKeywordApi(context)
+        Log.d("SuggestKeyword", "추천 검색어 API 호출 시작")
+        api.getSuggestKeywords().enqueue(object : Callback<SuggestKeywordResponse> {
+            override fun onResponse(
+                call: Call<SuggestKeywordResponse>,
+                response: Response<SuggestKeywordResponse>
+            ) {
+                Log.d("SuggestKeyword", "API 응답 코드: ${response.code()}")
+                Log.d("SuggestKeyword", "API 응답 body: ${response.body()}")
+                val body = response.body()
+                val keywords = body?.data ?: emptyList()
+                suggestKeywords = keywords
+                setupSuggestKeywordChips(inflater)
+                Log.d("SuggestKeyword", "추천 검색어 개수: ${suggestKeywords.size}")
+            }
+            override fun onFailure(call: Call<SuggestKeywordResponse>, t: Throwable) {
+                Log.e("SuggestKeyword", "API 호출 실패: ${t.message}")
+                suggestKeywords = emptyList()
+                setupSuggestKeywordChips(inflater)
+            }
+        })
+    }
+
     private fun setupSuggestKeywordChips(inflater: LayoutInflater) {
         val flexbox = binding.searchSuggestKeywordsFl
         flexbox.removeAllViews()
         val keywordsPerRow = 3
         val keywords = suggestKeywords.take(6)
+
+        if (keywords.isEmpty()) {
+            Log.d("SuggestKeyword", "추천 검색어 없음 안내 표시")
+            val emptyTv = TextView(requireContext()).apply {
+                text = "추천 검색어가 없습니다."
+                textSize = 14f
+                setTextColor(resources.getColor(android.R.color.darker_gray, null))
+                setPadding(0, 8, 0, 8)
+            }
+            flexbox.addView(emptyTv)
+            return
+        }
 
         for (i in keywords.indices step keywordsPerRow) {
             val rowLayout = LinearLayout(requireContext()).apply {
@@ -201,6 +240,7 @@ class SearchFragment : Fragment() {
             }
             flexbox.addView(rowLayout)
         }
+        Log.d("SuggestKeyword", "추천 검색어 칩 UI 세팅 완료. 칩 개수: ${keywords.size}")
     }
 
     private fun fetchPopularKeywordsFromApi() {
