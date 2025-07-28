@@ -10,17 +10,16 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
 class ExpiringIngredientAdapter(
-    private val items: List<Ingredient>,
+    private val items: MutableList<Ingredient>,
     private val onItemClick: (Ingredient) -> Unit
 ) : RecyclerView.Adapter<ExpiringIngredientAdapter.ViewHolder>() {
 
     inner class ViewHolder(val binding: ItemIngredientExpiringBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: Ingredient) {
+        fun bind(item: Ingredient, position: Int) {
             binding.name.text = item.name
             binding.date.text = "유통기한: ${item.expiryDate}"
 
-            // D-Day 계산
             val today = LocalDate.now()
             val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
             val expiry = LocalDate.parse(item.expiryDate, formatter)
@@ -29,6 +28,13 @@ class ExpiringIngredientAdapter(
 
             binding.root.setOnClickListener {
                 onItemClick(item)
+            }
+
+            binding.btnDelete.setOnClickListener {
+                items.removeAt(adapterPosition)
+                notifyItemRemoved(adapterPosition)
+                notifyItemRangeChanged(adapterPosition, items.size)
+                // 필요하다면 이곳에서 데이터베이스/서버에서도 삭제 처리
             }
         }
     }
@@ -43,7 +49,7 @@ class ExpiringIngredientAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(items[position])
+        holder.bind(items[position], position)
     }
 
     override fun getItemCount(): Int = items.size

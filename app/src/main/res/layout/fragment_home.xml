@@ -12,7 +12,7 @@
         android:layout_width="95dp"
         android:layout_height="30dp"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="10dp"
         android:src="@drawable/img_logo"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -20,7 +20,7 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -33,7 +33,7 @@
             <ImageView
                 android:id="@+id/imageView3"
                 android:layout_width="wrap_content"
-                android:layout_height="350dp"
+                android:layout_height="230dp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/img_banner_sample"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -49,7 +49,7 @@
                 android:layout_marginBottom="36dp"
                 android:text="오늘의 뭐뭑, \nAI 추천 레시피 보고가세요 !"
                 android:textColor="@color/white"
-                android:textSize="28dp"
+                android:textSize="24sp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="@+id/imageView3"
                 app:layout_constraintStart_toStartOf="parent" />
@@ -64,6 +64,7 @@
                 android:textOff=""
                 android:textOn=""
                 android:thumb="@drawable/switch_thumb_custom"
+                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/imageView3"
                 app:switchMinWidth="0dp"
@@ -78,6 +79,7 @@
                 android:paddingLeft="16dp"
                 android:paddingBottom="10dp"
                 android:src="@drawable/btn_info"
+                android:visibility="gone"
                 app:layout_constraintEnd_toStartOf="@+id/samBtn"
                 app:layout_constraintTop_toTopOf="@+id/samBtn" />
 
@@ -107,8 +109,8 @@
 
                         <ImageView
                             android:id="@+id/healthBtn"
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
                             android:src="@drawable/btn_health" />
 
                         <TextView
@@ -127,15 +129,16 @@
                         android:orientation="vertical">
 
                         <ImageView
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:src="@drawable/btn_today" />
+                            android:id="@+id/addBtn"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:src="@drawable/btn_add" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
-                            android:text="오늘의뭐먹"
+                            android:text="재료 등록"
                             android:textSize="12sp" />
                     </LinearLayout>
 
@@ -147,15 +150,16 @@
                         android:orientation="vertical">
 
                         <ImageView
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:src="@drawable/btn_personal" />
+                            android:id="@+id/dateBtn"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:src="@drawable/btn_date" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
-                            android:text="내 맞춤 추천"
+                            android:text="유통기한관리"
                             android:textSize="12sp" />
                     </LinearLayout>
 
@@ -168,15 +172,15 @@
 
                         <ImageView
                             android:id="@+id/bookmarkBtn"
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:src="@drawable/btn_liked" />
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:src="@drawable/btn_bookmarked" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
-                            android:text="찜레시피"
+                            android:text="찜한 레시피"
                             android:textSize="12sp" />
                     </LinearLayout>
 
@@ -188,16 +192,17 @@
                         android:orientation="vertical">
 
                         <ImageView
-                            android:id="@+id/addBtn"
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:src="@drawable/btn_add" />
+                            android:id="@+id/personalBtn"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:src="@drawable/btn_personal" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
-                            android:text="재료등록"
+                            android:text="건강관리\n맞춤 추천"
+                            android:textAlignment="center"
                             android:textSize="12sp" />
                     </LinearLayout>
 
@@ -208,34 +213,23 @@
                         android:orientation="vertical">
 
                         <ImageView
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:src="@drawable/btn_date" />
+                            android:id="@+id/ingredientBtn"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:src="@drawable/btn_ingredient" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
-                            android:text="유통기한관리"
+                            android:text="냉장고\n재료 맞춤 추천"
+                            android:textAlignment="center"
                             android:textSize="12sp" />
                     </LinearLayout>
 
                 </LinearLayout>
 
             </HorizontalScrollView>
-
-            <View
-                android:id="@+id/view"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="28dp"
-                android:layout_marginEnd="20dp"
-                android:background="#CFCFCF"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/menu_buttons_scroll_view" />
 
             <TextView
                 android:id="@+id/textView15"
@@ -245,17 +239,16 @@
                 android:layout_marginTop="28dp"
                 android:text="김뭐먹님, 오늘은 뭐 해먹을까요?"
                 android:textSize="20sp"
-                android:textStyle="bold"
+                android:textStyle="normal"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/view" />
+                app:layout_constraintTop_toBottomOf="@+id/menu_buttons_scroll_view" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/todayRV"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:clipToPadding="false"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
+                android:paddingStart="20dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView15" />
@@ -268,7 +261,6 @@
                 android:layout_marginTop="28dp"
                 android:text="최근에 본 레시피"
                 android:textSize="20sp"
-                android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/todayRV" />
 
@@ -277,8 +269,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:clipToPadding="false"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
+                android:paddingStart="20dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView16" />
@@ -289,93 +280,133 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="28dp"
-                android:text="건강 맞춤 레시피"
+                android:text="찜한 레시피"
                 android:textSize="20sp"
-                android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/recentRV" />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/healthRV"
+                android:id="@+id/bookmarkRV"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:clipToPadding="false"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
+                android:paddingStart="20dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView17" />
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/categoryBanner"
-                android:layout_width="match_parent"
-                android:layout_height="230dp"
-                android:layout_marginTop="28dp"
-                android:background="#7CE5B4"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/healthRV">
-
-                <TextView
-                    android:id="@+id/textView23"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:text="카테고리 별 추천"
-                    android:textSize="20dp"
-                    android:textStyle="bold"
-                    app:layout_constraintBottom_toTopOf="@id/categoryBtn"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toRightOf="parent" />
-
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/categoryBtn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="24dp"
-                    android:backgroundTint="@color/black"
-                    app:cardCornerRadius="4dp"
-                    app:cardElevation="0dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent">
-
-                    <TextView
-                        android:id="@+id/textView22"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingLeft="16dp"
-                        android:paddingTop="2dp"
-                        android:paddingRight="16dp"
-                        android:paddingBottom="3dp"
-                        android:text="지금 보러 가기 >"
-                        android:textColor="@color/white"
-                        android:textSize="12dp" />
-                </androidx.cardview.widget.CardView>
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
             <TextView
-                android:id="@+id/textView24"
+                android:id="@+id/textView22"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="28dp"
-                android:text="추천 레시피"
+                android:text="인기 레시피 랭킹"
                 android:textSize="20sp"
-                android:textStyle="bold"
+                android:visibility="visible"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/categoryBanner" />
+                app:layout_constraintTop_toBottomOf="@+id/bookmarkRV" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recommendedRV"
-                android:layout_width="0dp"
+            <LinearLayout
+                android:id="@+id/customTabLayout"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:clipToPadding="false"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
+                android:layout_marginTop="8dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:visibility="visible"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView24" />
+                app:layout_constraintTop_toBottomOf="@id/textView22">
+
+                <LinearLayout
+                    android:id="@+id/tabHealth"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tabHealthText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="건강 맞춤"
+                        android:textColor="@color/green_500"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <View
+                        android:id="@+id/tabHealthIndicator"
+                        android:layout_width="match_parent"
+                        android:layout_height="2dp"
+                        android:background="@color/green_500" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/tabIngredient"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tabIngredientText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="재료 맞춤"
+                        android:textColor="@color/black_200"
+                        android:textSize="12sp"
+                        android:textStyle="normal" />
+
+                    <View
+                        android:id="@+id/tabIngredientIndicator"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/black_200" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/tabRecent"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tabRecentText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="최근에 본"
+                        android:textColor="@color/black_200"
+                        android:textSize="12sp"
+                        android:textStyle="normal" />
+
+                    <View
+                        android:id="@+id/tabRecentIndicator"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/black_200" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rankRV"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:overScrollMode="never"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/customTabLayout" />
+
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

@@ -26,7 +26,11 @@
             android:background="@android:color/transparent"
             android:padding="0dp"
             android:textSize="16sp"
-            android:inputType="text" />
+            android:inputType="text"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:clickable="true"
+            android:cursorVisible="false" />
 
         <ImageView
             android:id="@+id/search_btn"
@@ -106,6 +110,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:overScrollMode="never" />
+
+    <TextView
+        android:id="@+id/popularEmptyTv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="인기 검색어가 없습니다."
+        android:textSize="16sp"
+        android:textColor="@android:color/darker_gray"
+        android:gravity="center"
+        android:visibility="gone"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp" />
 
     <TextView
         android:layout_width="wrap_content"

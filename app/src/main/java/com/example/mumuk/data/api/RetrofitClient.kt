@@ -34,4 +34,15 @@ object RetrofitClient {
         return getRetrofit(context).create(UserApiService::class.java)
     }
 
+    fun getRecentSearchApi(context: Context): RecentSearchApiService {
+        return getRetrofit(context).create(RecentSearchApiService::class.java)
+    }
+
+    fun getPopularKeywordApi(context: Context): PopularKeywordApiService {
+        return getRetrofit(context).create(PopularKeywordApiService::class.java)
+    }
+
+    fun getRecipeAutocompleteApi(context: Context): RecipeAutocompleteApiService {
+        return getRetrofit(context).create(RecipeAutocompleteApiService::class.java)
+    }
 }
