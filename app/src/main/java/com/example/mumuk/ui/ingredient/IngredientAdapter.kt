@@ -14,8 +14,8 @@ class IngredientAdapter(
     inner class IngredientViewHolder(val binding: ItemIngredientBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(item: Ingredient) {
-            binding.textView31.text = item.name
-            binding.textView32.text = "유통기한: ${item.expiryDate}"
+            binding.name.text = item.name
+            binding.date.text = "유통기한: ${item.expiryDate}"
             binding.root.setOnClickListener {
                 onItemClick(item)
             }
