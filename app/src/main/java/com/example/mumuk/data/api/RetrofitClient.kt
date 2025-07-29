@@ -49,4 +49,8 @@ object RetrofitClient {
     fun getSuggestKeywordApi(context: Context): SuggestKeywordApiService {
         return getRetrofit(context).create(SuggestKeywordApiService::class.java)
     }
+
+    fun getRecipeApi(context: Context): RecentRecipeApiService {
+        return getRetrofit(context).create(RecentRecipeApiService::class.java)
+    }
 }
