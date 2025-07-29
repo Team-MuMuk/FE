@@ -42,6 +42,22 @@
             app:exitAnim="@anim/hold"
             app:popEnterAnim="@anim/hold"
             app:popExitAnim="@anim/slide_out_right"/>
+
+        <action
+            android:id="@+id/action_navigation_home_to_ingredientRecommendFragment"
+            app:destination="@id/ingredientRecommendFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/hold"
+            app:popEnterAnim="@anim/hold"
+            app:popExitAnim="@anim/slide_out_right"/>
+
+        <action
+            android:id="@+id/action_navigation_home_to_healthRecommendFragment"
+            app:destination="@id/healthRecommendFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/hold"
+            app:popEnterAnim="@anim/hold"
+            app:popExitAnim="@anim/slide_out_right"/>
     </fragment>
 
     <fragment
@@ -263,4 +279,31 @@
         android:name="com.example.mumuk.ui.ingredient.IngredientDetailFragment"
         android:label="fragment_ingredient_detail"
         tools:layout="@layout/fragment_ingredient_detail" />
+
+    <fragment
+        android:id="@+id/ingredientRecommendFragment"
+        android:name="com.example.mumuk.ui.recommend.IngredientRecommendFragment"
+        android:label="fragment_ingredient_recommend"
+        tools:layout="@layout/fragment_ingredient_recommend">
+    <action
+        android:id="@+id/action_ingredientRecommendFragment_to_recipeFragment"
+        app:destination="@id/recipeFragment"
+        app:enterAnim="@anim/slide_in_right"
+        app:exitAnim="@anim/hold"
+        app:popEnterAnim="@anim/hold"
+        app:popExitAnim="@anim/slide_out_right"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/healthRecommendFragment"
+        android:name="com.example.mumuk.ui.recommend.HealthRecommendFragment"
+        android:label="fragment_health_recommend">
+    <action
+        android:id="@+id/action_healthRecommendFragment_to_recipeFragment"
+        app:destination="@id/recipeFragment"
+        app:enterAnim="@anim/slide_in_right"
+        app:exitAnim="@anim/hold"
+        app:popEnterAnim="@anim/hold"
+        app:popExitAnim="@anim/slide_out_right"/>
+    </fragment>
 </navigation>
