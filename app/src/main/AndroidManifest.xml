@@ -21,7 +21,6 @@
 
         <activity android:name=".ui.signup.SignupActivity" android:exported="false" />
         <activity android:name=".ui.MainActivity" android:exported="false" />
-        <activity android:name=".ui.login.LoginActivity" android:exported="false" />
 
         <!-- ✅ 네이버 로그인 Redirect 받는 곳 -->
         <activity
@@ -52,15 +51,17 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
 
-            <!-- 카카오 로그인 redirect 처리 -->
+        <activity
+            android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data
-                    android:scheme="kakao7950bf906fc9e8123a3832cb5378ae1b"
-                    android:host="oauth" />
+                <data android:host="oauth"
+                    android:scheme="kakao7950bf906fc9e8123a3832cb5378ae1b" />
             </intent-filter>
         </activity>
 

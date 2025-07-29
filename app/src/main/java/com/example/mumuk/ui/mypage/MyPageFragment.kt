@@ -25,7 +25,7 @@ import com.example.mumuk.data.model.mypage.UserProfileResponse
 import com.example.mumuk.databinding.DialogDeleteAccountBinding
 import com.example.mumuk.databinding.DialogLogoutBinding
 import com.example.mumuk.databinding.FragmentMyPageBinding
-import com.example.mumuk.ui.login.LoginActivity
+import com.example.mumuk.ui.login.LoginIntroActivity
 import com.example.mumuk.utils.JwtUtils
 import retrofit2.Call
 import retrofit2.Callback
@@ -45,7 +45,7 @@ class MyPageFragment : Fragment() {
         binding.btnProfile.setOnClickListener {
             val loginType = TokenManager.getLoginType(requireContext()) ?: "LOCAL"
 
-            if (loginType == "NAVER") {
+            if (loginType == "NAVER" || loginType == "KAKAO") {
                 showSimpleConfirmDialog(
                     message = "소셜로그인 이용자는\n프로필 수정이 불가합니다.",
                     buttonText = "확인"
@@ -100,7 +100,7 @@ class MyPageFragment : Fragment() {
                                 val prefs = requireContext().getSharedPreferences("auth", Context.MODE_PRIVATE)
                                 prefs.edit().clear().apply()
 
-                                val intent = Intent(requireContext(), LoginActivity::class.java)
+                                val intent = Intent(requireContext(), LoginIntroActivity::class.java)
                                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                                 startActivity(intent)
                                 return
@@ -113,9 +113,10 @@ class MyPageFragment : Fragment() {
                                 prefs.edit().clear().apply()
 
                                 Log.d("Logout", "로그아웃 성공. 토큰 삭제됨")
-                                val intent = Intent(requireContext(), LoginActivity::class.java)
+                                val intent = Intent(requireContext(), LoginIntroActivity::class.java)
                                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                                 startActivity(intent)
+
                             } else {
                                 Toast.makeText(requireContext(), "로그아웃 실패: ${response.body()?.message ?: "알 수 없는 오류"}", Toast.LENGTH_SHORT).show()
                             }
@@ -174,7 +175,7 @@ class MyPageFragment : Fragment() {
 
                                 Log.d("Logout", "AccessToken after logout: ${TokenManager.getAccessToken(requireContext())}")
 
-                                val intent = Intent(requireContext(), LoginActivity::class.java)
+                                val intent = Intent(requireContext(), LoginIntroActivity::class.java)
                                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                                 startActivity(intent)
                             } else {
@@ -293,18 +294,19 @@ class MyPageFragment : Fragment() {
         if (loginType == "KAKAO" || loginType == "NAVER") {
             val savedNickname = TokenManager.getNickName(requireContext())
 
-            binding.tvNickname.text = if (!savedNickname.isNullOrBlank()) {
+            val nicknameText = if (!savedNickname.isNullOrBlank()) {
                 "${savedNickname}님!"
             } else {
                 "사용자님!"
             }
 
-            binding.tvSubtitle.text = ""
+            binding.tvNickname.text = nicknameText
+            binding.recipeText.text = "${nicknameText.replace("님!", "")}님이 최근 본 레시피"
 
+            binding.tvSubtitle.text = ""
             binding.imgProfile.setImageResource(R.drawable.ic_user_profile_orange)
 
         } else {
-            // ✅ 일반 로그인: 서버에서 유저 정보 요청
             val accessToken = TokenManager.getAccessToken(requireContext())
             val userId = JwtUtils.getUserIdFromToken(accessToken ?: "")
 
@@ -322,7 +324,9 @@ class MyPageFragment : Fragment() {
                         if (response.isSuccessful) {
                             val profile = response.body()?.data ?: return
 
-                            binding.tvNickname.text = "${profile.nickName}님!"
+                            val nicknameText = "${profile.nickName}님!"
+                            binding.tvNickname.text = nicknameText
+                            binding.recipeText.text = "${profile.nickName}님이 최근 본 레시피"
                             binding.tvSubtitle.text = profile.statusMessage
 
                             val profileRes = when (profile.profileImage ?: "orange") {
@@ -343,6 +347,7 @@ class MyPageFragment : Fragment() {
                 })
         }
     }
+
 
 
 

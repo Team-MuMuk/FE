@@ -21,7 +21,7 @@ dependencyResolutionManagement {
         mavenCentral()
         maven { url = uri("https://jitpack.io") }
 
-        // ✅ 여기도 카카오 SDK 저장소 추가
+        // 여기도 카카오 SDK 저장소 추가
         maven { url = uri("https://devrepo.kakao.com/nexus/content/groups/public/") }
     }
 }

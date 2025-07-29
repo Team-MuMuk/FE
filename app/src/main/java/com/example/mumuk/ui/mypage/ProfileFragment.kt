@@ -93,6 +93,14 @@ class ProfileFragment : Fragment() {
                                 } else {
                                     binding.editStatus.setText(profile.statusMessage)
                                 }
+                                val profileRes = when (profile.profileImage ?: "orange") {
+                                    "orange" -> R.drawable.ic_user_profile_orange
+                                    "white" -> R.drawable.ic_user_profile_white
+                                    "green" -> R.drawable.ic_user_profile_green
+                                    else -> R.drawable.ic_user_profile_orange
+                                }
+                                binding.icProfile.setImageResource(profileRes)
+                                selectedProfileImageResId = profileRes
                             }
                         } else {
                             Log.e("Profile", "프로필 응답 실패: ${response.code()} / ${response.message()}")
