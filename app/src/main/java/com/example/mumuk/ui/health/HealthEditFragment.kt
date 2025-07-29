@@ -9,15 +9,26 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.mumuk.databinding.FragmentHealthEditBinding
 import com.example.mumuk.R
+import com.example.mumuk.data.api.AllergyOptionsResponse
+import com.example.mumuk.data.api.AllergyApiService
+import com.example.mumuk.data.api.RetrofitClient
+import com.example.mumuk.data.api.ToggleAllergyRequest
+import com.example.mumuk.data.api.ToggleAllergyResponse
 import com.google.android.material.button.MaterialButton
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class HealthEditFragment : Fragment() {
     private var _binding: FragmentHealthEditBinding? = null
     private val binding get() = _binding!!
 
-    // 카드 활성 상태 저장
     private var isAllergyEditSelected = false
     private var isGoalEditSelected = false
+
+    private lateinit var allergyButtonMap: Map<String, MaterialButton>
+    private lateinit var allergyTypeByButton: Map<MaterialButton, String>
+    private lateinit var allergyApi: AllergyApiService
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -34,8 +45,22 @@ class HealthEditFragment : Fragment() {
             findNavController().popBackStack()
         }
 
-        // 알레르기 정보 수정 카드 클릭 이벤트
+        // 맵과 API 인스턴스 초기화
+        allergyButtonMap = mapOf(
+            "SHELLFISH" to binding.btnShellfish,
+            "NUTS" to binding.btnNuts,
+            "DAIRY" to binding.btnDairy,
+            "WHEAT" to binding.btnWheat,
+            "EGG" to binding.btnEgg,
+            "FISH" to binding.btnFish,
+            "SOY" to binding.btnSoy,
+            "NONE" to binding.btnNone
+        )
+        allergyTypeByButton = allergyButtonMap.entries.associate { (type, btn) -> btn to type }
+        allergyApi = RetrofitClient.getAllergyApi(requireContext())
+
         binding.cardViewAllergyEdit.setOnClickListener {
+            val wasSelected = isAllergyEditSelected
             isAllergyEditSelected = !isAllergyEditSelected
             toggleCard(
                 selected = isAllergyEditSelected,
@@ -45,9 +70,37 @@ class HealthEditFragment : Fragment() {
                 imageView = binding.ivAllergyGoal,
                 defaultText = "수정"
             )
+
+            // "완료" -> "수정" 전환 시에만 서버에 변경 반영
+            if (!isAllergyEditSelected && wasSelected) {
+                val selectedTypes = allergyTypeByButton.filter { it.key.isChecked }.values.toList()
+                android.util.Log.d("HealthEditFragment", "선택된 allergyType: $selectedTypes")
+                val request = ToggleAllergyRequest(allergyTypeList = selectedTypes)
+                allergyApi.toggleAllergies(request).enqueue(object : Callback<ToggleAllergyResponse> {
+                    override fun onResponse(
+                        call: Call<ToggleAllergyResponse>,
+                        response: Response<ToggleAllergyResponse>
+                    ) {
+                        android.util.Log.d("HealthEditFragment", "toggleAllergies API 응답: isSuccessful=${response.isSuccessful}, code=${response.code()}, body=${response.body()}")
+                        if (response.isSuccessful) {
+                            val latestAllergies = response.body()?.data?.results?.map { it.allergyType } ?: emptyList()
+                            android.util.Log.d("HealthEditFragment", "서버 반영된 allergyType: $latestAllergies")
+                            allergyButtonMap.forEach { (type, btn) ->
+                                btn.isChecked = latestAllergies.contains(type)
+                                updateAllergyButtonColor(btn)
+                            }
+                        } else {
+                            android.util.Log.e("HealthEditFragment", "toggleAllergies 실패: code=${response.code()}, errorBody=${response.errorBody()?.string()}")
+                        }
+                    }
+                    override fun onFailure(call: Call<ToggleAllergyResponse>, t: Throwable) {
+                        android.util.Log.e("HealthEditFragment", "toggleAllergies API 호출 실패", t)
+                        // TODO: 에러 처리
+                    }
+                })
+            }
         }
 
-        // 건강 목표 수정 카드 클릭 이벤트
         binding.cardViewGoalEdit.setOnClickListener {
             isGoalEditSelected = !isGoalEditSelected
             toggleCard(
@@ -67,7 +120,6 @@ class HealthEditFragment : Fragment() {
         )
         allergyButtons.forEach { btn ->
             btn.setOnClickListener {
-                // 카드가 활성화(true)일 때만 버튼 토글
                 if (!isAllergyEditSelected) {
                     btn.isChecked = !btn.isChecked
                 }
@@ -76,7 +128,6 @@ class HealthEditFragment : Fragment() {
             updateAllergyButtonColor(btn)
         }
 
-        // 건강 목표 버튼들 (다중 선택)
         val goalButtons = listOf(
             binding.btnWeightLoss, binding.btnMuscleGain, binding.btnSugarReduction,
             binding.btnBloodPressure, binding.btnCholesterol, binding.btnDigestiveHealth, binding.btnNoneGoal
@@ -90,9 +141,30 @@ class HealthEditFragment : Fragment() {
             }
             updateGoalButtonColor(btn)
         }
+
+        // 처음 진입 시 서버에서 알레르기 상태 조회
+        allergyApi.getAllergyOptions()
+            .enqueue(object : Callback<AllergyOptionsResponse> {
+                override fun onResponse(
+                    call: Call<AllergyOptionsResponse>,
+                    response: Response<AllergyOptionsResponse>
+                ) {
+                    if (response.isSuccessful) {
+                        val options = response.body()?.data?.allergyOptions ?: emptyList()
+                        options.forEach { option ->
+                            allergyButtonMap[option.allergyType]?.let { btn ->
+                                btn.isChecked = true
+                                updateAllergyButtonColor(btn)
+                            }
+                        }
+                    }
+                }
+                override fun onFailure(call: Call<AllergyOptionsResponse>, t: Throwable) {
+                    // TODO: 에러 처리
+                }
+            })
     }
 
-    // 카드 토글 함수
     private fun toggleCard(
         selected: Boolean,
         card: com.google.android.material.card.MaterialCardView,
@@ -122,35 +194,23 @@ class HealthEditFragment : Fragment() {
         }
     }
 
-    // 알레르기 버튼 색상 업데이트 (다중 선택)
     private fun updateAllergyButtonColor(btn: MaterialButton) {
-        if (!isAllergyEditSelected) { // 카드가 비활성화면 모두 기본색
-            btn.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.health_button_background_selector))
-            btn.setTextColor(ContextCompat.getColor(requireContext(), R.color.health_button_text_selector))
+        if (btn.isChecked) {
+            btn.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.beige_500))
+            btn.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
         } else {
-            if (btn.isChecked) {
-                btn.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.beige_500))
-                btn.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-            } else {
-                btn.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.health_button_background_selector))
-                btn.setTextColor(ContextCompat.getColor(requireContext(), R.color.health_button_text_selector))
-            }
+            btn.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
+            btn.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
         }
     }
 
-    // 건강목표 버튼 색상 업데이트 (다중 선택)
     private fun updateGoalButtonColor(btn: MaterialButton) {
-        if (!isGoalEditSelected) {
-            btn.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.health_button_background_selector))
-            btn.setTextColor(ContextCompat.getColor(requireContext(), R.color.health_button_text_selector))
+        if (btn.isChecked) {
+            btn.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.beige_500))
+            btn.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
         } else {
-            if (btn.isChecked) {
-                btn.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.beige_500))
-                btn.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-            } else {
-                btn.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.health_button_background_selector))
-                btn.setTextColor(ContextCompat.getColor(requireContext(), R.color.health_button_text_selector))
-            }
+            btn.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
+            btn.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
         }
     }
 
