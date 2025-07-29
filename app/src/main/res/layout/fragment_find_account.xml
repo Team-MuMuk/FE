@@ -12,7 +12,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:layout_marginTop="54dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -32,19 +33,14 @@
                 android:id="@+id/tv_login_menu"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
+                android:layout_marginStart="76dp"
                 android:text="아이디 / 비밀번호 찾기"
                 android:textColor="@color/black"
                 android:textSize="24sp"
                 android:textStyle="bold" />
         </LinearLayout>
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#CFCFCF"
-            android:layout_marginTop="15dp"
-            android:layout_marginStart="-20dp"/>
+
 
         <LinearLayout
             android:id="@+id/layout_tabs"
@@ -52,7 +48,7 @@
             android:layout_height="48dp"
             android:orientation="horizontal"
             android:gravity="center"
-            android:layout_marginTop="20dp">
+            android:layout_marginTop="44dp">
 
             <TextView
                 android:id="@+id/tab_find_id"

@@ -51,8 +51,9 @@ class LoginIntroActivity : AppCompatActivity() {
         }
 
         val activeDrawable = ContextCompat.getDrawable(this, R.drawable.btn_login_active)
-        val inactiveDrawable = ContextCompat.getDrawable(this, R.drawable.logintext_border)
+        val defaultDrawable = ContextCompat.getDrawable(this, R.drawable.logintext_border)
         val whiteTextColor = ContextCompat.getColor(this, android.R.color.white)
+        val blackTextColor = ContextCompat.getColor(this, android.R.color.black)
 
         var isPasswordVisible = false
         binding.ivTogglePw.setOnClickListener {
@@ -99,10 +100,7 @@ class LoginIntroActivity : AppCompatActivity() {
                     if (response.isSuccessful) {
                         val loginResponse = response.body()
                         if (loginResponse?.status == "OK" && loginResponse.data != null) {
-                            val accessToken = loginResponse.data.accessToken
-                            val refreshToken = loginResponse.data.refreshToken
-
-                            TokenManager.saveTokens(this@LoginIntroActivity, accessToken, refreshToken)
+                            TokenManager.saveTokens(this@LoginIntroActivity, loginResponse.data.accessToken, loginResponse.data.refreshToken)
                             TokenManager.saveLoginType(this@LoginIntroActivity, "LOCAL")
 
                             startActivity(Intent(this@LoginIntroActivity, MainActivity::class.java).apply {
@@ -122,7 +120,6 @@ class LoginIntroActivity : AppCompatActivity() {
             })
         }
 
-
         val watcher = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
@@ -131,30 +128,28 @@ class LoginIntroActivity : AppCompatActivity() {
                 val isPasswordFilled = binding.etPassword.text?.isNotEmpty() == true
 
                 if (isIdFilled) {
-                    binding.etId.background = ContextCompat.getDrawable(this@LoginIntroActivity, R.drawable.logintext_border)
+                    binding.etId.background = defaultDrawable
                     binding.etId.setHintTextColor(ContextCompat.getColor(this@LoginIntroActivity, R.color.gray))
                 }
 
                 if (isPasswordFilled) {
-                    binding.etPassword.background = ContextCompat.getDrawable(this@LoginIntroActivity, R.drawable.logintext_border)
+                    binding.etPassword.background = defaultDrawable
                     binding.etPassword.setHintTextColor(ContextCompat.getColor(this@LoginIntroActivity, R.color.gray))
                 }
 
                 if (isIdFilled && isPasswordFilled) {
-                    binding.btnLogin.isEnabled = true
                     binding.btnLogin.background = activeDrawable
                     binding.btnLogin.setTextColor(whiteTextColor)
                 } else {
-                    binding.btnLogin.isEnabled = false
-                    binding.btnLogin.background = inactiveDrawable
+                    binding.btnLogin.background = defaultDrawable
+                    binding.btnLogin.setTextColor(blackTextColor)
                 }
             }
         }
 
-
         binding.etId.addTextChangedListener(watcher)
         binding.etPassword.addTextChangedListener(watcher)
-        binding.btnLogin.isEnabled = false
+        binding.btnLogin.isEnabled = true
 
         binding.btnSignup.setOnClickListener {
             startActivity(Intent(this, SignupActivity::class.java))
@@ -198,8 +193,6 @@ class LoginIntroActivity : AppCompatActivity() {
                 }
             }
         }
-
-
     }
 
     private fun loginWithNaverToken(token: String) {
