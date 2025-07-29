@@ -88,6 +88,9 @@ dependencies {
     implementation("com.navercorp.nid:oauth:5.9.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
+    //카카오 sdk
+    implementation("com.kakao.sdk:v2-user:2.21.6")
+
     //스와이프
     implementation("com.github.chthai64:SwipeRevealLayout:1.4.0")
 }
