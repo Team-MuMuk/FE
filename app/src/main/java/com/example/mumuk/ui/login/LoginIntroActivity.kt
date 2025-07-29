@@ -38,11 +38,17 @@ import retrofit2.Response
 import java.io.IOException
 import android.app.Dialog
 import android.graphics.drawable.ColorDrawable
+import android.widget.TextView
 
 
 class LoginIntroActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginIntroBinding
+
+    companion object {
+        private const val TAG = "LoginIntroActivity"
+    }
+
 
     // 카카오 로그인 콜백
     private val kakaoLoginCallback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
@@ -54,6 +60,29 @@ class LoginIntroActivity : AppCompatActivity() {
             // 토큰 저장
             TokenManager.saveTokens(this, token.accessToken, token.refreshToken ?: "")
             TokenManager.saveLoginType(this, "KAKAO")
+
+            UserApiClient.instance.me { user, error ->
+                if (error != null) {
+                    Log.e(TAG, "사용자 정보 요청 실패", error)
+                } else if (user != null) {
+                    val nickname = user.kakaoAccount?.profile?.nickname ?: ""
+                    val email = user.kakaoAccount?.email ?: ""
+
+                    // 로컬에 저장
+                    TokenManager.saveUserInfo(this, email, nickname, "orange")
+
+                    runOnUiThread {
+                        Toast.makeText(this, "${nickname}님 환영합니다!", Toast.LENGTH_SHORT).show()
+
+                        val intent = Intent(this, MainActivity::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        startActivity(intent)
+                        finish()
+                    }
+                }
+            }
+
+
             // MainActivity로 이동
             val intent = Intent(this, MainActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -247,6 +276,7 @@ class LoginIntroActivity : AppCompatActivity() {
                 }
             }
         }
+        printKeyHash()
     }
 
     private fun loginWithNaverToken(token: String) {
@@ -312,5 +342,20 @@ class LoginIntroActivity : AppCompatActivity() {
 
         dialog.show()
     }
+
+    private fun printKeyHash() {
+        try {
+            val info = packageManager.getPackageInfo(packageName, android.content.pm.PackageManager.GET_SIGNATURES)
+            for (signature in info.signatures!!) {
+                val md = java.security.MessageDigest.getInstance("SHA")
+                md.update(signature.toByteArray())
+                val keyHash = android.util.Base64.encodeToString(md.digest(), android.util.Base64.NO_WRAP)
+                Log.d("🔑KeyHash", keyHash)
+            }
+        } catch (e: Exception) {
+            Log.e("KeyHash", "키 해시 얻기 실패", e)
+        }
+    }
+
 
 }

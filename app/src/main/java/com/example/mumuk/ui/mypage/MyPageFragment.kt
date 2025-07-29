@@ -45,7 +45,7 @@ class MyPageFragment : Fragment() {
         binding.btnProfile.setOnClickListener {
             val loginType = TokenManager.getLoginType(requireContext()) ?: "LOCAL"
 
-            if (loginType == "NAVER") {
+            if (loginType == "NAVER" || loginType == "KAKAO") {
                 showSimpleConfirmDialog(
                     message = "소셜로그인 이용자는\n프로필 수정이 불가합니다.",
                     buttonText = "확인"
@@ -294,18 +294,19 @@ class MyPageFragment : Fragment() {
         if (loginType == "KAKAO" || loginType == "NAVER") {
             val savedNickname = TokenManager.getNickName(requireContext())
 
-            binding.tvNickname.text = if (!savedNickname.isNullOrBlank()) {
+            val nicknameText = if (!savedNickname.isNullOrBlank()) {
                 "${savedNickname}님!"
             } else {
                 "사용자님!"
             }
 
-            binding.tvSubtitle.text = ""
+            binding.tvNickname.text = nicknameText
+            binding.recipeText.text = "${nicknameText.replace("님!", "")}님이 최근 본 레시피"
 
+            binding.tvSubtitle.text = ""
             binding.imgProfile.setImageResource(R.drawable.ic_user_profile_orange)
 
         } else {
-            // ✅ 일반 로그인: 서버에서 유저 정보 요청
             val accessToken = TokenManager.getAccessToken(requireContext())
             val userId = JwtUtils.getUserIdFromToken(accessToken ?: "")
 
@@ -323,7 +324,9 @@ class MyPageFragment : Fragment() {
                         if (response.isSuccessful) {
                             val profile = response.body()?.data ?: return
 
-                            binding.tvNickname.text = "${profile.nickName}님!"
+                            val nicknameText = "${profile.nickName}님!"
+                            binding.tvNickname.text = nicknameText
+                            binding.recipeText.text = "${profile.nickName}님이 최근 본 레시피"
                             binding.tvSubtitle.text = profile.statusMessage
 
                             val profileRes = when (profile.profileImage ?: "orange") {
@@ -344,6 +347,7 @@ class MyPageFragment : Fragment() {
                 })
         }
     }
+
 
 
 
