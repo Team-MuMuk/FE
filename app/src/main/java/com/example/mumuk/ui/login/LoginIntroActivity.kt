@@ -7,6 +7,7 @@ import android.text.InputType
 import android.text.TextWatcher
 import android.util.Log
 import android.view.View
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -32,6 +33,9 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.io.IOException
+import android.app.Dialog
+import android.graphics.drawable.ColorDrawable
+
 
 class LoginIntroActivity : AppCompatActivity() {
 
@@ -107,16 +111,24 @@ class LoginIntroActivity : AppCompatActivity() {
                                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                             })
                         } else {
-                            Toast.makeText(this@LoginIntroActivity, "로그인 실패: ${loginResponse?.message ?: "알 수 없음"}", Toast.LENGTH_SHORT).show()
+                            showSimpleConfirmDialog(
+                                message = "등록되지 않은 아이디거나,\nID 또는 비밀번호를 \n잘못 입력하였습니다."
+                            )
                         }
                     } else {
-                        Toast.makeText(this@LoginIntroActivity, "서버 에러: ${response.code()}", Toast.LENGTH_SHORT).show()
+                        showSimpleConfirmDialog(
+                            message = "등록되지 않은 아이디거나,\nID 또는 비밀번호를 \n잘못 입력하였습니다."
+                        )
                     }
                 }
 
+
                 override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
-                    Toast.makeText(this@LoginIntroActivity, "네트워크 오류: ${t.message}", Toast.LENGTH_SHORT).show()
+                    showSimpleConfirmDialog(
+                        message = "일시적인 오류로 로그인을 할 수 없습니다.\n잠시 후 다시 시도해 주세요."
+                    )
                 }
+
             })
         }
 
@@ -235,4 +247,28 @@ class LoginIntroActivity : AppCompatActivity() {
             }
         })
     }
+    private fun showSimpleConfirmDialog(
+        message: String,
+        buttonText: String = "확인",
+        onButtonClick: (() -> Unit)? = null
+    ) {
+        val dialog = Dialog(this)
+        dialog.setContentView(R.layout.dialog_confirm)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(android.graphics.Color.TRANSPARENT))
+        dialog.window?.setDimAmount(0.2f)
+
+        val tvMessage = dialog.findViewById<TextView>(R.id.tv_dialog_message)
+        val btnOk = dialog.findViewById<TextView>(R.id.btn_dialog_ok)
+
+        tvMessage.text = message
+        btnOk.text = buttonText
+
+        btnOk.setOnClickListener {
+            dialog.dismiss()
+            onButtonClick?.invoke()
+        }
+
+        dialog.show()
+    }
+
 }
