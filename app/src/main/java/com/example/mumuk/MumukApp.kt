@@ -1,6 +1,7 @@
 package com.example.mumuk
 
 import android.app.Application
+import com.kakao.sdk.common.KakaoSdk
 import com.navercorp.nid.NaverIdLoginSDK
 
 class MumukApp : Application() {
@@ -12,5 +13,6 @@ class MumukApp : Application() {
             clientSecret = "agp8iF1gmk",
             clientName = "MUMUK"
         )
+        KakaoSdk.init(this, "7950bf906fc9e8123a3832cb5378ae1b")
     }
 }

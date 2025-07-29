@@ -7,7 +7,6 @@ import android.text.InputType
 import android.text.TextWatcher
 import android.util.Log
 import android.view.View
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -23,7 +22,11 @@ import com.example.mumuk.data.model.auth.LoginResponse
 import com.example.mumuk.databinding.ActivityLoginIntroBinding
 import com.example.mumuk.ui.MainActivity
 import com.example.mumuk.ui.signup.SignupActivity
-import com.example.mumuk.data.model.login.openKakaoLoginPage
+import com.example.mumuk.data.model.login.openKakaoLoginPage // 기존 코드에서 사용했던 경우 남겨둠
+import com.kakao.sdk.auth.model.OAuthToken
+import com.kakao.sdk.common.model.ClientError
+import com.kakao.sdk.common.model.ClientErrorCause
+import com.kakao.sdk.user.UserApiClient
 import com.navercorp.nid.NaverIdLoginSDK
 import com.navercorp.nid.oauth.OAuthLoginCallback
 import okhttp3.OkHttpClient
@@ -40,6 +43,44 @@ import android.graphics.drawable.ColorDrawable
 class LoginIntroActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginIntroBinding
+
+    // 카카오 로그인 콜백
+    private val kakaoLoginCallback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
+        if (error != null) {
+            Log.e(TAG, "카카오 로그인 실패", error)
+            Toast.makeText(this, "카카오 로그인 실패: ${error.localizedMessage}", Toast.LENGTH_SHORT).show()
+        } else if (token != null) {
+            Log.i(TAG, "카카오 로그인 성공 ${token.accessToken}")
+            // 토큰 저장
+            TokenManager.saveTokens(this, token.accessToken, token.refreshToken ?: "")
+            TokenManager.saveLoginType(this, "KAKAO")
+            // MainActivity로 이동
+            val intent = Intent(this, MainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+            finish()
+        }
+    }
+
+    // 카카오 로그인 시작
+    private fun startKakaoLogin() {
+        if (UserApiClient.instance.isKakaoTalkLoginAvailable(this)) {
+            UserApiClient.instance.loginWithKakaoTalk(this) { token, error ->
+                if (error != null) {
+                    Log.e(TAG, "카카오톡으로 로그인 실패", error)
+                    if (error is ClientError && error.reason == ClientErrorCause.Cancelled) {
+                        return@loginWithKakaoTalk
+                    }
+                    UserApiClient.instance.loginWithKakaoAccount(this, callback = kakaoLoginCallback)
+                } else if (token != null) {
+                    Log.i(TAG, "카카오톡으로 로그인 성공 ${token.accessToken}")
+                    kakaoLoginCallback(token, null)
+                }
+            }
+        } else {
+            UserApiClient.instance.loginWithKakaoAccount(this, callback = kakaoLoginCallback)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -128,7 +169,6 @@ class LoginIntroActivity : AppCompatActivity() {
                         message = "일시적인 오류로 로그인을 할 수 없습니다.\n잠시 후 다시 시도해 주세요."
                     )
                 }
-
             })
         }
 
@@ -168,10 +208,12 @@ class LoginIntroActivity : AppCompatActivity() {
             finish()
         }
 
+        // 카카오 로그인 버튼
         binding.btnLoginKakao.setOnClickListener {
-            openKakaoLoginPage(this)
+            startKakaoLogin()
         }
 
+        // 네이버 로그인 버튼
         binding.btnLoginNaver.setOnClickListener {
             NaverIdLoginSDK.authenticate(this, object : OAuthLoginCallback {
                 override fun onSuccess() {
