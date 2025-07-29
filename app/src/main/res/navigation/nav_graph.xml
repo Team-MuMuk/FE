@@ -19,7 +19,7 @@
             app:popExitAnim="@anim/slide_out_right"/>
         <action
             android:id="@+id/action_navigation_home_to_healthManagementFragment"
-            app:destination="@id/healthManagementFragment"
+            app:destination="@id/healthEditFragment"
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/hold"
             app:popEnterAnim="@anim/hold"
@@ -306,4 +306,10 @@
         app:popEnterAnim="@anim/hold"
         app:popExitAnim="@anim/slide_out_right"/>
     </fragment>
+
+    <fragment
+        android:id="@+id/healthEditFragment"
+        android:name="com.example.mumuk.ui.health.HealthEditFragment"
+        android:label="fragment_health_edit"
+        tools:layout="@layout/fragment_health_edit" />
 </navigation>

@@ -99,7 +99,7 @@ class HealthManagementFragment : Fragment() {
     private fun updateNextButtonState(isComplete: Boolean) {
         val context = requireContext()
         if (isComplete) {
-            binding.btnOnboardingNext.setCardBackgroundColor(ContextCompat.getColor(context, R.color.green_500))
+            binding.btnOnboardingNext.setCardBackgroundColor(ContextCompat.getColor(context, R.color.beige_500))
             binding.tvNext.setTextColor(ContextCompat.getColor(context, R.color.white))
             binding.ivNextArrow.setColorFilter(ContextCompat.getColor(context, R.color.white))
         } else {
