@@ -23,6 +23,8 @@
     <color name="beige_600">#A29583</color>
     <color name="beige_500">#BAAE99</color>
     <color name="beige_300">#D4CEC1</color>
+    <color name="beige_200">#E5E1D9</color>
     <color name="beige_100">#F4F2ED</color>
     <color name="blue_default">#306AF2</color>
+    <color name="red_inbody">#971B2F</color>
 </resources>

@@ -3,7 +3,7 @@ package com.example.mumuk.data.repository
 import com.example.mumuk.data.model.Recipe
 import com.example.mumuk.R
 
-class AiRecipeRepository {
+class IngredientAiRecipeRepository {
     fun getAiRecipes(): List<Recipe> {
         return listOf(
             Recipe(img = R.drawable.bg_mosaic, title = "두부유부초밥"),
