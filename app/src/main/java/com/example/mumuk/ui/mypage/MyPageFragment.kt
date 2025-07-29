@@ -25,7 +25,7 @@ import com.example.mumuk.data.model.mypage.UserProfileResponse
 import com.example.mumuk.databinding.DialogDeleteAccountBinding
 import com.example.mumuk.databinding.DialogLogoutBinding
 import com.example.mumuk.databinding.FragmentMyPageBinding
-import com.example.mumuk.ui.login.LoginActivity
+import com.example.mumuk.ui.login.LoginIntroActivity
 import com.example.mumuk.utils.JwtUtils
 import retrofit2.Call
 import retrofit2.Callback
@@ -100,7 +100,7 @@ class MyPageFragment : Fragment() {
                                 val prefs = requireContext().getSharedPreferences("auth", Context.MODE_PRIVATE)
                                 prefs.edit().clear().apply()
 
-                                val intent = Intent(requireContext(), LoginActivity::class.java)
+                                val intent = Intent(requireContext(), LoginIntroActivity::class.java)
                                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                                 startActivity(intent)
                                 return
@@ -113,9 +113,10 @@ class MyPageFragment : Fragment() {
                                 prefs.edit().clear().apply()
 
                                 Log.d("Logout", "로그아웃 성공. 토큰 삭제됨")
-                                val intent = Intent(requireContext(), LoginActivity::class.java)
+                                val intent = Intent(requireContext(), LoginIntroActivity::class.java)
                                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                                 startActivity(intent)
+
                             } else {
                                 Toast.makeText(requireContext(), "로그아웃 실패: ${response.body()?.message ?: "알 수 없는 오류"}", Toast.LENGTH_SHORT).show()
                             }
@@ -174,7 +175,7 @@ class MyPageFragment : Fragment() {
 
                                 Log.d("Logout", "AccessToken after logout: ${TokenManager.getAccessToken(requireContext())}")
 
-                                val intent = Intent(requireContext(), LoginActivity::class.java)
+                                val intent = Intent(requireContext(), LoginIntroActivity::class.java)
                                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                                 startActivity(intent)
                             } else {

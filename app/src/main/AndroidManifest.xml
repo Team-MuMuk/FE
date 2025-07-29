@@ -21,7 +21,6 @@
 
         <activity android:name=".ui.signup.SignupActivity" android:exported="false" />
         <activity android:name=".ui.MainActivity" android:exported="false" />
-        <activity android:name=".ui.login.LoginActivity" android:exported="false" />
 
         <!-- ✅ 네이버 로그인 Redirect 받는 곳 -->
         <activity
