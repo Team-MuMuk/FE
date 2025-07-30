@@ -8,6 +8,9 @@ class HomeRecipeRepository {
         return listOf(
             Recipe(R.drawable.bg_mosaic, "연어 포케", false),
             Recipe(R.drawable.bg_mosaic, "닭가슴살 덮밥", true),
+            Recipe(R.drawable.bg_mosaic, "두부유부초밥", false),
+            Recipe(R.drawable.bg_mosaic, "연어 포케", false),
+            Recipe(R.drawable.bg_mosaic, "닭가슴살 덮밥", true),
             Recipe(R.drawable.bg_mosaic, "두부유부초밥", false)
         )
     }
