@@ -41,7 +41,6 @@ class MyPageFragment : Fragment() {
     ): View {
         _binding = FragmentMyPageBinding.inflate(inflater, container, false)
 
-
         binding.btnProfile.setOnClickListener {
             val loginType = TokenManager.getLoginType(requireContext()) ?: "LOCAL"
 
@@ -169,7 +168,7 @@ class MyPageFragment : Fragment() {
 
                                 TokenManager.clearTokens(requireContext())
 
-                                // SharedPreferences("auth")의 카카오 로그인 정보도 삭제
+                                // SharedPreferences(auth)의 카카오 로그인 정보도 삭제
                                 val prefs = requireContext().getSharedPreferences("auth", Context.MODE_PRIVATE)
                                 prefs.edit().clear().apply()
 
@@ -219,6 +218,7 @@ class MyPageFragment : Fragment() {
             showSimpleConfirmDialog(
                 message = "푸시알림 설정을\n하시겠습니까?",
                 buttonText = "동의"
+
             ) {
                 Toast.makeText(requireContext(), "푸시알림 설정에 동의하셨습니다", Toast.LENGTH_SHORT).show()
             }
@@ -226,7 +226,7 @@ class MyPageFragment : Fragment() {
 
         binding.itemPwChange.setOnClickListener {
             childFragmentManager.commit {
-                replace(R.id.signup_container, SubChangePw1Fragment())
+                replace(R.id.mypage_container, SubChangePw1Fragment())
                 addToBackStack(null)
             }
         }

@@ -1,6 +1,7 @@
 package com.example.mumuk.data.api
 
 
+import com.example.mumuk.data.model.auth.CheckCurrentPwRequest
 import com.example.mumuk.data.model.auth.CommonResponse
 import com.example.mumuk.data.model.auth.FindIdRequest
 import com.example.mumuk.data.model.auth.FindPwRequest
@@ -9,7 +10,6 @@ import com.example.mumuk.data.model.auth.LoginRequest
 import com.example.mumuk.data.model.auth.LoginResponse
 import com.example.mumuk.data.model.auth.NaverLoginResponse
 import com.example.mumuk.data.model.auth.ReissuePwRequest
-import com.example.mumuk.data.model.auth.ReissuePwResponse
 import com.example.mumuk.data.model.auth.SignupRequest
 import com.example.mumuk.data.model.auth.SignupResponse
 import retrofit2.Call
@@ -26,8 +26,10 @@ interface AuthApiService {
     fun login(@Body request: LoginRequest): Call<LoginResponse>
     @POST("/api/auth/sign-up")
     fun signUp(@Body request: SignupRequest): Call<SignupResponse>
+    @POST("/api/auth/check-current-pw")
+    fun checkCurrentPassword(@Body request: CheckCurrentPwRequest): Call<CommonResponse>
     @PATCH("/api/auth/reissue-pw")
-    fun reissuePassword(@Body request: ReissuePwRequest): Call<ReissuePwResponse>
+    fun reissuePassword(@Body request: ReissuePwRequest): Call<CommonResponse>
     @PATCH("/api/auth/logout")
     fun logout(
         @Header("X-Refresh-Token") refreshToken: String,
@@ -48,10 +50,6 @@ interface AuthApiService {
     suspend fun naverLogin(
         @Query("code") code: String,
         @Query("state") state: String = "mumukDefaultState"
-    ): Response<NaverLoginResponse>
-    @POST("/api/auth/naver-login")
-    suspend fun naverLoginWithToken(
-        @Header("Authorization") token: String
     ): Response<NaverLoginResponse>
 
 
