@@ -16,8 +16,8 @@ import androidx.viewpager2.widget.ViewPager2
 import com.example.mumuk.R
 import com.example.mumuk.databinding.FragmentHealthManagementBinding
 import com.example.mumuk.data.api.RetrofitClient
-import com.example.mumuk.data.api.ToggleAllergyRequest
-import com.example.mumuk.data.api.ToggleAllergyResponse
+import com.example.mumuk.data.model.allergy.ToggleAllergyRequest
+import com.example.mumuk.data.model.allergy.ToggleAllergyResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
