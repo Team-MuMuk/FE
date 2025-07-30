@@ -1,16 +1,21 @@
 package com.example.mumuk.data.repository
 
+import android.content.Context
+import com.example.mumuk.data.api.RetrofitClient
 import com.example.mumuk.data.model.Ingredient
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
-class IngredientRepository {
-    fun getIngredients(): List<Ingredient> {
-        return listOf(
-            Ingredient("아보카도 샐러드", "2025-07-28"),
-            Ingredient("토마토", "2025-07-29"),
-            Ingredient("계란", "2025-07-24"),
-            Ingredient("아보카도 샐러드", "2023-10-30"),
-            Ingredient("토마토", "2023-11-05"),
-            Ingredient("계란", "2023-12-01")
-        )
+class IngredientRepository(private val context: Context) {
+
+    suspend fun getIngredients(): List<Ingredient> = withContext(Dispatchers.IO) {
+        val response = RetrofitClient.getIngredientApi(context).getIngredients()
+        if (response.isSuccessful) {
+            response.body()?.data?.map { dto ->
+                Ingredient(dto.name, dto.expireDate)
+            } ?: emptyList()
+        } else {
+            emptyList()
+        }
     }
 }

@@ -13,6 +13,7 @@ import android.widget.PopupWindow
 import android.graphics.Color
 import android.os.Build
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.GridLayoutManager
@@ -20,6 +21,7 @@ import com.example.mumuk.R
 import com.example.mumuk.data.model.DayData
 import com.example.mumuk.data.repository.IngredientRepository
 import com.example.mumuk.databinding.FragmentAddIngredientBinding
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
@@ -28,7 +30,7 @@ class AddIngredientFragment : Fragment() {
     private var _binding: FragmentAddIngredientBinding? = null
     private val binding get() = _binding!!
 
-    private val ingredientRepository = IngredientRepository()
+    private val ingredientRepository by lazy { IngredientRepository(requireContext()) }
 
     private var selectedDate: LocalDate = LocalDate.now()
     private var currentMonth: YearMonth = YearMonth.now()
@@ -51,16 +53,18 @@ class AddIngredientFragment : Fragment() {
             findNavController().navigate(R.id.action_addIngredientFragment_to_ingredientListFragment)
         }
 
-        val ingredientList = ingredientRepository.getIngredients()
-        binding.ingredientRV.layoutManager = LinearLayoutManager(requireContext())
-        binding.ingredientRV.adapter = IngredientAdapter(ingredientList) { ingredient ->
-            val bundle = Bundle().apply {
-                putSerializable("ingredient", ingredient)
+        viewLifecycleOwner.lifecycleScope.launch {
+            val ingredientList = ingredientRepository.getIngredients()
+            binding.ingredientRV.layoutManager = LinearLayoutManager(requireContext())
+            binding.ingredientRV.adapter = IngredientAdapter(ingredientList) { ingredient ->
+                val bundle = Bundle().apply {
+                    putSerializable("ingredient", ingredient)
+                }
+                findNavController().navigate(
+                    R.id.action_addIngredientFragment_to_ingredientDetailFragment,
+                    bundle
+                )
             }
-            findNavController().navigate(
-                R.id.action_addIngredientFragment_to_ingredientDetailFragment,
-                bundle
-            )
         }
 
         binding.calendarBtn.setOnClickListener {
