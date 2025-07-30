@@ -77,6 +77,8 @@ dependencies {
 
     //검색
     implementation("com.google.android.flexbox:flexbox:3.0.0")
+    implementation ("com.github.bumptech.glide:glide:4.16.0")
+    annotationProcessor ("com.github.bumptech.glide:compiler:4.16.0")
 
     //api
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
@@ -87,6 +89,9 @@ dependencies {
     //네이버 sdk
     implementation("com.navercorp.nid:oauth:5.9.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
+
+    //카카오 sdk
+    implementation("com.kakao.sdk:v2-user:2.21.6")
 
     //스와이프
     implementation("com.github.chthai64:SwipeRevealLayout:1.4.0")

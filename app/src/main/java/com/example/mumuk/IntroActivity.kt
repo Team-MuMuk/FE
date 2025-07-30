@@ -44,65 +44,65 @@ class IntroActivity : AppCompatActivity() {
             insets
         }
 
-        handleKakaoRedirect(intent)
+//        handleKakaoRedirect(intent)
         handleNaverRedirect(intent)
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        handleKakaoRedirect(intent)
+//        handleKakaoRedirect(intent)
         handleNaverRedirect(intent)
     }
 
     // 카카오 로그인 처리
-    private fun handleKakaoRedirect(intent: Intent?) {
-        val uri: Uri? = intent?.data
-        if (uri != null && uri.toString().startsWith("kakao7950bf906fc9e8123a3832cb5378ae1b://oauth")) {
-            val code = uri.getQueryParameter("code")
-            if (!code.isNullOrEmpty()) {
-                Log.d("KakaoAuth", "인가코드 수신 완료: $code")
-                sendKakaoCodeToBackend(code)
-            }
-        }
-    }
+//    private fun handleKakaoRedirect(intent: Intent?) {
+//        val uri: Uri? = intent?.data
+//        if (uri != null && uri.toString().startsWith("kakao7950bf906fc9e8123a3832cb5378ae1b://oauth")) {
+//            val code = uri.getQueryParameter("code")
+//            if (!code.isNullOrEmpty()) {
+//                Log.d("KakaoAuth", "인가코드 수신 완료: $code")
+//                sendKakaoCodeToBackend(code)
+//            }
+//        }
+//    }
 
-    private fun sendKakaoCodeToBackend(code: String) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val response = RetrofitClient.getAuthApi(this@IntroActivity).kakaoLogin(code)
-                if (response.isSuccessful) {
-                    val user = response.body()?.data
-                    withContext(Dispatchers.Main) {
-                        if (user != null) {
-                            val prefs = getSharedPreferences("auth", MODE_PRIVATE)
-                            prefs.edit().apply {
-                                putString("refreshToken", user.refreshToken)
-                                putString("email", user.email)
-                                putString("nickName", user.nickName)
-                                putString("profileImage", user.profileImage)
-                                apply()
-                            }
-                            startActivity(Intent(this@IntroActivity, MainActivity::class.java))
-                            finish()
-                        } else {
-                            fallbackToLogin("카카오 로그인 실패: 사용자 정보 없음")
-                        }
-                    }
-                } else {
-                    val msg = response.errorBody()?.string()
-                    Log.e("KakaoAuth", "로그인 실패: $msg")
-                    withContext(Dispatchers.Main) {
-                        fallbackToLogin("카카오 로그인 실패\n${response.code()}: $msg")
-                    }
-                }
-            } catch (e: Exception) {
-                Log.e("KakaoAuth", "예외 발생: ${e.message}")
-                withContext(Dispatchers.Main) {
-                    fallbackToLogin("카카오 로그인 예외: ${e.message}")
-                }
-            }
-        }
-    }
+//    private fun sendKakaoCodeToBackend(code: String) {
+//        CoroutineScope(Dispatchers.IO).launch {
+//            try {
+//                val response = RetrofitClient.getAuthApi(this@IntroActivity).kakaoLogin(code)
+//                if (response.isSuccessful) {
+//                    val user = response.body()?.data
+//                    withContext(Dispatchers.Main) {
+//                        if (user != null) {
+//                            val prefs = getSharedPreferences("auth", MODE_PRIVATE)
+//                            prefs.edit().apply {
+//                                putString("refreshToken", user.refreshToken)
+//                                putString("email", user.email)
+//                                putString("nickName", user.nickName)
+//                                putString("profileImage", user.profileImage)
+//                                apply()
+//                            }
+//                            startActivity(Intent(this@IntroActivity, MainActivity::class.java))
+//                            finish()
+//                        } else {
+//                            fallbackToLogin("카카오 로그인 실패: 사용자 정보 없음")
+//                        }
+//                    }
+//                } else {
+//                    val msg = response.errorBody()?.string()
+//                    Log.e("KakaoAuth", "로그인 실패: $msg")
+//                    withContext(Dispatchers.Main) {
+//                        fallbackToLogin("카카오 로그인 실패\n${response.code()}: $msg")
+//                    }
+//                }
+//            } catch (e: Exception) {
+//                Log.e("KakaoAuth", "예외 발생: ${e.message}")
+//                withContext(Dispatchers.Main) {
+//                    fallbackToLogin("카카오 로그인 예외: ${e.message}")
+//                }
+//            }
+//        }
+//    }
 
     // 네이버 로그인 처리 추가
     private fun handleNaverRedirect(intent: Intent?) {

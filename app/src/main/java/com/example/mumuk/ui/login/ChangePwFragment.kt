@@ -115,7 +115,7 @@ class ChangePwFragment : Fragment() {
         val btnOk = dialog.findViewById<TextView>(R.id.btn_dialog_ok)
         btnOk?.setOnClickListener {
             dialog.dismiss()
-            startActivity(Intent(requireContext(), LoginActivity::class.java))
+            startActivity(Intent(requireContext(), LoginIntroActivity::class.java))
             requireActivity().finish()
         }
 

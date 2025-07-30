@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -19,8 +20,8 @@ import com.example.mumuk.data.model.search.PopularKeywordResponse
 import com.example.mumuk.data.model.search.SuggestKeywordResponse
 import com.example.mumuk.databinding.FragmentSearchBinding
 import com.example.mumuk.databinding.ItemSearchSuggestKeywordChipBinding
-import com.example.mumuk.data.model.Recipe
-import com.example.mumuk.ui.search.SearchRecentRecipeAdapter
+import com.example.mumuk.ui.search.SearchRecentRecipeViewModel
+import com.example.mumuk.data.model.search.RecentRecipe
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -37,18 +38,9 @@ class SearchFragment : Fragment() {
     private var suggestKeywords = listOf<String>()
     private var popularKeywords = listOf<String>()
 
-    private val recentRecipes = listOf(
-        Recipe(
-            img = R.drawable.img_food_sample,
-            title = "연어 포케",
-            isLiked = false
-        ),
-        Recipe(
-            img = R.drawable.img_food_sample,
-            title = "바스크치즈케이크",
-            isLiked = false
-        )
-    )
+    private lateinit var recentRecipeViewModel: SearchRecentRecipeViewModel
+    private lateinit var recentRecipeAdapter: SearchRecentRecipeAdapter
+    private val recentRecipeList = mutableListOf<RecentRecipe>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -59,12 +51,23 @@ class SearchFragment : Fragment() {
         setupRecentKeywordList()
         fetchSuggestKeywordsFromApi(inflater)
         fetchPopularKeywordsFromApi()
-        setupRecentRecipeList()
         fetchRecentKeywordsFromApi()
 
         binding.searchEditEt.setOnClickListener {
             findNavController().navigate(R.id.action_searchFragment_to_searchAutocompleteFragment)
         }
+
+        val apiService = RetrofitClient.getRecipeApi(requireContext())
+        recentRecipeViewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
+            override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
+                @Suppress("UNCHECKED_CAST")
+                return SearchRecentRecipeViewModel(apiService) as T
+            }
+        })[SearchRecentRecipeViewModel::class.java]
+
+        setupRecentRecipeList()
+        observeRecentRecipes()
+        recentRecipeViewModel.fetchRecentRecipes()
 
         return binding.root
     }
@@ -73,6 +76,7 @@ class SearchFragment : Fragment() {
         super.onResume()
         fetchRecentKeywordsFromApi()
         fetchPopularKeywordsFromApi()
+        recentRecipeViewModel.fetchRecentRecipes()
     }
 
     private fun setupRecentKeywordList() {
@@ -97,11 +101,15 @@ class SearchFragment : Fragment() {
     private fun fetchRecentKeywordsFromApi() {
         val context = context ?: return
         val api = RetrofitClient.getRecentSearchApi(context)
+        Log.d("RecentKeyword", "최근 검색어 조회 API 호출 시작")
         api.getRecentSearches().enqueue(object : Callback<RecentSearchResponse> {
             override fun onResponse(
                 call: Call<RecentSearchResponse>,
                 response: Response<RecentSearchResponse>
             ) {
+                Log.d("RecentKeyword", "API 응답 코드: ${response.code()}")
+                Log.d("RecentKeyword", "API 응답 body: ${response.body()}")
+                Log.d("RecentKeyword", "API 응답 errorBody: ${response.errorBody()?.string()}")
                 if (response.isSuccessful) {
                     val body = response.body()
                     if (body?.status == "OK" && body.data != null) {
@@ -109,18 +117,22 @@ class SearchFragment : Fragment() {
                         recentKeywords.addAll(body.data)
                         recentKeywordAdapter.notifyDataSetChanged()
                         setRecentKeywordEmptyView(false)
+                        Log.d("RecentKeyword", "최근 검색어 정상 수신 개수: ${body.data.size}")
                     } else if (body?.code == "SEARCH_404") {
                         recentKeywords.clear()
                         recentKeywordAdapter.notifyDataSetChanged()
                         setRecentKeywordEmptyView(true)
+                        Log.d("RecentKeyword", "최근 검색어 없음(SEARCH_404)")
                     }
                 } else {
                     recentKeywords.clear()
                     recentKeywordAdapter.notifyDataSetChanged()
                     setRecentKeywordEmptyView(true)
+                    Log.e("RecentKeyword", "최근 검색어 불러오기 실패: ${response.code()}")
                 }
             }
             override fun onFailure(call: Call<RecentSearchResponse>, t: Throwable) {
+                Log.e("RecentKeyword", "네트워크 오류: ${t.message}", t)
                 recentKeywords.clear()
                 recentKeywordAdapter.notifyDataSetChanged()
                 setRecentKeywordEmptyView(true)
@@ -154,13 +166,18 @@ class SearchFragment : Fragment() {
     fun saveRecentKeyword(keyword: String) {
         val context = context ?: return
         val api = RetrofitClient.getRecentSearchApi(context)
+        Log.d("RecentKeyword", "최근 검색어 저장 API 호출 시작: $keyword")
         api.saveRecentSearch(keyword).enqueue(object : Callback<RecentSearchResponse> {
             override fun onResponse(
                 call: Call<RecentSearchResponse>,
                 response: Response<RecentSearchResponse>
             ) {
+                Log.d("RecentKeyword", "저장 API 응답 코드: ${response.code()}")
+                Log.d("RecentKeyword", "저장 API 응답 body: ${response.body()}")
+                Log.d("RecentKeyword", "저장 API 응답 errorBody: ${response.errorBody()?.string()}")
             }
             override fun onFailure(call: Call<RecentSearchResponse>, t: Throwable) {
+                Log.e("RecentKeyword", "저장 API 네트워크 오류: ${t.message}", t)
             }
         })
     }
@@ -169,13 +186,18 @@ class SearchFragment : Fragment() {
         val context = context ?: return
         val api = RetrofitClient.getRecentSearchApi(context)
         val request = RecentSearch(title, createdAt)
+        Log.d("RecentKeyword", "최근 검색어 삭제 API 호출: title=$title, createdAt=$createdAt")
         api.deleteRecentSearch(request).enqueue(object : Callback<RecentSearchResponse> {
             override fun onResponse(
                 call: Call<RecentSearchResponse>,
                 response: Response<RecentSearchResponse>
             ) {
+                Log.d("RecentKeyword", "삭제 API 응답 코드: ${response.code()}")
+                Log.d("RecentKeyword", "삭제 API 응답 body: ${response.body()}")
+                Log.d("RecentKeyword", "삭제 API 응답 errorBody: ${response.errorBody()?.string()}")
             }
             override fun onFailure(call: Call<RecentSearchResponse>, t: Throwable) {
+                Log.e("RecentKeyword", "삭제 API 네트워크 오류: ${t.message}", t)
             }
         })
     }
@@ -191,6 +213,7 @@ class SearchFragment : Fragment() {
             ) {
                 Log.d("SuggestKeyword", "API 응답 코드: ${response.code()}")
                 Log.d("SuggestKeyword", "API 응답 body: ${response.body()}")
+                Log.d("SuggestKeyword", "API 응답 errorBody: ${response.errorBody()?.string()}")
                 val body = response.body()
                 val keywords = body?.data ?: emptyList()
                 suggestKeywords = keywords
@@ -198,7 +221,7 @@ class SearchFragment : Fragment() {
                 Log.d("SuggestKeyword", "추천 검색어 개수: ${suggestKeywords.size}")
             }
             override fun onFailure(call: Call<SuggestKeywordResponse>, t: Throwable) {
-                Log.e("SuggestKeyword", "API 호출 실패: ${t.message}")
+                Log.e("SuggestKeyword", "API 호출 실패: ${t.message}", t)
                 suggestKeywords = emptyList()
                 setupSuggestKeywordChips(inflater)
             }
@@ -246,11 +269,15 @@ class SearchFragment : Fragment() {
     private fun fetchPopularKeywordsFromApi() {
         val context = context ?: return
         val api = RetrofitClient.getPopularKeywordApi(context)
+        Log.d("PopularKeyword", "인기 검색어 API 호출 시작")
         api.getPopularKeywords().enqueue(object : Callback<PopularKeywordResponse> {
             override fun onResponse(
                 call: Call<PopularKeywordResponse>,
                 response: Response<PopularKeywordResponse>
             ) {
+                Log.d("PopularKeyword", "API 응답 코드: ${response.code()}")
+                Log.d("PopularKeyword", "API 응답 body: ${response.body()}")
+                Log.d("PopularKeyword", "API 응답 errorBody: ${response.errorBody()?.string()}")
                 val body = response.body()
                 val keywords = body?.data?.trendKeywordList
                 val timeRaw = body?.data?.localDateTime
@@ -264,8 +291,10 @@ class SearchFragment : Fragment() {
                 } else {
                     binding.searchPopularTimeTv.text = "없음"
                 }
+                Log.d("PopularKeyword", "인기 검색어 개수: ${popularKeywords.size}")
             }
             override fun onFailure(call: Call<PopularKeywordResponse>, t: Throwable) {
+                Log.e("PopularKeyword", "API 호출 실패: ${t.message}", t)
                 popularKeywords = emptyList()
                 setupPopularKeywordList()
                 binding.searchPopularTimeTv.text = "없음"
@@ -301,17 +330,29 @@ class SearchFragment : Fragment() {
     }
 
     private fun setupRecentRecipeList() {
-        val adapter = SearchRecentRecipeAdapter(recentRecipes) { recipe ->
+        recentRecipeAdapter = SearchRecentRecipeAdapter(recentRecipeList) { recipe ->
             val bundle = Bundle().apply {
-                putString("title", recipe.title)
-                putInt("img", recipe.img ?: 0)
-                putBoolean("isLiked", recipe.isLiked)
+                putLong("recipeId", recipe.recipeId)
+                putString("name", recipe.name)
+                putString("imageUrl", recipe.imageUrl)
+                putBoolean("liked", recipe.liked)
             }
+            Log.d("RecentRecipe", "최근 본 레시피 클릭: $recipe")
             findNavController().navigate(R.id.action_searchFragment_to_recipeFragment, bundle)
         }
-        binding.searchRecentRecipeRv.adapter = adapter
+        binding.searchRecentRecipeRv.adapter = recentRecipeAdapter
         binding.searchRecentRecipeRv.layoutManager =
             LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        Log.d("RecentRecipe", "최근 본 레시피 RecyclerView 세팅 완료")
+    }
+
+    private fun observeRecentRecipes() {
+        recentRecipeViewModel.recentRecipes.observe(viewLifecycleOwner) { recipes ->
+            Log.d("RecentRecipe", "최근 본 레시피 옵저브 데이터 변경: ${recipes.size}개")
+            recentRecipeList.clear()
+            recentRecipeList.addAll(recipes)
+            recentRecipeAdapter.notifyDataSetChanged()
+        }
     }
 
     override fun onDestroyView() {
