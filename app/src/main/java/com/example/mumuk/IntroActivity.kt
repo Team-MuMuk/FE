@@ -29,12 +29,31 @@ class IntroActivity : AppCompatActivity() {
 
         val prefs = getSharedPreferences("auth", MODE_PRIVATE)
         val refreshToken = prefs.getString("refreshToken", null)
+        val loginType = prefs.getString("loginType", "LOCAL") ?: "LOCAL"
 
-        // 자동 로그인 처리
         if (refreshToken != null) {
-            Log.d("AutoLogin", "저장된 refreshToken 발견 → 자동 로그인")
-            startActivity(Intent(this, MainActivity::class.java))
-            finish()
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    val response = RetrofitClient.getAuthApi(this@IntroActivity)
+                        .reissueToken(refreshToken, loginType)
+                    withContext(Dispatchers.Main) {
+                        if (response.isSuccessful && response.body()?.data != null) {
+                            val tokenData = response.body()!!.data!!
+                            TokenManager.saveTokens(this@IntroActivity, tokenData.accessToken, tokenData.refreshToken)
+                            startActivity(Intent(this@IntroActivity, MainActivity::class.java))
+                            finish()
+                        } else {
+                            TokenManager.clearTokens(this@IntroActivity)
+                            fallbackToLogin("세션이 만료되었습니다. 다시 로그인 해주세요.")
+                        }
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        TokenManager.clearTokens(this@IntroActivity)
+                        fallbackToLogin("자동 로그인 실패: 네트워크 오류")
+                    }
+                }
+            }
             return
         }
 
