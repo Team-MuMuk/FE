@@ -256,10 +256,7 @@
                 android:layout_marginTop="15dp"
                 />
 
-            <androidx.fragment.app.FragmentContainerView
-                android:id="@+id/signup_container"
-                android:layout_width="0dp"
-                android:layout_height="0dp" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -354,6 +351,12 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <FrameLayout
+        android:id="@+id/mypage_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

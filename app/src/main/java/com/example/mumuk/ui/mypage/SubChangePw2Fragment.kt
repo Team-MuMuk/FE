@@ -1,7 +1,6 @@
 package com.example.mumuk.ui.login
 
 import android.app.Dialog
-import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -14,8 +13,9 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.example.mumuk.R
 import com.example.mumuk.data.api.RetrofitClient
+import com.example.mumuk.data.api.TokenManager
+import com.example.mumuk.data.model.auth.CommonResponse
 import com.example.mumuk.data.model.auth.ReissuePwRequest
-import com.example.mumuk.data.model.auth.ReissuePwResponse
 import com.example.mumuk.databinding.FragmentChangePwBinding
 import com.example.mumuk.ui.mypage.MyPageFragment
 import retrofit2.Call
@@ -77,31 +77,26 @@ class SubChangePw2Fragment : Fragment() {
                 binding.tvPwStatus.text = ""
 
                 val request = ReissuePwRequest(
-                    currentPassWord = currentPassword,
-                    passWord = pw,
+                    newPassWord = pw,
                     confirmPassWord = pwNew
                 )
 
-
                 RetrofitClient.getAuthApi(requireContext()).reissuePassword(request)
-                    .enqueue(object : Callback<ReissuePwResponse> {
-                        override fun onResponse(
-                            call: Call<ReissuePwResponse>,
-                            response: Response<ReissuePwResponse>
-                        ) {
+                    .enqueue(object : Callback<CommonResponse> {
+                        override fun onResponse(call: Call<CommonResponse>, response: Response<CommonResponse>) {
                             val result = response.body()
                             if (response.isSuccessful && result?.message?.contains("성공") == true) {
                                 showPasswordChangedDialog()
                             } else {
                                 binding.tvPwStatus.text = "변경 실패: ${result?.message ?: "서버 응답 없음"}"
                             }
-
                         }
 
-                        override fun onFailure(call: Call<ReissuePwResponse>, t: Throwable) {
+                        override fun onFailure(call: Call<CommonResponse>, t: Throwable) {
                             binding.tvPwStatus.text = "네트워크 오류: ${t.message}"
                         }
                     })
+
             }
 
         }
@@ -124,15 +119,19 @@ class SubChangePw2Fragment : Fragment() {
         btnOk?.setOnClickListener {
             dialog.dismiss()
 
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.signup_container, MyPageFragment())
-                .addToBackStack(null)
-                .commit()
-        }
+            TokenManager.clearTokens(requireContext())
+            val prefs = requireContext().getSharedPreferences("auth", android.content.Context.MODE_PRIVATE)
+            prefs.edit().clear().apply()
 
+            // 로그인 화면으로 이동
+            val intent = android.content.Intent(requireContext(), LoginIntroActivity::class.java)
+            intent.flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+        }
 
         dialog.show()
     }
+
 
 
     override fun onDestroyView() {

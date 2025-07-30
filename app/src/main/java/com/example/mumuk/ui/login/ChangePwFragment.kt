@@ -16,7 +16,7 @@ import androidx.fragment.app.Fragment
 import com.example.mumuk.R
 import com.example.mumuk.data.api.RetrofitClient
 import com.example.mumuk.data.model.auth.ReissuePwRequest
-import com.example.mumuk.data.model.auth.ReissuePwResponse
+import com.example.mumuk.data.model.auth.CommonResponse
 import com.example.mumuk.databinding.FragmentChangePwBinding
 import retrofit2.Call
 import retrofit2.Callback
@@ -26,7 +26,6 @@ class ChangePwFragment : Fragment() {
 
     private var _binding: FragmentChangePwBinding? = null
     private val binding get() = _binding!!
-    private var currentPassword: String = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -39,7 +38,6 @@ class ChangePwFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        currentPassword = arguments?.getString("currentPassWord") ?: ""
 
         binding.btnBack.setOnClickListener {
             parentFragmentManager.popBackStack()
@@ -49,8 +47,7 @@ class ChangePwFragment : Fragment() {
             val pw = binding.etPw.text.toString()
             val pwNew = binding.etPwNew.text.toString()
 
-            val pwPattern =
-                Regex("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@\$!%*#?&])[A-Za-z\\d@\$!%*#?&]{8,15}$")
+            val pwPattern = Regex("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@\$!%*#?&])[A-Za-z\\d@\$!%*#?&]{8,15}$")
 
             if (!pwPattern.matches(pw)) {
                 binding.tvPwFormatStatus.apply {
@@ -72,16 +69,15 @@ class ChangePwFragment : Fragment() {
                 binding.tvPwStatus.text = ""
 
                 val request = ReissuePwRequest(
-                    currentPassWord = currentPassword,
-                    passWord = pw,
+                    newPassWord = pw,
                     confirmPassWord = pwNew
                 )
 
                 RetrofitClient.getAuthApi(requireContext()).reissuePassword(request)
-                    .enqueue(object : Callback<ReissuePwResponse> {
+                    .enqueue(object : Callback<CommonResponse> {
                         override fun onResponse(
-                            call: Call<ReissuePwResponse>,
-                            response: Response<ReissuePwResponse>
+                            call: Call<CommonResponse>,
+                            response: Response<CommonResponse>
                         ) {
                             if (response.isSuccessful && response.body()?.status == "100 CONTINUE") {
                                 showPasswordChangedDialog()
@@ -90,13 +86,13 @@ class ChangePwFragment : Fragment() {
                             }
                         }
 
-                        override fun onFailure(call: Call<ReissuePwResponse>, t: Throwable) {
+                        override fun onFailure(call: Call<CommonResponse>, t: Throwable) {
                             Toast.makeText(requireContext(), "네트워크 오류: ${t.message}", Toast.LENGTH_SHORT).show()
                         }
                     })
             }
-
         }
+
 
     }
 
