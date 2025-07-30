@@ -15,6 +15,12 @@ import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import com.example.mumuk.R
 import com.example.mumuk.databinding.FragmentHealthManagementBinding
+import com.example.mumuk.data.api.RetrofitClient
+import com.example.mumuk.data.api.ToggleAllergyRequest
+import com.example.mumuk.data.api.ToggleAllergyResponse
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class HealthManagementFragment : Fragment() {
 
@@ -58,7 +64,8 @@ class HealthManagementFragment : Fragment() {
             if (viewPager.currentItem < numPages - 1) {
                 viewPager.currentItem += 1
             } else {
-                navigateToComplete()
+                // 온보딩 마지막 단계에서 알러지 정보 서버로 전송
+                sendAllergiesToServerAndNavigate()
             }
         }
     }
@@ -192,15 +199,43 @@ class HealthManagementFragment : Fragment() {
         animator.start()
     }
 
-
-    private fun navigateToComplete() {
-        val currentFragment = adapter.getFragmentAt(viewPager.currentItem)
-        if (currentFragment is HealthStep2Fragment) {
-            currentFragment.saveHealthData()
+    // 알러지 정보 서버로 전송 후 온보딩 완료 네비게이션
+    private fun sendAllergiesToServerAndNavigate() {
+        val allergies = healthViewModel.allergies.value ?: emptySet()
+        val customAllergy = healthViewModel.customAllergy.value?.takeIf { !it.isNullOrBlank() }
+        val allergyTypeList = allergies.toMutableList().apply {
+            customAllergy?.let { add(it) }
         }
 
-        findNavController().navigate(R.id.action_healthManagement_to_healthComplete)
+        val allergyApi = RetrofitClient.getAllergyApi(requireContext())
+        val request = ToggleAllergyRequest(allergyTypeList = allergyTypeList)
+
+        allergyApi.toggleAllergies(request).enqueue(object : Callback<ToggleAllergyResponse> {
+            override fun onResponse(call: Call<ToggleAllergyResponse>, response: Response<ToggleAllergyResponse>) {
+                if (response.isSuccessful) {
+                    // 성공시 온보딩 완료 화면 이동
+                    findNavController().navigate(R.id.action_healthManagement_to_healthComplete)
+                } else {
+                    // 실패시에도 일단 이동(원하면 에러처리)
+                    findNavController().navigate(R.id.action_healthManagement_to_healthComplete)
+                }
+            }
+
+            override fun onFailure(call: Call<ToggleAllergyResponse>, t: Throwable) {
+                // 네트워크 에러 처리(원하면 사용자 알림)
+                findNavController().navigate(R.id.action_healthManagement_to_healthComplete)
+            }
+        })
     }
+
+    // 더 이상 사용하지 않음: navigateToComplete()
+    // private fun navigateToComplete() {
+    //     val currentFragment = adapter.getFragmentAt(viewPager.currentItem)
+    //     if (currentFragment is HealthStep2Fragment) {
+    //         currentFragment.saveHealthData()
+    //     }
+    //     findNavController().navigate(R.id.action_healthManagement_to_healthComplete)
+    // }
 
     override fun onDestroyView() {
         super.onDestroyView()
