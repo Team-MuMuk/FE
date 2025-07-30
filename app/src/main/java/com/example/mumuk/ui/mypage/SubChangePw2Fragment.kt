@@ -13,6 +13,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.example.mumuk.R
 import com.example.mumuk.data.api.RetrofitClient
+import com.example.mumuk.data.api.TokenManager
 import com.example.mumuk.data.model.auth.CommonResponse
 import com.example.mumuk.data.model.auth.ReissuePwRequest
 import com.example.mumuk.databinding.FragmentChangePwBinding
@@ -118,15 +119,19 @@ class SubChangePw2Fragment : Fragment() {
         btnOk?.setOnClickListener {
             dialog.dismiss()
 
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.signup_container, MyPageFragment())
-                .addToBackStack(null)
-                .commit()
-        }
+            TokenManager.clearTokens(requireContext())
+            val prefs = requireContext().getSharedPreferences("auth", android.content.Context.MODE_PRIVATE)
+            prefs.edit().clear().apply()
 
+            // 로그인 화면으로 이동
+            val intent = android.content.Intent(requireContext(), LoginIntroActivity::class.java)
+            intent.flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+        }
 
         dialog.show()
     }
+
 
 
     override fun onDestroyView() {
