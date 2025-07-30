@@ -21,14 +21,14 @@ class HealthStep1Fragment : Fragment() {
 
     private val allergyButtonsMap by lazy {
         mapOf(
-            binding.btnShellfish to "갑각류",
-            binding.btnNuts to "견과류",
-            binding.btnDairy to "유제품",
-            binding.btnWheat to "밀가루",
-            binding.btnEgg to "계란",
-            binding.btnFish to "생선",
-            binding.btnSoy to "대두",
-            binding.btnNone to "없음"
+            binding.btnShellfish to "SHELLFISH",
+            binding.btnNuts to "NUTS",
+            binding.btnDairy to "DAIRY",
+            binding.btnWheat to "WHEAT",
+            binding.btnEgg to "EGG",
+            binding.btnFish to "FISH",
+            binding.btnSoy to "SOY",
+            binding.btnNone to "NONE"
         )
     }
 

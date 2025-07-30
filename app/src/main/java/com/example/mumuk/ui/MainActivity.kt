@@ -55,6 +55,14 @@ class MainActivity : AppCompatActivity(), HomeFragment.BottomNavSelector {
                 }
             }
         }
+
+        if (intent.getBooleanExtra("go_health_management", false)) {
+            // 이미 백스택에 있을 수도 있으니, 중복 이동이 안되게 조심
+            // 현재 destination이 healthManagementFragment가 아니라면 이동
+            if (navController.currentDestination?.id != R.id.healthManagementFragment) {
+                navController.navigate(R.id.healthManagementFragment)
+            }
+        }
     }
 
     override fun selectBottomNavItem(itemId: Int) {

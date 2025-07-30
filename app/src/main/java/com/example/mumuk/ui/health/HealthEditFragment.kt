@@ -1,0 +1,221 @@
+package com.example.mumuk.ui.health
+
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import com.example.mumuk.databinding.FragmentHealthEditBinding
+import com.example.mumuk.R
+import com.example.mumuk.data.api.AllergyOptionsResponse
+import com.example.mumuk.data.api.AllergyApiService
+import com.example.mumuk.data.api.RetrofitClient
+import com.example.mumuk.data.api.ToggleAllergyRequest
+import com.example.mumuk.data.api.ToggleAllergyResponse
+import com.google.android.material.button.MaterialButton
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+
+class HealthEditFragment : Fragment() {
+    private var _binding: FragmentHealthEditBinding? = null
+    private val binding get() = _binding!!
+
+    private var isAllergyEditSelected = false
+    private var isGoalEditSelected = false
+
+    private lateinit var allergyButtonMap: Map<String, MaterialButton>
+    private lateinit var allergyTypeByButton: Map<MaterialButton, String>
+    private lateinit var allergyApi: AllergyApiService
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentHealthEditBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        binding.backBtn.setOnClickListener {
+            findNavController().popBackStack()
+        }
+
+        // 맵과 API 인스턴스 초기화
+        allergyButtonMap = mapOf(
+            "SHELLFISH" to binding.btnShellfish,
+            "NUTS" to binding.btnNuts,
+            "DAIRY" to binding.btnDairy,
+            "WHEAT" to binding.btnWheat,
+            "EGG" to binding.btnEgg,
+            "FISH" to binding.btnFish,
+            "SOY" to binding.btnSoy,
+            "NONE" to binding.btnNone
+        )
+        allergyTypeByButton = allergyButtonMap.entries.associate { (type, btn) -> btn to type }
+        allergyApi = RetrofitClient.getAllergyApi(requireContext())
+
+        binding.cardViewAllergyEdit.setOnClickListener {
+            val wasSelected = isAllergyEditSelected
+            isAllergyEditSelected = !isAllergyEditSelected
+            toggleCard(
+                selected = isAllergyEditSelected,
+                card = binding.cardViewAllergyEdit,
+                layout = binding.layoutAllergyEdit,
+                textView = binding.tvAllergyGoal,
+                imageView = binding.ivAllergyGoal,
+                defaultText = "수정"
+            )
+
+            // "완료" -> "수정" 전환 시에만 서버에 변경 반영
+            if (!isAllergyEditSelected && wasSelected) {
+                val selectedTypes = allergyTypeByButton.filter { it.key.isChecked }.values.toList()
+                android.util.Log.d("HealthEditFragment", "선택된 allergyType: $selectedTypes")
+                val request = ToggleAllergyRequest(allergyTypeList = selectedTypes)
+                allergyApi.toggleAllergies(request).enqueue(object : Callback<ToggleAllergyResponse> {
+                    override fun onResponse(
+                        call: Call<ToggleAllergyResponse>,
+                        response: Response<ToggleAllergyResponse>
+                    ) {
+                        android.util.Log.d("HealthEditFragment", "toggleAllergies API 응답: isSuccessful=${response.isSuccessful}, code=${response.code()}, body=${response.body()}")
+                        if (response.isSuccessful) {
+                            val latestAllergies = response.body()?.data?.results?.map { it.allergyType } ?: emptyList()
+                            android.util.Log.d("HealthEditFragment", "서버 반영된 allergyType: $latestAllergies")
+                            allergyButtonMap.forEach { (type, btn) ->
+                                btn.isChecked = latestAllergies.contains(type)
+                                updateAllergyButtonColor(btn)
+                            }
+                        } else {
+                            android.util.Log.e("HealthEditFragment", "toggleAllergies 실패: code=${response.code()}, errorBody=${response.errorBody()?.string()}")
+                        }
+                    }
+                    override fun onFailure(call: Call<ToggleAllergyResponse>, t: Throwable) {
+                        android.util.Log.e("HealthEditFragment", "toggleAllergies API 호출 실패", t)
+                        // TODO: 에러 처리
+                    }
+                })
+            }
+        }
+
+        binding.cardViewGoalEdit.setOnClickListener {
+            isGoalEditSelected = !isGoalEditSelected
+            toggleCard(
+                selected = isGoalEditSelected,
+                card = binding.cardViewGoalEdit,
+                layout = binding.layoutGoalEdit,
+                textView = binding.tvGoalEdit,
+                imageView = binding.ivGoalEdit,
+                defaultText = "수정"
+            )
+        }
+
+        // 알레르기 버튼들 (다중 선택)
+        val allergyButtons = listOf(
+            binding.btnShellfish, binding.btnNuts, binding.btnDairy, binding.btnWheat,
+            binding.btnEgg, binding.btnFish, binding.btnSoy, binding.btnNone
+        )
+        allergyButtons.forEach { btn ->
+            btn.setOnClickListener {
+                if (!isAllergyEditSelected) {
+                    btn.isChecked = !btn.isChecked
+                }
+                updateAllergyButtonColor(btn)
+            }
+            updateAllergyButtonColor(btn)
+        }
+
+        val goalButtons = listOf(
+            binding.btnWeightLoss, binding.btnMuscleGain, binding.btnSugarReduction,
+            binding.btnBloodPressure, binding.btnCholesterol, binding.btnDigestiveHealth, binding.btnNoneGoal
+        )
+        goalButtons.forEach { btn ->
+            btn.setOnClickListener {
+                if (isGoalEditSelected) {
+                    btn.isChecked = !btn.isChecked
+                }
+                updateGoalButtonColor(btn)
+            }
+            updateGoalButtonColor(btn)
+        }
+
+        // 처음 진입 시 서버에서 알레르기 상태 조회
+        allergyApi.getAllergyOptions()
+            .enqueue(object : Callback<AllergyOptionsResponse> {
+                override fun onResponse(
+                    call: Call<AllergyOptionsResponse>,
+                    response: Response<AllergyOptionsResponse>
+                ) {
+                    if (response.isSuccessful) {
+                        val options = response.body()?.data?.allergyOptions ?: emptyList()
+                        options.forEach { option ->
+                            allergyButtonMap[option.allergyType]?.let { btn ->
+                                btn.isChecked = true
+                                updateAllergyButtonColor(btn)
+                            }
+                        }
+                    }
+                }
+                override fun onFailure(call: Call<AllergyOptionsResponse>, t: Throwable) {
+                    // TODO: 에러 처리
+                }
+            })
+    }
+
+    private fun toggleCard(
+        selected: Boolean,
+        card: com.google.android.material.card.MaterialCardView,
+        layout: View,
+        textView: android.widget.TextView,
+        imageView: android.widget.ImageView,
+        defaultText: String
+    ) {
+        val green800 = ContextCompat.getColor(requireContext(), R.color.green_800)
+        val white = ContextCompat.getColor(requireContext(), R.color.white)
+        val grayStroke = ContextCompat.getColor(requireContext(), R.color.black_300)
+        val defaultBackground = ContextCompat.getColor(requireContext(), R.color.white)
+        val black = ContextCompat.getColor(requireContext(), R.color.black)
+
+        if (selected) {
+            card.strokeColor = green800
+            layout.setBackgroundColor(green800)
+            textView.setTextColor(white)
+            imageView.setColorFilter(white)
+            textView.text = "완료"
+        } else {
+            card.strokeColor = grayStroke
+            layout.setBackgroundColor(defaultBackground)
+            textView.setTextColor(black)
+            imageView.setColorFilter(black)
+            textView.text = defaultText
+        }
+    }
+
+    private fun updateAllergyButtonColor(btn: MaterialButton) {
+        if (btn.isChecked) {
+            btn.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.beige_500))
+            btn.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+        } else {
+            btn.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
+            btn.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+        }
+    }
+
+    private fun updateGoalButtonColor(btn: MaterialButton) {
+        if (btn.isChecked) {
+            btn.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.beige_500))
+            btn.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+        } else {
+            btn.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
+            btn.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+}

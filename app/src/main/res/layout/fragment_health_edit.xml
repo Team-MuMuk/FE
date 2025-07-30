@@ -1,0 +1,554 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.health.HealthEditFragment"
+    android:background="@color/white">
+
+    <TextView
+        android:id="@+id/textView32"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="건강정보"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@+id/backBtn"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/backBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:src="@drawable/ic_arrowleft"
+        app:layout_constraintBottom_toBottomOf="@+id/textView32"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/textView32" />
+
+    <View
+        android:id="@+id/view16"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="8dp"
+        android:background="@color/black_200"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView32" />
+
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/view16">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:id="@+id/textView50"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="24dp"
+                android:text="김뭐먹님이 설정한 건강정보입니다"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:textSize="20sp"
+                android:fontFamily="@font/pretendard_semibold"/>
+
+            <TextView
+                android:id="@+id/textView51"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="24dp"
+                android:text="알레르기 정보"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView50"
+                android:textSize="20sp"
+                android:fontFamily="@font/pretendard_semibold"/>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardView_allergy_edit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="20dp"
+                app:cardCornerRadius="5dp"
+                app:cardElevation="0dp"
+                app:layout_constraintBottom_toBottomOf="@+id/textView51"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/textView51"
+                app:strokeColor="@color/black_300"
+                app:strokeWidth="1dp"
+                app:rippleColor="@android:color/transparent">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/layout_allergy_edit"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/white">
+
+                    <TextView
+                        android:id="@+id/tv_allergy_goal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginBottom="4dp"
+                        android:fontFamily="@font/pretendard_semibold"
+                        android:text="수정"
+                        android:textSize="12sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <ImageView
+                        android:id="@+id/iv_allergy_goal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:src="@drawable/icon_edit"
+                        app:layout_constraintBottom_toBottomOf="@+id/tv_allergy_goal"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/tv_allergy_goal"
+                        app:layout_constraintTop_toTopOf="@+id/tv_allergy_goal" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <LinearLayout
+                android:id="@+id/layout_allergies"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="20dp"
+                android:orientation="vertical"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView51">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_shellfish"
+                    style="@style/CustomMaterialButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="49dp"
+                    android:layout_marginBottom="8dp"
+                    android:backgroundTint="@color/health_button_background_selector"
+                    android:checkable="true"
+                    android:paddingLeft="16dp"
+                    android:text="갑각류 알레르기"
+                    android:textAlignment="viewStart"
+                    android:textColor="@color/health_button_text_selector"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="8dp"
+                    app:rippleColor="@android:color/transparent"
+                    app:strokeColor="@color/beige_500"
+                    app:strokeWidth="2dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_nuts"
+                    style="@style/CustomMaterialButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="49dp"
+                    android:layout_marginBottom="8dp"
+                    android:backgroundTint="@color/health_button_background_selector"
+                    android:checkable="true"
+                    android:paddingLeft="16dp"
+                    android:text="견과류 알레르기"
+                    android:textAlignment="viewStart"
+                    android:textColor="@color/health_button_text_selector"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="8dp"
+                    app:rippleColor="@android:color/transparent"
+                    app:strokeColor="@color/beige_500"
+                    app:strokeWidth="2dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_dairy"
+                    style="@style/CustomMaterialButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="49dp"
+                    android:layout_marginBottom="8dp"
+                    android:backgroundTint="@color/health_button_background_selector"
+                    android:checkable="true"
+                    android:paddingLeft="16dp"
+                    android:text="유제품 알레르기"
+                    android:textAlignment="viewStart"
+                    android:textColor="@color/health_button_text_selector"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="8dp"
+                    app:rippleColor="@android:color/transparent"
+                    app:strokeColor="@color/beige_500"
+                    app:strokeWidth="2dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_wheat"
+                    style="@style/CustomMaterialButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="49dp"
+                    android:layout_marginBottom="8dp"
+                    android:backgroundTint="@color/health_button_background_selector"
+                    android:checkable="true"
+                    android:paddingLeft="16dp"
+                    android:text="밀가루 알레르기"
+                    android:textAlignment="viewStart"
+                    android:textColor="@color/health_button_text_selector"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="8dp"
+                    app:rippleColor="@android:color/transparent"
+                    app:strokeColor="@color/beige_500"
+                    app:strokeWidth="2dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_egg"
+                    style="@style/CustomMaterialButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="49dp"
+                    android:layout_marginBottom="8dp"
+                    android:backgroundTint="@color/health_button_background_selector"
+                    android:checkable="true"
+                    android:paddingLeft="16dp"
+                    android:text="계란 알레르기"
+                    android:textAlignment="viewStart"
+                    android:textColor="@color/health_button_text_selector"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="8dp"
+                    app:rippleColor="@android:color/transparent"
+                    app:strokeColor="@color/beige_500"
+                    app:strokeWidth="2dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_fish"
+                    style="@style/CustomMaterialButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="49dp"
+                    android:layout_marginBottom="8dp"
+                    android:backgroundTint="@color/health_button_background_selector"
+                    android:checkable="true"
+                    android:paddingLeft="16dp"
+                    android:text="생선 알레르기"
+                    android:textAlignment="viewStart"
+                    android:textColor="@color/health_button_text_selector"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="8dp"
+                    app:rippleColor="@android:color/transparent"
+                    app:strokeColor="@color/beige_500"
+                    app:strokeWidth="2dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_soy"
+                    style="@style/CustomMaterialButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="49dp"
+                    android:layout_marginBottom="8dp"
+                    android:backgroundTint="@color/health_button_background_selector"
+                    android:checkable="true"
+                    android:paddingLeft="16dp"
+                    android:text="대두 알레르기"
+                    android:textAlignment="viewStart"
+                    android:textColor="@color/health_button_text_selector"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="8dp"
+                    app:rippleColor="@android:color/transparent"
+                    app:strokeColor="@color/beige_500"
+                    app:strokeWidth="2dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_none"
+                    style="@style/CustomMaterialButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="49dp"
+                    android:layout_marginBottom="8dp"
+                    android:backgroundTint="@color/health_button_background_selector"
+                    android:checkable="true"
+                    android:paddingLeft="16dp"
+                    android:text="없습니다"
+                    android:textAlignment="viewStart"
+                    android:textColor="@color/health_button_text_selector"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="8dp"
+                    app:rippleColor="@android:color/transparent"
+                    app:strokeColor="@color/beige_500"
+                    app:strokeWidth="2dp" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/layout_custom_allergy"
+                    android:layout_width="match_parent"
+                    android:layout_height="49dp"
+                    android:layout_marginTop="0dp"
+                    android:background="@drawable/bg_edittext_rounded"
+                    android:paddingHorizontal="16dp">
+
+                    <EditText
+                        android:id="@+id/et_custom_allergy"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:background="@android:color/transparent"
+                        android:gravity="start|center_vertical"
+                        android:hint="직접 추가"
+                        android:inputType="text"
+                        android:textColor="@android:color/black"
+                        android:textColorHint="@android:color/darker_gray"
+                        android:textSize="16sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/textView52"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="24dp"
+                android:text="건강 목표"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/layout_allergies"
+                android:textSize="20sp"
+                android:fontFamily="@font/pretendard_semibold"/>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardView_goal_edit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="20dp"
+                app:cardCornerRadius="5dp"
+                app:cardElevation="0dp"
+                app:layout_constraintBottom_toBottomOf="@+id/textView52"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/textView52"
+                app:strokeColor="@color/black_300"
+                app:strokeWidth="1dp"
+                app:rippleColor="@android:color/transparent">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/layout_goal_edit"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/white">
+
+                    <TextView
+                        android:id="@+id/tv_goal_edit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginBottom="4dp"
+                        android:fontFamily="@font/pretendard_semibold"
+                        android:text="수정"
+                        android:textSize="12sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <ImageView
+                        android:id="@+id/iv_goal_edit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:src="@drawable/icon_edit"
+                        app:layout_constraintBottom_toBottomOf="@+id/tv_goal_edit"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/tv_goal_edit"
+                        app:layout_constraintTop_toTopOf="@+id/tv_goal_edit" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <LinearLayout
+                android:id="@+id/layout_goals"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="24dp"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView52">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_weight_loss"
+                    style="@style/CustomMaterialButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="49dp"
+                    android:layout_marginBottom="8dp"
+                    android:backgroundTint="@color/health_button_background_selector"
+                    android:checkable="true"
+                    android:paddingLeft="16dp"
+                    android:text="체중감량"
+                    android:textAlignment="viewStart"
+                    android:textColor="@color/health_button_text_selector"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="8dp"
+                    app:rippleColor="@android:color/transparent"
+                    app:strokeColor="@color/beige_500"
+                    app:strokeWidth="2dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_muscle_gain"
+                    style="@style/CustomMaterialButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="49dp"
+                    android:layout_marginBottom="8dp"
+                    android:backgroundTint="@color/health_button_background_selector"
+                    android:checkable="true"
+                    android:paddingLeft="16dp"
+                    android:text="근육량 증가"
+                    android:textAlignment="viewStart"
+                    android:textColor="@color/health_button_text_selector"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="8dp"
+                    app:rippleColor="@android:color/transparent"
+                    app:strokeColor="@color/beige_500"
+                    app:strokeWidth="2dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_sugar_reduction"
+                    style="@style/CustomMaterialButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="49dp"
+                    android:layout_marginBottom="8dp"
+                    android:backgroundTint="@color/health_button_background_selector"
+                    android:checkable="true"
+                    android:paddingLeft="16dp"
+                    android:text="당 줄이기"
+                    android:textAlignment="viewStart"
+                    android:textColor="@color/health_button_text_selector"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="8dp"
+                    app:rippleColor="@android:color/transparent"
+                    app:strokeColor="@color/beige_500"
+                    app:strokeWidth="2dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_blood_pressure"
+                    style="@style/CustomMaterialButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="49dp"
+                    android:layout_marginBottom="8dp"
+                    android:backgroundTint="@color/health_button_background_selector"
+                    android:checkable="true"
+                    android:paddingLeft="16dp"
+                    android:text="혈압관리"
+                    android:textAlignment="viewStart"
+                    android:textColor="@color/health_button_text_selector"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="8dp"
+                    app:rippleColor="@android:color/transparent"
+                    app:strokeColor="@color/beige_500"
+                    app:strokeWidth="2dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_cholesterol"
+                    style="@style/CustomMaterialButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="49dp"
+                    android:layout_marginBottom="8dp"
+                    android:backgroundTint="@color/health_button_background_selector"
+                    android:checkable="true"
+                    android:paddingLeft="16dp"
+                    android:text="콜레스테롤 관리"
+                    android:textAlignment="viewStart"
+                    android:textColor="@color/health_button_text_selector"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="8dp"
+                    app:rippleColor="@android:color/transparent"
+                    app:strokeColor="@color/beige_500"
+                    app:strokeWidth="2dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_digestive_health"
+                    style="@style/CustomMaterialButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="49dp"
+                    android:layout_marginBottom="8dp"
+                    android:backgroundTint="@color/health_button_background_selector"
+                    android:checkable="true"
+                    android:paddingLeft="16dp"
+                    android:text="소화 및 장 건강"
+                    android:textAlignment="viewStart"
+                    android:textColor="@color/health_button_text_selector"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="8dp"
+                    app:rippleColor="@android:color/transparent"
+                    app:strokeColor="@color/beige_500"
+                    app:strokeWidth="2dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_none_goal"
+                    style="@style/CustomMaterialButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="49dp"
+                    android:layout_marginBottom="8dp"
+                    android:backgroundTint="@color/health_button_background_selector"
+                    android:checkable="true"
+                    android:paddingLeft="16dp"
+                    android:text="없습니다"
+                    android:textAlignment="viewStart"
+                    android:textColor="@color/health_button_text_selector"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="8dp"
+                    app:rippleColor="@android:color/transparent"
+                    app:strokeColor="@color/beige_500"
+                    app:strokeWidth="2dp" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/layout_custom_goal"
+                    android:layout_width="match_parent"
+                    android:layout_height="49dp"
+                    android:layout_marginTop="0dp"
+                    android:background="@drawable/bg_edittext_rounded"
+                    android:paddingHorizontal="16dp">
+
+                    <EditText
+                        android:id="@+id/et_custom_goal"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:background="@android:color/transparent"
+                        android:gravity="start|center_vertical"
+                        android:hint="직접 추가"
+                        android:inputType="text"
+                        android:textColor="@android:color/black"
+                        android:textColorHint="@android:color/darker_gray"
+                        android:textSize="16sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

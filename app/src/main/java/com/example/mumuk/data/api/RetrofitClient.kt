@@ -50,6 +50,10 @@ object RetrofitClient {
         return getRetrofit(context).create(SuggestKeywordApiService::class.java)
     }
 
+    fun getAllergyApi(context: Context): AllergyApiService {
+        return getRetrofit(context).create(AllergyApiService::class.java)
+    }
+
     fun getRecipeApi(context: Context): RecentRecipeApiService {
         return getRetrofit(context).create(RecentRecipeApiService::class.java)
     }

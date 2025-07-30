@@ -46,21 +46,24 @@
         app:layout_constraintTop_toBottomOf="@id/tv_subtitle" />
 
     <com.google.android.material.button.MaterialButton
+        style="@style/CustomMaterialButton"
         android:id="@+id/btn_go_home"
         android:layout_width="0dp"
         android:layout_height="60dp"
         android:layout_marginTop="120dp"
-        android:backgroundTint="@color/green_500"
+        android:backgroundTint="@color/white"
         android:text="홈으로 가기"
-        android:textColor="@color/white"
+        android:textColor="@color/black"
         android:textSize="16sp"
         android:textStyle="bold"
-        app:cornerRadius="28dp"
+        app:cornerRadius="30dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/iv_complete_illustration"
         app:layout_constraintVertical_bias="1.0"
-        app:rippleColor="@android:color/transparent"/>
+        app:rippleColor="@android:color/transparent"
+        app:strokeWidth="1dp"
+        app:strokeColor="@color/black_400"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
