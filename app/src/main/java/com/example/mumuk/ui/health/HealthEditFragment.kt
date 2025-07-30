@@ -14,6 +14,8 @@ import com.example.mumuk.data.api.AllergyApiService
 import com.example.mumuk.data.api.RetrofitClient
 import com.example.mumuk.data.api.ToggleAllergyRequest
 import com.example.mumuk.data.api.ToggleAllergyResponse
+import com.example.mumuk.data.api.TokenManager
+import com.example.mumuk.utils.JwtUtils
 import com.google.android.material.button.MaterialButton
 import retrofit2.Call
 import retrofit2.Callback
@@ -40,6 +42,7 @@ class HealthEditFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setNicknameForHealthTitle()
 
         binding.backBtn.setOnClickListener {
             findNavController().popBackStack()
@@ -211,6 +214,43 @@ class HealthEditFragment : Fragment() {
         } else {
             btn.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
             btn.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+        }
+    }
+
+    private fun setNicknameForHealthTitle() {
+        val loginType = TokenManager.getLoginType(requireContext()) ?: "LOCAL"
+        if (loginType == "KAKAO" || loginType == "NAVER") {
+            val savedNickname = TokenManager.getNickName(requireContext())
+            val nickname = if (!savedNickname.isNullOrBlank()) savedNickname else "사용자"
+            binding.textView50.text = "${nickname}님이 설정한 건강정보입니다"
+        } else {
+            val accessToken = TokenManager.getAccessToken(requireContext())
+            val userId = JwtUtils.getUserIdFromToken(accessToken ?: "")
+            if (userId == null) {
+                binding.textView50.text = "사용자님이 설정한 건강정보입니다"
+                return
+            }
+            RetrofitClient.getUserApi(requireContext()).getUserProfile(userId)
+                .enqueue(object : Callback<com.example.mumuk.data.model.mypage.UserProfileResponse> {
+                    override fun onResponse(
+                        call: Call<com.example.mumuk.data.model.mypage.UserProfileResponse>,
+                        response: Response<com.example.mumuk.data.model.mypage.UserProfileResponse>
+                    ) {
+                        if (response.isSuccessful) {
+                            val profile = response.body()?.data
+                            val nickname = profile?.nickName ?: "사용자"
+                            binding.textView50.text = "${nickname}님이 설정한 건강정보입니다"
+                        } else {
+                            binding.textView50.text = "사용자님이 설정한 건강정보입니다"
+                        }
+                    }
+                    override fun onFailure(
+                        call: Call<com.example.mumuk.data.model.mypage.UserProfileResponse>,
+                        t: Throwable
+                    ) {
+                        binding.textView50.text = "사용자님이 설정한 건강정보입니다"
+                    }
+                })
         }
     }
 

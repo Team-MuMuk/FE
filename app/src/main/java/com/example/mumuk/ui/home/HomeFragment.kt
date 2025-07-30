@@ -13,10 +13,17 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mumuk.R
+import com.example.mumuk.data.api.RetrofitClient
+import com.example.mumuk.data.api.TokenManager
 import com.example.mumuk.data.model.Recipe
+import com.example.mumuk.data.model.mypage.UserProfileResponse
 import com.example.mumuk.data.repository.RecipeRankRepository
 import com.example.mumuk.databinding.FragmentHomeBinding
+import com.example.mumuk.utils.JwtUtils
 import com.google.android.material.card.MaterialCardView
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class HomeFragment : Fragment() {
     interface BottomNavSelector {
@@ -51,6 +58,7 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        loadUserNicknameForHome()
 
         binding.infoBtn.setOnClickListener {
             showInfoPopup(it)
@@ -123,6 +131,43 @@ class HomeFragment : Fragment() {
             adapter = recipeRankAdapter
         }
         recipeRankAdapter.submitList(recipeRankRepository.getHealthRankRecipes())
+    }
+
+    private fun loadUserNicknameForHome() {
+        val loginType = TokenManager.getLoginType(requireContext()) ?: "LOCAL"
+
+        if (loginType == "KAKAO" || loginType == "NAVER") {
+            val savedNickname = TokenManager.getNickName(requireContext())
+            val nickname = if (!savedNickname.isNullOrBlank()) savedNickname else "사용자"
+            binding.textView15.text = "${nickname}님, 오늘은 뭐 해먹을까요?"
+        } else {
+            val accessToken = TokenManager.getAccessToken(requireContext())
+            val userId = JwtUtils.getUserIdFromToken(accessToken ?: "")
+            if (userId == null) {
+                binding.textView15.text = "사용자님, 오늘은 뭐 해먹을까요?"
+                return
+            }
+
+            RetrofitClient.getUserApi(requireContext()).getUserProfile(userId)
+                .enqueue(object : Callback<UserProfileResponse> {
+                    override fun onResponse(
+                        call: Call<UserProfileResponse>,
+                        response: Response<UserProfileResponse>
+                    ) {
+                        if (response.isSuccessful) {
+                            val profile = response.body()?.data
+                            val nickname = profile?.nickName ?: "사용자"
+                            binding.textView15.text = "${nickname}님, 오늘은 뭐 해먹을까요?"
+                        } else {
+                            binding.textView15.text = "사용자님, 오늘은 뭐 해먹을까요?"
+                        }
+                    }
+
+                    override fun onFailure(call: Call<UserProfileResponse>, t: Throwable) {
+                        binding.textView15.text = "사용자님, 오늘은 뭐 해먹을까요?"
+                    }
+                })
+        }
     }
 
     override fun onDetach() {
