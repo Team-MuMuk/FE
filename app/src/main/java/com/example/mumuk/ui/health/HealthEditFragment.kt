@@ -9,12 +9,12 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.mumuk.databinding.FragmentHealthEditBinding
 import com.example.mumuk.R
-import com.example.mumuk.data.api.AllergyOptionsResponse
 import com.example.mumuk.data.api.AllergyApiService
 import com.example.mumuk.data.api.RetrofitClient
-import com.example.mumuk.data.api.ToggleAllergyRequest
-import com.example.mumuk.data.api.ToggleAllergyResponse
 import com.example.mumuk.data.api.TokenManager
+import com.example.mumuk.data.model.allergy.AllergyOptionsResponse
+import com.example.mumuk.data.model.allergy.ToggleAllergyRequest
+import com.example.mumuk.data.model.allergy.ToggleAllergyResponse
 import com.example.mumuk.utils.JwtUtils
 import com.google.android.material.button.MaterialButton
 import retrofit2.Call
