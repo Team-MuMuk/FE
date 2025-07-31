@@ -33,7 +33,7 @@
                 android:id="@+id/tv_login_menu"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="76dp"
+                android:layout_marginStart="70dp"
                 android:text="아이디 / 비밀번호 찾기"
                 android:textColor="@color/black"
                 android:textSize="24sp"

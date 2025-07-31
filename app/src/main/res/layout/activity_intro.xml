@@ -30,11 +30,11 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="40dp"
             android:gravity="center"
-            android:text="우리집 냉장고 속 재료로\n맞춤 AI 레시피 제공 서비스,"
+            android:text="우리집 냉장고 속 재료로\n맞춤 AI 레시피 제공 서비스"
             android:textAlignment="center"
             android:textColor="#1C937E"
-            android:textSize="20sp"
-            android:textStyle="bold" />
+            android:textSize="24sp"
+            android:textStyle="normal" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
