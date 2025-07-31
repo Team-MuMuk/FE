@@ -85,6 +85,7 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.9.0")
     implementation("com.kakao.sdk:v2-user:2.19.0")
+    implementation ("com.google.code.gson:gson:2.8.9")
 
     //네이버 sdk
     implementation("com.navercorp.nid:oauth:5.9.0")

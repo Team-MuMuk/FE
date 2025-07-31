@@ -41,6 +41,7 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="32dp"
                 android:text="연어 포케"
+                android:fontFamily="@font/pretendard_bold"
                 android:textColor="@color/black"
                 android:textSize="16dp"
                 android:textStyle="bold"

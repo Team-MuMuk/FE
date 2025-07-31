@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mumuk.ui.category.CategoryItem
 import com.example.mumuk.ui.category.CategoryItemAdapter
 import com.example.mumuk.databinding.FragmentCategoryWeightBinding
@@ -31,7 +31,7 @@ class CategoryWeightFragment : Fragment() {
         binding.topMessageTv.text = "체형/체중 관리 식단"
         binding.topMessageIcon.setImageResource(R.drawable.ic_category_weight)
 
-        binding.recyclerView.layoutManager = GridLayoutManager(context, 2)
+        binding.recyclerView.layoutManager = LinearLayoutManager(context)
         binding.recyclerView.adapter = CategoryItemAdapter(getDummyList()) { item ->
             val bundle = Bundle().apply {
                 putString("selected_tab", item.name)
@@ -45,8 +45,8 @@ class CategoryWeightFragment : Fragment() {
 
     private fun getDummyList(): List<CategoryItem> {
         return listOf(
-            CategoryItem("체중 감량", R.drawable.ic_category_weight_1),
-            CategoryItem("근육 증가", R.drawable.ic_category_weight_2)
+            CategoryItem("체중 감량"),
+            CategoryItem("근육 증가")
         )
     }
 
