@@ -16,6 +16,7 @@
         android:text="카테고리"
         android:textSize="28sp"
         android:textStyle="bold"
+        android:fontFamily="@font/pretendard_bold"
         android:paddingStart="4dp"
         android:paddingEnd="4dp"
         app:layout_constraintStart_toStartOf="parent"
@@ -49,6 +50,7 @@
             android:background="@drawable/bg_category_button_selector"
             android:backgroundTint="@android:color/transparent"
             android:text="체형/체중\n관리식단"
+            android:fontFamily="@font/pretendard_medium"
             android:textColor="@color/category_button_text_color"
             android:textSize="12sp" />
 
@@ -59,6 +61,7 @@
             android:background="@drawable/bg_category_button_selector"
             android:backgroundTint="@android:color/transparent"
             android:text="건강 관리식단"
+            android:fontFamily="@font/pretendard_medium"
             android:textColor="@color/category_button_text_color"
             android:textSize="12sp" />
 
@@ -69,6 +72,7 @@
             android:background="@drawable/bg_category_button_selector"
             android:backgroundTint="@android:color/transparent"
             android:text="랜덤식단"
+            android:fontFamily="@font/pretendard_medium"
             android:textColor="@color/category_button_text_color"
             android:textSize="12sp" />
     </LinearLayout>

@@ -32,6 +32,7 @@
             android:text="체형/체중 관리 식단"
             android:textSize="16sp"
             android:textStyle="bold"
+            android:fontFamily="@font/pretendard_medium"
             android:gravity="center_vertical"/>
     </LinearLayout>
 

@@ -11,10 +11,8 @@ class CategoryItemAdapter(
 ) : RecyclerView.Adapter<CategoryItemAdapter.ViewHolder>() {
 
     inner class ViewHolder(private val binding: ItemCategoryBinding) : RecyclerView.ViewHolder(binding.root) {
-
         fun bind(item: CategoryItem) {
             binding.itemName.text = item.name
-            binding.itemImage.setImageResource(item.imageResId)
 
             binding.root.setOnClickListener {
                 onItemClick(item)

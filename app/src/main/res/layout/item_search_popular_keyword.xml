@@ -11,6 +11,7 @@
         android:layout_height="wrap_content"
         android:text="1"
         android:textStyle="bold"
+        android:fontFamily="@font/pretendard_bold"
         android:textSize="16sp"
         android:gravity="center"/>
 
@@ -20,6 +21,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:text="연어 포케"
+        android:fontFamily="@font/pretendard_medium"
         android:textSize="16sp"
         android:textColor="@color/black" />
 </LinearLayout>

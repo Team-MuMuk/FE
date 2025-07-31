@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mumuk.ui.category.CategoryItem
 import com.example.mumuk.ui.category.CategoryItemAdapter
 import com.example.mumuk.databinding.FragmentCategoryRandomBinding
@@ -28,7 +28,7 @@ class CategoryRandomFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.recyclerView.layoutManager = GridLayoutManager(context, 2)
+        binding.recyclerView.layoutManager = LinearLayoutManager(context)
         binding.recyclerView.adapter = CategoryItemAdapter(getDummyList()) { item ->
             val bundle = Bundle().apply {
                 putString("selected_tab", item.name)
@@ -42,7 +42,7 @@ class CategoryRandomFragment : Fragment() {
 
     private fun getDummyList(): List<CategoryItem> {
         return listOf(
-            CategoryItem("랜덤식단", R.drawable.ic_category_random_1)
+            CategoryItem("랜덤식단")
         )
     }
 

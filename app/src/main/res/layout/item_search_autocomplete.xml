@@ -5,5 +5,6 @@
     android:layout_height="wrap_content"
     android:text="연어포케"
     android:textSize="16sp"
+    android:fontFamily="@font/pretendard_medium"
     android:paddingVertical="8dp"
     android:paddingHorizontal="4dp" />
