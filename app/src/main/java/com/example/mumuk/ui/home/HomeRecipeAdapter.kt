@@ -6,9 +6,17 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.mumuk.R
 import com.example.mumuk.data.model.Recipe
 import com.example.mumuk.databinding.ItemRecipeBinding
+import com.example.mumuk.data.api.RetrofitClient
+import com.example.mumuk.data.model.recipe.ClickLikeRequest
+import com.example.mumuk.data.model.recipe.ClickLikeResponse
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
-class HomeRecipeAdapter(private val recipes: List<Recipe>, private val onItemClick: (Recipe) -> Unit) :
-    RecyclerView.Adapter<HomeRecipeAdapter.RecipeViewHolder>() {
+class HomeRecipeAdapter(
+    private val recipes: MutableList<Recipe>,
+    private val onItemClick: (Recipe) -> Unit
+) : RecyclerView.Adapter<HomeRecipeAdapter.RecipeViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecipeViewHolder {
         val binding = ItemRecipeBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -21,11 +29,26 @@ class HomeRecipeAdapter(private val recipes: List<Recipe>, private val onItemCli
         holder.itemView.setOnClickListener {
             onItemClick(recipe)
         }
+        holder.binding.imageView6.setOnClickListener {
+            val context = holder.binding.root.context
+            recipe.isLiked = !recipe.isLiked
+            notifyItemChanged(position)
+
+            val api = RetrofitClient.getUserRecipeApi(context)
+            val request = ClickLikeRequest(recipeId = recipe.id)
+            api.clickLike(request).enqueue(object : Callback<ClickLikeResponse> {
+                override fun onResponse(
+                    call: Call<ClickLikeResponse>,
+                    response: Response<ClickLikeResponse>
+                ) {}
+                override fun onFailure(call: Call<ClickLikeResponse>, t: Throwable) {}
+            })
+        }
     }
 
     override fun getItemCount(): Int = recipes.size
 
-    class RecipeViewHolder(private val binding: ItemRecipeBinding) :
+    class RecipeViewHolder(val binding: ItemRecipeBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(recipe: Recipe) {
             if (recipe.img != null) {
@@ -34,11 +57,9 @@ class HomeRecipeAdapter(private val recipes: List<Recipe>, private val onItemCli
                 binding.recipeImg.setImageResource(R.drawable.bg_mosaic)
             }
             binding.recipeTitle.text = recipe.title
-            if (recipe.isLiked) {
-                binding.imageView6.setImageResource(R.drawable.btn_heart_fill)
-            } else {
-                binding.imageView6.setImageResource(R.drawable.btn_heart_blank)
-            }
+            binding.imageView6.setImageResource(
+                if (recipe.isLiked) R.drawable.btn_heart_fill else R.drawable.btn_heart_blank
+            )
         }
     }
 }

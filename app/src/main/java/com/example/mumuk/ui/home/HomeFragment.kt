@@ -115,7 +115,7 @@ class HomeFragment : Fragment() {
     private fun setupRecyclerView(recyclerView: RecyclerView, recipeList: List<Recipe>) {
         recyclerView.apply {
             layoutManager = GridLayoutManager(requireContext(), 2)
-            adapter = HomeRecipeAdapter(recipeList) {
+            adapter = HomeRecipeAdapter(recipeList.toMutableList()) {
                 findNavController().navigate(R.id.action_navigation_home_to_recipeFragment)
             }
         }

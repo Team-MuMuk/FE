@@ -76,70 +76,77 @@ class CategoryLowSugarFragment : Fragment() {
                 textView?.isSelected = true
                 updateRecyclerWith(textView?.text.toString())
             }
-
             override fun onTabUnselected(tab: TabLayout.Tab?) {
                 tab?.customView?.findViewById<TextView>(R.id.tab_text)?.isSelected = false
             }
-
             override fun onTabReselected(tab: TabLayout.Tab?) {}
         })
     }
 
     private fun updateRecyclerWith(tabName: String) {
         val items = when (tabName) {
-            "당 줄이기" -> listOf(
+            "당 줄이기" -> mutableListOf(
                 Recipe(
-                    img = R.drawable.img_food_sample,
+                    id = 1,
                     title = "연어 포케",
+                    img = R.drawable.img_food_sample,
                     isLiked = false
                 ),
                 Recipe(
-                    img = R.drawable.img_food_sample,
+                    id = 2,
                     title = "두부유부초밥",
+                    img = R.drawable.img_food_sample,
                     isLiked = true
                 )
             )
-            "혈압관리" -> listOf(
+            "혈압관리" -> mutableListOf(
                 Recipe(
-                    img = R.drawable.img_food_sample,
+                    id = 3,
                     title = "닭가슴살 샐러드",
-                    isLiked = false
-                ),
-                Recipe(
                     img = R.drawable.img_food_sample,
+                    isLiked = false
+                ),
+                Recipe(
+                    id = 4,
                     title = "오트밀죽",
+                    img = R.drawable.img_food_sample,
                     isLiked = false
                 )
             )
-            "콜레스테롤 관리" -> listOf(
+            "콜레스테롤 관리" -> mutableListOf(
                 Recipe(
-                    img = R.drawable.bg_mosaic,
+                    id = 5,
                     title = "아보카도 샐러드",
+                    img = R.drawable.bg_mosaic,
                     isLiked = false
                 ),
                 Recipe(
-                    img = R.drawable.bg_mosaic,
+                    id = 6,
                     title = "병아리콩스튜",
+                    img = R.drawable.bg_mosaic,
                     isLiked = false
                 )
             )
-            "소화 건강" -> listOf(
+            "소화 건강" -> mutableListOf(
                 Recipe(
-                    img = R.drawable.bg_mosaic,
+                    id = 7,
                     title = "요거트볼",
+                    img = R.drawable.bg_mosaic,
                     isLiked = false
                 ),
                 Recipe(
-                    img = R.drawable.bg_mosaic,
+                    id = 8,
                     title = "바나나 오트밀",
+                    img = R.drawable.bg_mosaic,
                     isLiked = false
                 )
             )
-            else -> emptyList()
+            else -> mutableListOf()
         }
 
         binding.categoryRecipeRecyclerView.adapter = CategoryRecipeCardAdapter(items) { recipe ->
             val bundle = Bundle().apply {
+                putLong("id", recipe.id)
                 putString("title", recipe.title)
                 putInt("img", recipe.img ?: 0)
                 putBoolean("isLiked", recipe.isLiked)

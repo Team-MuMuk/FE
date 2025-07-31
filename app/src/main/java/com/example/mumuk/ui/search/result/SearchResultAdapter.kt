@@ -4,10 +4,16 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mumuk.data.model.Recipe
+import com.example.mumuk.data.api.RetrofitClient
+import com.example.mumuk.data.model.recipe.ClickLikeRequest
+import com.example.mumuk.data.model.recipe.ClickLikeResponse
 import com.example.mumuk.databinding.ItemRecipeBinding
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class SearchResultAdapter(
-    private val items: List<Recipe>,
+    private val items: MutableList<Recipe>, // 상태 변경 반영 위해 MutableList!
     private val onItemClick: (Recipe) -> Unit
 ) : RecyclerView.Adapter<SearchResultAdapter.ViewHolder>() {
 
@@ -17,11 +23,34 @@ class SearchResultAdapter(
             binding.recipeTitle.text = item.title
             item.img?.let { binding.recipeImg.setImageResource(it) } ?: binding.recipeImg.setImageDrawable(null)
             binding.imageView6.setImageResource(
-                if (item.isLiked) com.example.mumuk.R.drawable.btn_heart_blank
+                if (item.isLiked) com.example.mumuk.R.drawable.btn_heart_fill
                 else com.example.mumuk.R.drawable.btn_heart_blank
             )
+
             binding.root.setOnClickListener {
                 onItemClick(item)
+            }
+
+            binding.imageView6.setOnClickListener {
+                val context = binding.root.context
+                item.isLiked = !item.isLiked
+                notifyItemChanged(adapterPosition)
+
+                val api = RetrofitClient.getUserRecipeApi(context)
+                val request = ClickLikeRequest(recipeId = item.id)
+                api.clickLike(request).enqueue(object : Callback<ClickLikeResponse> {
+                    override fun onResponse(
+                        call: Call<ClickLikeResponse>,
+                        response: Response<ClickLikeResponse>
+                    ) {
+                    }
+
+                    override fun onFailure(
+                        call: Call<ClickLikeResponse>,
+                        t: Throwable
+                    ) {
+                    }
+                })
             }
         }
     }

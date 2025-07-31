@@ -19,21 +19,25 @@ class SearchResultFragment : Fragment() {
 
     private val dummyList = listOf(
         Recipe(
+            id = 1,
             img = R.drawable.bg_mosaic,
             title = "연어 포케",
             isLiked = false
         ),
         Recipe(
+            id = 2,
             img = R.drawable.bg_mosaic,
             title = "닭가슴살 포케",
             isLiked = false
         ),
         Recipe(
+            id = 3,
             img = R.drawable.bg_mosaic,
             title = "아보카도 포케",
             isLiked = false
         ),
         Recipe(
+            id = 4,
             img = R.drawable.bg_mosaic,
             title = "참치 포케",
             isLiked = false
@@ -46,8 +50,9 @@ class SearchResultFragment : Fragment() {
     ): View {
         _binding = FragmentSearchResultBinding.inflate(inflater, container, false)
 
-        adapter = SearchResultAdapter(dummyList) { recipe ->
+        adapter = SearchResultAdapter(dummyList.toMutableList()) { recipe ->
             val bundle = Bundle().apply {
+                putLong("id", recipe.id)
                 putString("recipeTitle", recipe.title)
             }
             findNavController().navigate(
