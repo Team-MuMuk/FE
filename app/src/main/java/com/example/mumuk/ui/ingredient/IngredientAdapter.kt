@@ -7,7 +7,7 @@ import com.example.mumuk.data.model.Ingredient
 import com.example.mumuk.databinding.ItemIngredientBinding
 
 class IngredientAdapter(
-    private val items: List<Ingredient>,
+    private var items: List<Ingredient>,
     private val onItemClick: (Ingredient) -> Unit
 ) : RecyclerView.Adapter<IngredientAdapter.IngredientViewHolder>() {
 
@@ -36,4 +36,9 @@ class IngredientAdapter(
     }
 
     override fun getItemCount(): Int = items.size
+
+    fun submitList(newItems: List<Ingredient>) {
+        items = newItems
+        notifyDataSetChanged()
+    }
 }

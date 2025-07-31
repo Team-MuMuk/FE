@@ -1,16 +1,32 @@
 package com.example.mumuk.data.repository
 
+import android.content.Context
+import com.example.mumuk.data.api.RetrofitClient
 import com.example.mumuk.data.model.Ingredient
+import com.example.mumuk.data.model.ingredient.IngredientRegisterRequest
+import com.example.mumuk.data.model.ingredient.IngredientRegisterResponse
+import com.example.mumuk.data.model.ingredient.IngredientResponse
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import retrofit2.Response
 
-class IngredientRepository {
-    fun getIngredients(): List<Ingredient> {
-        return listOf(
-            Ingredient("아보카도 샐러드", "2025-07-28"),
-            Ingredient("토마토", "2025-07-29"),
-            Ingredient("계란", "2025-07-24"),
-            Ingredient("아보카도 샐러드", "2023-10-30"),
-            Ingredient("토마토", "2023-11-05"),
-            Ingredient("계란", "2023-12-01")
-        )
+class IngredientRepository(private val context: Context) {
+
+    suspend fun getIngredients(): List<Ingredient> = withContext(Dispatchers.IO) {
+        val response = RetrofitClient.getIngredientApi(context).getIngredients()
+        if (response.isSuccessful) {
+            response.body()?.data?.map { dto ->
+                Ingredient(dto.name, dto.expireDate)
+            } ?: emptyList()
+        } else {
+            emptyList()
+        }
+    }
+
+    suspend fun registerIngredient(
+        name: String, expireDate: String, daySetting: String = "D7"
+    ): Response<IngredientRegisterResponse> = withContext(Dispatchers.IO) {
+        val request = IngredientRegisterRequest(name, expireDate, daySetting)
+        RetrofitClient.getIngredientApi(context).registerIngredient(request)
     }
 }

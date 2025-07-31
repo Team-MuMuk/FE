@@ -13,6 +13,7 @@ import android.widget.PopupWindow
 import android.graphics.Color
 import android.os.Build
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.GridLayoutManager
@@ -20,15 +21,18 @@ import com.example.mumuk.R
 import com.example.mumuk.data.model.DayData
 import com.example.mumuk.data.repository.IngredientRepository
 import com.example.mumuk.databinding.FragmentAddIngredientBinding
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
+import com.example.mumuk.data.model.ingredient.IngredientRegisterRequest
+import android.widget.Toast
 
 class AddIngredientFragment : Fragment() {
     private var _binding: FragmentAddIngredientBinding? = null
     private val binding get() = _binding!!
 
-    private val ingredientRepository = IngredientRepository()
+    private val ingredientRepository by lazy { IngredientRepository(requireContext()) }
 
     private var selectedDate: LocalDate = LocalDate.now()
     private var currentMonth: YearMonth = YearMonth.now()
@@ -51,16 +55,18 @@ class AddIngredientFragment : Fragment() {
             findNavController().navigate(R.id.action_addIngredientFragment_to_ingredientListFragment)
         }
 
-        val ingredientList = ingredientRepository.getIngredients()
-        binding.ingredientRV.layoutManager = LinearLayoutManager(requireContext())
-        binding.ingredientRV.adapter = IngredientAdapter(ingredientList) { ingredient ->
-            val bundle = Bundle().apply {
-                putSerializable("ingredient", ingredient)
+        viewLifecycleOwner.lifecycleScope.launch {
+            val ingredientList = ingredientRepository.getIngredients()
+            binding.ingredientRV.layoutManager = LinearLayoutManager(requireContext())
+            binding.ingredientRV.adapter = IngredientAdapter(ingredientList) { ingredient ->
+                val bundle = Bundle().apply {
+                    putSerializable("ingredient", ingredient)
+                }
+                findNavController().navigate(
+                    R.id.action_addIngredientFragment_to_ingredientDetailFragment,
+                    bundle
+                )
             }
-            findNavController().navigate(
-                R.id.action_addIngredientFragment_to_ingredientDetailFragment,
-                bundle
-            )
         }
 
         binding.calendarBtn.setOnClickListener {
@@ -68,16 +74,61 @@ class AddIngredientFragment : Fragment() {
             showCalendarPopup(binding.editTextDate)
         }
 
+        fun updateAddButtonState() {
+            val ingredientNotEmpty = binding.editTextIngredient.text.toString().trim().isNotEmpty()
+            val dateStr = binding.editTextDate.text.toString().trim()
+            val dateValid = isValidDateFormat(dateStr)
+            val enabled = ingredientNotEmpty && dateValid
+
+            binding.addBtn.isEnabled = enabled
+            if (enabled) {
+                binding.addBtn.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_500))
+                binding.addBtn.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.white))
+            } else {
+                binding.addBtn.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.black_100))
+                binding.addBtn.setTextColor(ContextCompat.getColor(requireContext(), R.color.black_300))
+            }
+        }
+
+        // TextWatcher 등록
+        val watcher = object : android.text.TextWatcher {
+            override fun afterTextChanged(s: android.text.Editable?) = updateAddButtonState()
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        }
+
+        binding.editTextIngredient.addTextChangedListener(watcher)
+        binding.editTextDate.addTextChangedListener(watcher)
+
+        // 초기 상태 세팅
+        updateAddButtonState()
+
+
         binding.addBtn.setOnClickListener {
             val ingredient = binding.editTextIngredient.text.toString().trim()
             val date = binding.editTextDate.text.toString().trim()
 
-            // 재료명과 날짜가 모두 입력된 경우에만
             if (ingredient.isNotEmpty() && date.isNotEmpty()) {
-                // TODO: 재료 추가 로직 (예: ingredientRepository.addIngredient ...)
-
-                showIngredientAddedDialog()
-                // 입력값 초기화 등 필요하면 추가
+                // API 호출로 등록
+                viewLifecycleOwner.lifecycleScope.launch {
+                    try {
+                        val response = ingredientRepository.registerIngredient(ingredient, date, "D7")
+                        val body = response.body()
+                        if (response.isSuccessful && body?.code == "INGREDIENT_200") {
+                            showIngredientAddedDialog()
+                            // 입력값 초기화
+                            binding.editTextIngredient.text.clear()
+                            binding.editTextDate.text.clear()
+                            // 필요시 RecyclerView 갱신
+                            val newList = ingredientRepository.getIngredients()
+                            (binding.ingredientRV.adapter as? IngredientAdapter)?.submitList(newList)
+                        } else {
+                            Toast.makeText(requireContext(), "재료 등록 실패: ${response.body()?.message ?: response.message()}", Toast.LENGTH_SHORT).show()
+                        }
+                    } catch (e: Exception) {
+                        Toast.makeText(requireContext(), "네트워크 오류: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+                    }
+                }
             }
         }
     }
@@ -187,6 +238,15 @@ class AddIngredientFragment : Fragment() {
         val btnOk = dialog.findViewById<TextView>(R.id.btnOk)
         btnOk.setOnClickListener { dialog.dismiss() }
         dialog.show()
+    }
+
+    fun isValidDateFormat(date: String): Boolean {
+        return try {
+            java.time.LocalDate.parse(date)
+            true
+        } catch (e: Exception) {
+            false
+        }
     }
 
     override fun onDestroyView() {

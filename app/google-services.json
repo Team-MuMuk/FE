@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "142686630231",
+    "project_id": "mumuk-push",
+    "storage_bucket": "mumuk-push.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:142686630231:android:9fbce3544b6b6027cf4e12",
+        "android_client_info": {
+          "package_name": "com.example.mumuk"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCqiVtBqGLJz2ZIn1opbY78lCmXL1Kwgb8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:142686630231:android:853c26f86a276fdbcf4e12",
+        "android_client_info": {
+          "package_name": "com.umc.foodlier"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCqiVtBqGLJz2ZIn1opbY78lCmXL1Kwgb8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -13,12 +13,14 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import androidx.navigation.fragment.findNavController
 import com.example.mumuk.R
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 
 class IngredientListFragment : Fragment() {
     private var _binding: FragmentIngredientListBinding? = null
     private val binding get() = _binding!!
 
-    private val ingredientRepository = IngredientRepository()
+    private val ingredientRepository by lazy { IngredientRepository(requireContext()) }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -31,34 +33,34 @@ class IngredientListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val ingredientList = ingredientRepository.getIngredients()
-        binding.ingredientRV.layoutManager = LinearLayoutManager(requireContext())
-        binding.ingredientRV.adapter = IngredientAdapter(ingredientList) { ingredient ->
-            val bundle = Bundle().apply {
-                putSerializable("ingredient", ingredient)
+        viewLifecycleOwner.lifecycleScope.launch {
+            val ingredientList = ingredientRepository.getIngredients()
+            binding.ingredientRV.layoutManager = LinearLayoutManager(requireContext())
+            binding.ingredientRV.adapter = IngredientAdapter(ingredientList) { ingredient ->
+                val bundle = Bundle().apply {
+                    putSerializable("ingredient", ingredient)
+                }
+                findNavController().navigate(
+                    R.id.action_ingredientListFragment_to_ingredientDetailFragment,
+                    bundle
+                )
             }
-            findNavController().navigate(
-                R.id.action_ingredientListFragment_to_ingredientDetailFragment,
-                bundle
-            )
-        }
 
-        // MutableList로 변경
-        val allIngredients = ingredientRepository.getIngredients()
-        val expiringList = allIngredients.filter {
-            val today = LocalDate.now()
-            val expiry = LocalDate.parse(it.expiryDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-            ChronoUnit.DAYS.between(today, expiry) in 0..3
-        }.toMutableList()
-        binding.expiringRV.layoutManager = LinearLayoutManager(requireContext())
-        binding.expiringRV.adapter = ExpiringIngredientAdapter(expiringList) { ingredient ->
-            val bundle = Bundle().apply {
-                putSerializable("ingredient", ingredient)
+            val expiringList = ingredientList.filter {
+                val today = LocalDate.now()
+                val expiry = LocalDate.parse(it.expiryDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+                ChronoUnit.DAYS.between(today, expiry) in 0..3
+            }.toMutableList()
+            binding.expiringRV.layoutManager = LinearLayoutManager(requireContext())
+            binding.expiringRV.adapter = ExpiringIngredientAdapter(expiringList) { ingredient ->
+                val bundle = Bundle().apply {
+                    putSerializable("ingredient", ingredient)
+                }
+                findNavController().navigate(
+                    R.id.action_ingredientListFragment_to_ingredientDetailFragment,
+                    bundle
+                )
             }
-            findNavController().navigate(
-                R.id.action_ingredientListFragment_to_ingredientDetailFragment,
-                bundle
-            )
         }
 
         binding.backBtn.setOnClickListener {
