@@ -209,12 +209,12 @@ class LoginIntroActivity : AppCompatActivity() {
                 val isPasswordFilled = binding.etPassword.text?.isNotEmpty() == true
 
                 if (isIdFilled) {
-                    binding.etId.background = defaultDrawable
+                    binding.etId.setBackgroundResource(R.drawable.logintext_border_selector)
                     binding.etId.setHintTextColor(ContextCompat.getColor(this@LoginIntroActivity, R.color.gray))
                 }
 
                 if (isPasswordFilled) {
-                    binding.etPassword.background = defaultDrawable
+                    binding.etPassword.setBackgroundResource(R.drawable.logintext_border_selector)
                     binding.etPassword.setHintTextColor(ContextCompat.getColor(this@LoginIntroActivity, R.color.gray))
                 }
 
