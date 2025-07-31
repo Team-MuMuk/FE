@@ -25,6 +25,8 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
+import com.example.mumuk.data.model.ingredient.IngredientRegisterRequest
+import android.widget.Toast
 
 class AddIngredientFragment : Fragment() {
     private var _binding: FragmentAddIngredientBinding? = null
@@ -76,12 +78,27 @@ class AddIngredientFragment : Fragment() {
             val ingredient = binding.editTextIngredient.text.toString().trim()
             val date = binding.editTextDate.text.toString().trim()
 
-            // 재료명과 날짜가 모두 입력된 경우에만
             if (ingredient.isNotEmpty() && date.isNotEmpty()) {
-                // TODO: 재료 추가 로직 (예: ingredientRepository.addIngredient ...)
-
-                showIngredientAddedDialog()
-                // 입력값 초기화 등 필요하면 추가
+                // API 호출로 등록
+                viewLifecycleOwner.lifecycleScope.launch {
+                    try {
+                        val response = ingredientRepository.registerIngredient(ingredient, date, "D7")
+                        val body = response.body()
+                        if (response.isSuccessful && body?.code == "INGREDIENT_200") {
+                            showIngredientAddedDialog()
+                            // 입력값 초기화
+                            binding.editTextIngredient.text.clear()
+                            binding.editTextDate.text.clear()
+                            // 필요시 RecyclerView 갱신
+                            val newList = ingredientRepository.getIngredients()
+                            (binding.ingredientRV.adapter as? IngredientAdapter)?.submitList(newList)
+                        } else {
+                            Toast.makeText(requireContext(), "재료 등록 실패: ${response.body()?.message ?: response.message()}", Toast.LENGTH_SHORT).show()
+                        }
+                    } catch (e: Exception) {
+                        Toast.makeText(requireContext(), "네트워크 오류: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+                    }
+                }
             }
         }
     }
