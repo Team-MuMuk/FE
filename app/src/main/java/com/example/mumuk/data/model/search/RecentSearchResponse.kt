@@ -4,5 +4,5 @@ data class RecentSearchResponse(
     val status: String?,
     val code: String?,
     val message: String?,
-    val data: List<RecentSearch>?
+    val data: Any?
 )

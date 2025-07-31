@@ -114,10 +114,24 @@ class SearchFragment : Fragment() {
                     val body = response.body()
                     if (body?.status == "OK" && body.data != null) {
                         recentKeywords.clear()
-                        recentKeywords.addAll(body.data)
+                        val keywordList = when (body.data) {
+                            is List<*> -> {
+                                (body.data as List<*>).mapNotNull { item ->
+                                    if (item is RecentSearch) {
+                                        item
+                                    } else if (item is Map<*, *>) {
+                                        val title = item["title"] as? String
+                                        val createdAt = item["createdAt"] as? String
+                                        if (title != null && createdAt != null) RecentSearch(title, createdAt) else null
+                                    } else null
+                                }
+                            }
+                            else -> emptyList()
+                        }
+                        recentKeywords.addAll(keywordList)
                         recentKeywordAdapter.notifyDataSetChanged()
-                        setRecentKeywordEmptyView(false)
-                        Log.d("RecentKeyword", "최근 검색어 정상 수신 개수: ${body.data.size}")
+                        setRecentKeywordEmptyView(keywordList.isEmpty())
+                        Log.d("RecentKeyword", "최근 검색어 정상 수신 개수: ${keywordList.size}")
                     } else if (body?.code == "SEARCH_404") {
                         recentKeywords.clear()
                         recentKeywordAdapter.notifyDataSetChanged()
