@@ -74,6 +74,36 @@ class AddIngredientFragment : Fragment() {
             showCalendarPopup(binding.editTextDate)
         }
 
+        fun updateAddButtonState() {
+            val ingredientNotEmpty = binding.editTextIngredient.text.toString().trim().isNotEmpty()
+            val dateStr = binding.editTextDate.text.toString().trim()
+            val dateValid = isValidDateFormat(dateStr)
+            val enabled = ingredientNotEmpty && dateValid
+
+            binding.addBtn.isEnabled = enabled
+            if (enabled) {
+                binding.addBtn.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_500))
+                binding.addBtn.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.white))
+            } else {
+                binding.addBtn.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.black_100))
+                binding.addBtn.setTextColor(ContextCompat.getColor(requireContext(), R.color.black_300))
+            }
+        }
+
+        // TextWatcher 등록
+        val watcher = object : android.text.TextWatcher {
+            override fun afterTextChanged(s: android.text.Editable?) = updateAddButtonState()
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        }
+
+        binding.editTextIngredient.addTextChangedListener(watcher)
+        binding.editTextDate.addTextChangedListener(watcher)
+
+        // 초기 상태 세팅
+        updateAddButtonState()
+
+
         binding.addBtn.setOnClickListener {
             val ingredient = binding.editTextIngredient.text.toString().trim()
             val date = binding.editTextDate.text.toString().trim()
@@ -208,6 +238,15 @@ class AddIngredientFragment : Fragment() {
         val btnOk = dialog.findViewById<TextView>(R.id.btnOk)
         btnOk.setOnClickListener { dialog.dismiss() }
         dialog.show()
+    }
+
+    fun isValidDateFormat(date: String): Boolean {
+        return try {
+            java.time.LocalDate.parse(date)
+            true
+        } catch (e: Exception) {
+            false
+        }
     }
 
     override fun onDestroyView() {
