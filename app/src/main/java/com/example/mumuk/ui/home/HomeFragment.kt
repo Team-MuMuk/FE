@@ -139,12 +139,12 @@ class HomeFragment : Fragment() {
         if (loginType == "KAKAO" || loginType == "NAVER") {
             val savedNickname = TokenManager.getNickName(requireContext())
             val nickname = if (!savedNickname.isNullOrBlank()) savedNickname else "사용자"
-            binding.textView15.text = "${nickname}님, 오늘은 뭐 해먹을까요?"
+            _binding?.textView15?.text = "${nickname}님, 오늘은 뭐 해먹을까요?"
         } else {
             val accessToken = TokenManager.getAccessToken(requireContext())
             val userId = JwtUtils.getUserIdFromToken(accessToken ?: "")
             if (userId == null) {
-                binding.textView15.text = "사용자님, 오늘은 뭐 해먹을까요?"
+                _binding?.textView15?.text = "사용자님, 오늘은 뭐 해먹을까요?"
                 return
             }
 
@@ -154,17 +154,21 @@ class HomeFragment : Fragment() {
                         call: Call<UserProfileResponse>,
                         response: Response<UserProfileResponse>
                     ) {
-                        if (response.isSuccessful) {
-                            val profile = response.body()?.data
-                            val nickname = profile?.nickName ?: "사용자"
-                            binding.textView15.text = "${nickname}님, 오늘은 뭐 해먹을까요?"
-                        } else {
-                            binding.textView15.text = "사용자님, 오늘은 뭐 해먹을까요?"
+                        _binding?.let {
+                            if (response.isSuccessful) {
+                                val profile = response.body()?.data
+                                val nickname = profile?.nickName ?: "사용자"
+                                it.textView15.text = "${nickname}님, 오늘은 뭐 해먹을까요?"
+                            } else {
+                                it.textView15.text = "사용자님, 오늘은 뭐 해먹을까요?"
+                            }
                         }
                     }
 
                     override fun onFailure(call: Call<UserProfileResponse>, t: Throwable) {
-                        binding.textView15.text = "사용자님, 오늘은 뭐 해먹을까요?"
+                        _binding?.let {
+                            it.textView15.text = "사용자님, 오늘은 뭐 해먹을까요?"
+                        }
                     }
                 })
         }
