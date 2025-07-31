@@ -52,10 +52,9 @@ interface AuthApiService {
         @Query("state") state: String = "mumukDefaultState"
     ): Response<NaverLoginResponse>
 
-
-
-
-
-
-
+    @POST("/api/auth/reissue")
+    suspend fun reissueToken(
+        @Header("X-Refresh-Token") refreshToken: String,
+        @Header("X-Login-Type") loginType: String
+    ): Response<LoginResponse>
 }
