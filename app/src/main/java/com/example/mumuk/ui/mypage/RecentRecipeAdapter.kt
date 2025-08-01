@@ -7,8 +7,9 @@ import com.example.mumuk.R
 import com.example.mumuk.databinding.ItemRecentRecipeBinding
 
 class RecentRecipeAdapter(
-    private val recipes: List<RecentRecipe>,
-    private val onItemClick: (RecentRecipe) -> Unit
+    private val recipes: MutableList<RecentRecipe>,
+    private val onItemClick: (RecentRecipe) -> Unit,
+    private val onHeartClick: ((RecentRecipe, Int) -> Unit)? = null
 ) : RecyclerView.Adapter<RecentRecipeAdapter.RecipeViewHolder>() {
 
     inner class RecipeViewHolder(val binding: ItemRecentRecipeBinding) :
@@ -21,6 +22,19 @@ class RecentRecipeAdapter(
                 }
             }
         }
+        fun bind(recipe: RecentRecipe, position: Int) {
+            binding.tvRecipeTitle.text = recipe.title
+            binding.ivRecipeImage.setImageResource(recipe.imageResId)
+            binding.ivRecipeHeart.setImageResource(
+                if (recipe.liked) R.drawable.ic_heart_full else R.drawable.ic_heart_empty
+            )
+
+            binding.ivRecipeHeart.setOnClickListener {
+                recipes[position].liked = !recipes[position].liked
+                notifyItemChanged(position)
+                onHeartClick?.invoke(recipes[position], position)
+            }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecipeViewHolder {
@@ -31,14 +45,7 @@ class RecentRecipeAdapter(
     }
 
     override fun onBindViewHolder(holder: RecipeViewHolder, position: Int) {
-        val recipe = recipes[position]
-        with(holder.binding) {
-            tvRecipeTitle.text = recipe.title
-            ivRecipeImage.setImageResource(recipe.imageResId)
-            ivRecipeHeart.setImageResource(
-                if (recipe.liked) R.drawable.ic_heart_full else R.drawable.ic_heart_empty
-            )
-        }
+        holder.bind(recipes[position], position)
     }
 
     override fun getItemCount(): Int = recipes.size
