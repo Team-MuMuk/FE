@@ -54,29 +54,21 @@ class MyPageFragment : Fragment() {
             }
         }
 
-
         binding.btnFavorites.setOnClickListener {
             findNavController().navigate(R.id.bookmarkRecipeFragment)
         }
 
-
         binding.itemLogout.setOnClickListener {
             val logoutBinding = DialogLogoutBinding.inflate(layoutInflater)
-
             val dialog = Dialog(requireContext())
             dialog.setContentView(logoutBinding.root)
             dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             dialog.window?.setDimAmount(0.3f)
-
             dialog.show()
 
             logoutBinding.btnDialogOk.setOnClickListener {
                 val refreshToken = TokenManager.getRefreshToken(requireContext()) ?: ""
                 val loginType = "LOCAL"
-
-                Log.d("LogoutRequest", "Sending logout request")
-                Log.d("LogoutRequest", "Header - X-Refresh-Token: $refreshToken")
-                Log.d("LogoutRequest", "Header - X-Login-Type: $loginType")
 
                 RetrofitClient.getAuthApi(requireContext()).logout(refreshToken, loginType)
                     .enqueue(object : Callback<CommonResponse> {
@@ -84,49 +76,30 @@ class MyPageFragment : Fragment() {
                             call: Call<CommonResponse>,
                             response: Response<CommonResponse>
                         ) {
-                            Log.d("LogoutResponse", "Response received")
-                            Log.d("LogoutResponse", "isSuccessful: ${response.isSuccessful}")
-                            Log.d("LogoutResponse", "code: ${response.code()}, message: ${response.message()}")
-                            Log.d("LogoutResponse", "raw: ${response.raw()}")
-                            Log.d("LogoutResponse", "headers: ${response.headers()}")
-                            Log.d("LogoutResponse", "body: ${response.body()}")
-                            Log.d("LogoutResponse", "errorBody: ${response.errorBody()?.string()}")
-
                             if (response.code() == 401) {
-                                Log.w("Logout", "RefreshToken 만료로 로그아웃 실패. 강제 로그아웃 처리")
-
                                 TokenManager.clearTokens(requireContext())
                                 val prefs = requireContext().getSharedPreferences("auth", Context.MODE_PRIVATE)
                                 prefs.edit().clear().apply()
-
                                 val intent = Intent(requireContext(), LoginIntroActivity::class.java)
                                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                                 startActivity(intent)
                                 return
                             }
-
                             if (response.isSuccessful && response.body()?.message?.contains("성공") == true) {
                                 TokenManager.clearTokens(requireContext())
-
                                 val prefs = requireContext().getSharedPreferences("auth", Context.MODE_PRIVATE)
                                 prefs.edit().clear().apply()
-
-                                Log.d("Logout", "로그아웃 성공. 토큰 삭제됨")
                                 val intent = Intent(requireContext(), LoginIntroActivity::class.java)
                                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                                 startActivity(intent)
-
                             } else {
                                 Toast.makeText(requireContext(), "로그아웃 실패: ${response.body()?.message ?: "알 수 없는 오류"}", Toast.LENGTH_SHORT).show()
                             }
                         }
-
                         override fun onFailure(call: Call<CommonResponse>, t: Throwable) {
-                            Log.e("LogoutFailure", "네트워크 오류", t)
                             Toast.makeText(requireContext(), "네트워크 오류: ${t.message}", Toast.LENGTH_SHORT).show()
                         }
                     })
-
                 dialog.dismiss()
             }
 
@@ -138,15 +111,12 @@ class MyPageFragment : Fragment() {
             dialog.window?.setLayout(widthInPx, ViewGroup.LayoutParams.WRAP_CONTENT)
         }
 
-
         binding.itemDeleteAccount.setOnClickListener {
             val deleteBinding = DialogDeleteAccountBinding.inflate(layoutInflater)
-
             val dialog = Dialog(requireContext())
             dialog.setContentView(deleteBinding.root)
             dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             dialog.window?.setDimAmount(0.3f)
-
             dialog.show()
 
             deleteBinding.btnDialogCancel.setOnClickListener {
@@ -161,19 +131,11 @@ class MyPageFragment : Fragment() {
                             response: Response<CommonResponse>
                         ) {
                             val result = response.body()
-                            Log.d("Withdraw", "response: $result")
-
                             if (response.isSuccessful && result?.message?.contains("성공") == true) {
                                 Toast.makeText(requireContext(), "회원탈퇴가 완료되었습니다.", Toast.LENGTH_SHORT).show()
-
                                 TokenManager.clearTokens(requireContext())
-
-                                // SharedPreferences(auth)의 카카오 로그인 정보도 삭제
                                 val prefs = requireContext().getSharedPreferences("auth", Context.MODE_PRIVATE)
                                 prefs.edit().clear().apply()
-
-                                Log.d("Logout", "AccessToken after logout: ${TokenManager.getAccessToken(requireContext())}")
-
                                 val intent = Intent(requireContext(), LoginIntroActivity::class.java)
                                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                                 startActivity(intent)
@@ -185,7 +147,6 @@ class MyPageFragment : Fragment() {
                                 ).show()
                             }
                         }
-
                         override fun onFailure(call: Call<CommonResponse>, t: Throwable) {
                             Toast.makeText(
                                 requireContext(),
@@ -194,7 +155,6 @@ class MyPageFragment : Fragment() {
                             ).show()
                         }
                     })
-
                 dialog.dismiss()
             }
 
@@ -205,7 +165,6 @@ class MyPageFragment : Fragment() {
             ).toInt()
             dialog.window?.setLayout(widthInPx, ViewGroup.LayoutParams.WRAP_CONTENT)
         }
-
 
         binding.itemVersion.setOnClickListener {
             showSimpleConfirmDialog(
@@ -218,7 +177,6 @@ class MyPageFragment : Fragment() {
             showSimpleConfirmDialog(
                 message = "푸시알림 설정을\n하시겠습니까?",
                 buttonText = "동의"
-
             ) {
                 Toast.makeText(requireContext(), "푸시알림 설정에 동의하셨습니다", Toast.LENGTH_SHORT).show()
             }
@@ -234,7 +192,6 @@ class MyPageFragment : Fragment() {
         return binding.root
     }
 
-
     private fun showSimpleConfirmDialog(
         message: String,
         buttonText: String = "확인",
@@ -244,19 +201,14 @@ class MyPageFragment : Fragment() {
         dialog.setContentView(R.layout.dialog_confirm)
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialog.window?.setDimAmount(0.3f)
-
-
         val tvMessage = dialog.findViewById<TextView>(R.id.tv_dialog_message)
         val btnOk = dialog.findViewById<TextView>(R.id.btn_dialog_ok)
-
         tvMessage.text = message
         btnOk.text = buttonText
-
         btnOk.setOnClickListener {
             dialog.dismiss()
             onButtonClick?.invoke()
         }
-
         dialog.show()
     }
 
@@ -264,10 +216,11 @@ class MyPageFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val recentList = listOf(
+        val recentList = mutableListOf(
             RecentRecipe("연어 포케", R.drawable.bg_mosaic, liked = true),
             RecentRecipe("훈제오리 포케", R.drawable.bg_mosaic, liked = false),
             RecentRecipe("그린포케", R.drawable.bg_mosaic, liked = true),
@@ -278,13 +231,16 @@ class MyPageFragment : Fragment() {
         )
 
         binding.rvRecentRecipes.apply {
-            adapter = RecentRecipeAdapter(recentList) { recipe ->
-                findNavController().navigate(R.id.recipeFragment)
-            }
+            adapter = RecentRecipeAdapter(recentList,
+                onItemClick = { recipe ->
+                    findNavController().navigate(R.id.recipeFragment)
+                },
+                onHeartClick = { recipe, position ->
+                }
+            )
             layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         }
 
-        // 서버에서 프로필 정보 불러오기
         loadUserProfile()
     }
 
@@ -293,28 +249,23 @@ class MyPageFragment : Fragment() {
 
         if (loginType == "KAKAO" || loginType == "NAVER") {
             val savedNickname = TokenManager.getNickName(requireContext())
-
             val nicknameText = if (!savedNickname.isNullOrBlank()) {
                 "${savedNickname}님!"
             } else {
                 "사용자님!"
             }
-
             binding.tvNickname.text = nicknameText
             binding.recipeText.text = "${nicknameText.replace("님!", "")}님이 최근 본 레시피"
-
             binding.tvSubtitle.text = ""
             binding.imgProfile.setImageResource(R.drawable.ic_user_profile_orange)
 
         } else {
             val accessToken = TokenManager.getAccessToken(requireContext())
             val userId = JwtUtils.getUserIdFromToken(accessToken ?: "")
-
             if (userId == null) {
                 Log.e("MyPage", "userId 추출 실패")
                 return
             }
-
             RetrofitClient.getUserApi(requireContext()).getUserProfile(userId)
                 .enqueue(object : Callback<UserProfileResponse> {
                     override fun onResponse(
@@ -323,12 +274,10 @@ class MyPageFragment : Fragment() {
                     ) {
                         if (response.isSuccessful) {
                             val profile = response.body()?.data ?: return
-
                             val nicknameText = "${profile.nickName}님!"
                             binding.tvNickname.text = nicknameText
                             binding.recipeText.text = "${profile.nickName}님이 최근 본 레시피"
                             binding.tvSubtitle.text = profile.statusMessage
-
                             val profileRes = when (profile.profileImage ?: "orange") {
                                 "orange" -> R.drawable.ic_user_profile_orange
                                 "white" -> R.drawable.ic_user_profile_white
@@ -340,17 +289,10 @@ class MyPageFragment : Fragment() {
                             Log.e("MyPage", "프로필 API 실패: ${response.code()}")
                         }
                     }
-
                     override fun onFailure(call: Call<UserProfileResponse>, t: Throwable) {
                         Log.e("MyPage", "네트워크 오류", t)
                     }
                 })
         }
     }
-
-
-
-
-
-
 }

@@ -35,7 +35,6 @@ class HomeFragment : Fragment() {
     private val binding get() = _binding!!
     private val recipeRepository = HomeRecipeRepository()
 
-    // Rank 관련 변수
     private val recipeRankRepository = RecipeRankRepository()
     private lateinit var recipeRankAdapter: RecipeRankAdapter
 
@@ -115,17 +114,20 @@ class HomeFragment : Fragment() {
     private fun setupRecyclerView(recyclerView: RecyclerView, recipeList: List<Recipe>) {
         recyclerView.apply {
             layoutManager = GridLayoutManager(requireContext(), 2)
-            adapter = HomeRecipeAdapter(recipeList) {
+            adapter = HomeRecipeAdapter(recipeList.toMutableList()) {
                 findNavController().navigate(R.id.action_navigation_home_to_recipeFragment)
             }
         }
     }
 
-    // 랭크 목록만 보여줌
     private fun setupRankRecyclerView() {
-        recipeRankAdapter = RecipeRankAdapter {
-            findNavController().navigate(R.id.action_navigation_home_to_recipeFragment)
-        }
+        recipeRankAdapter = RecipeRankAdapter(
+            onItemClick = {
+                findNavController().navigate(R.id.action_navigation_home_to_recipeFragment)
+            },
+            onHeartClick = { recipeRank, position ->
+            }
+        )
         binding.rankRV.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = recipeRankAdapter

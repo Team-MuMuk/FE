@@ -61,4 +61,8 @@ object RetrofitClient {
     fun getIngredientApi(context: Context): IngredientApiService {
         return getRetrofit(context).create(IngredientApiService::class.java)
     }
+
+    fun getUserRecipeApi(context: Context): UserRecipeApiService {
+        return getRetrofit(context).create(UserRecipeApiService::class.java)
+    }
 }

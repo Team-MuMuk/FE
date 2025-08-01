@@ -4,5 +4,6 @@ data class RecipeRank(
     val img: Int?,
     val name: String,
     val kcal: Int,
-    val rank: Int
+    val rank: Int,
+    var isLiked: Boolean = false
 )

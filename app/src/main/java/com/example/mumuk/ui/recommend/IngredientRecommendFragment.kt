@@ -38,19 +38,21 @@ class IngredientRecommendFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // 비동기로 데이터 받아오기
         viewLifecycleOwner.lifecycleScope.launch {
-            // 1. 재료 리스트
             val ingredientList = ingredientRepository.getIngredients()
             val adapter = IngredientCountAdapter(ingredientList)
             binding.countRV.layoutManager = LinearLayoutManager(requireContext())
             binding.countRV.adapter = adapter
 
-            // 2. AI 추천 레시피 리스트
             aiRecipeList = aiRecipeRepository.getAiRecipes()
-            aiRecipeAdapter = IngredientAiRecipeAdapter(emptyList()) { recipe ->
-                findNavController().navigate(R.id.action_ingredientRecommendFragment_to_recipeFragment)
-            }
+            aiRecipeAdapter = IngredientAiRecipeAdapter(
+                aiRecipeList.toMutableList(),
+                onItemClick = { recipe ->
+                    findNavController().navigate(R.id.action_ingredientRecommendFragment_to_recipeFragment)
+                },
+                onHeartClick = { recipe, position ->
+                }
+            )
             binding.aiRecipeRV.layoutManager = GridLayoutManager(requireContext(), 2)
             binding.aiRecipeRV.adapter = aiRecipeAdapter
 

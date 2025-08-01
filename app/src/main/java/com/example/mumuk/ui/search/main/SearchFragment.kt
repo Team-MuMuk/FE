@@ -346,8 +346,8 @@ class SearchFragment : Fragment() {
     private fun setupRecentRecipeList() {
         recentRecipeAdapter = SearchRecentRecipeAdapter(recentRecipeList) { recipe ->
             val bundle = Bundle().apply {
-                putLong("recipeId", recipe.recipeId)
-                putString("name", recipe.name)
+                putLong("recipeId", recipe.id)
+                putString("name", recipe.title)
                 putString("imageUrl", recipe.imageUrl)
                 putBoolean("liked", recipe.liked)
             }

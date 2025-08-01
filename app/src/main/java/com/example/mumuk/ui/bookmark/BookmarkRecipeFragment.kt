@@ -37,6 +37,8 @@ class BookmarkRecipeFragment : Fragment() {
         recipeAdapter.onItemClick = {
             findNavController().navigate(R.id.action_bookmarkRecipeFragment_to_recipeFragment)
         }
+        recipeAdapter.onHeartClick = { recipe, position ->
+        }
 
         binding.recipeRV.apply {
             adapter = recipeAdapter

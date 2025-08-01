@@ -82,16 +82,19 @@ class CategoryRandomRecipeFragment : Fragment() {
         val items = when (tabName) {
             "랜덤식단" -> listOf(
                 Recipe(
+                    id = 1,
                     img = R.drawable.bg_mosaic,
                     title = "연어 포케",
                     isLiked = false
                 ),
                 Recipe(
+                    id = 2,
                     img = R.drawable.bg_mosaic,
                     title = "바질 파스타",
                     isLiked = false
                 ),
                 Recipe(
+                    id = 3,
                     img = R.drawable.bg_mosaic,
                     title = "두부유부초밥",
                     isLiked = false
@@ -100,8 +103,9 @@ class CategoryRandomRecipeFragment : Fragment() {
             else -> emptyList()
         }
 
-        binding.categoryRecipeRecyclerView.adapter = CategoryRecipeCardAdapter(items) { recipe ->
+        binding.categoryRecipeRecyclerView.adapter = CategoryRecipeCardAdapter(items.toMutableList()) { recipe ->
             val bundle = Bundle().apply {
+                putLong("id", recipe.id)
                 putString("title", recipe.title)
                 putInt("img", recipe.img ?: 0)
                 putBoolean("isLiked", recipe.isLiked)

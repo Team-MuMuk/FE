@@ -7,12 +7,13 @@ import com.example.mumuk.data.model.Recipe
 import com.example.mumuk.databinding.ItemRecipeBinding
 
 class IngredientAiRecipeAdapter(
-    private var items: List<Recipe>,
-    private val onItemClick: (Recipe) -> Unit // 클릭 리스너 추가
+    private var items: MutableList<Recipe>,
+    private val onItemClick: (Recipe) -> Unit,
+    private val onHeartClick: ((Recipe, Int) -> Unit)? = null
 ) : RecyclerView.Adapter<IngredientAiRecipeAdapter.ViewHolder>() {
 
     inner class ViewHolder(val binding: ItemRecipeBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(recipe: Recipe) {
+        fun bind(recipe: Recipe, position: Int) {
             binding.recipeTitle.text = recipe.title
             recipe.img?.let {
                 binding.recipeImg.setImageResource(it)
@@ -21,6 +22,11 @@ class IngredientAiRecipeAdapter(
                 if (recipe.isLiked) com.example.mumuk.R.drawable.btn_heart_fill
                 else com.example.mumuk.R.drawable.btn_heart_blank
             )
+            binding.imageView6.setOnClickListener {
+                recipe.isLiked = !recipe.isLiked
+                notifyItemChanged(position)
+                onHeartClick?.invoke(recipe, position)
+            }
             binding.root.setOnClickListener {
                 onItemClick(recipe)
             }
@@ -33,13 +39,13 @@ class IngredientAiRecipeAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(items[position])
+        holder.bind(items[position], position)
     }
 
     override fun getItemCount(): Int = items.size
 
     fun updateList(newItems: List<Recipe>) {
-        items = newItems
+        items = newItems.toMutableList()
         notifyDataSetChanged()
     }
 }

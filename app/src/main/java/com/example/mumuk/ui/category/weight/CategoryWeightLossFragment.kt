@@ -88,11 +88,13 @@ class CategoryWeightLossFragment : Fragment() {
         val items = when (tabName) {
             "체중 감량" -> listOf(
                 Recipe(
+                    id = 1,
                     img = R.drawable.bg_mosaic,
                     title = "연어 포케",
                     isLiked = false
                 ),
                 Recipe(
+                    id = 2,
                     img = R.drawable.bg_mosaic,
                     title = "닭가슴살 샐러드",
                     isLiked = false
@@ -100,11 +102,13 @@ class CategoryWeightLossFragment : Fragment() {
             )
             "근육 증가" -> listOf(
                 Recipe(
+                    id = 3,
                     img = R.drawable.bg_mosaic,
                     title = "닭가슴살 스테이크",
                     isLiked = false
                 ),
                 Recipe(
+                    id = 4,
                     img = R.drawable.bg_mosaic,
                     title = "오트밀 스크램블",
                     isLiked = false
@@ -113,8 +117,9 @@ class CategoryWeightLossFragment : Fragment() {
             else -> emptyList()
         }
 
-        binding.categoryRecipeRecyclerView.adapter = CategoryRecipeCardAdapter(items) { recipe ->
+        binding.categoryRecipeRecyclerView.adapter = CategoryRecipeCardAdapter(items.toMutableList()) { recipe ->
             val bundle = Bundle().apply {
+                putLong("id", recipe.id)
                 putString("title", recipe.title)
                 putInt("img", recipe.img ?: 0)
                 putBoolean("isLiked", recipe.isLiked)

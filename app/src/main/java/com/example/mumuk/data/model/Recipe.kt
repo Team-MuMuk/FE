@@ -1,7 +1,8 @@
 package com.example.mumuk.data.model
 
 data class Recipe(
+    val id: Long,
     val img: Int?,
     val title: String,
-    val isLiked: Boolean = false
+    var isLiked: Boolean = false
 )
