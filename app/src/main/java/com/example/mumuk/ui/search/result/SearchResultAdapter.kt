@@ -13,7 +13,7 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class SearchResultAdapter(
-    private val items: MutableList<Recipe>, // 상태 변경 반영 위해 MutableList!
+    private val items: MutableList<Recipe>,
     private val onItemClick: (Recipe) -> Unit
 ) : RecyclerView.Adapter<SearchResultAdapter.ViewHolder>() {
 
@@ -67,4 +67,10 @@ class SearchResultAdapter(
     }
 
     override fun getItemCount() = items.size
+
+    fun updateList(newItems: List<Recipe>) {
+        items.clear()
+        items.addAll(newItems)
+        notifyDataSetChanged()
+    }
 }

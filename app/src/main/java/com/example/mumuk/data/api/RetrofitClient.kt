@@ -2,6 +2,7 @@ package com.example.mumuk.data.api
 
 import android.content.Context
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -11,8 +12,14 @@ object RetrofitClient {
 
     private fun getRetrofit(context: Context): Retrofit {
         if (retrofit == null) {
+            // 1. HttpLoggingInterceptor 추가
+            val logging = HttpLoggingInterceptor().apply {
+                // 개발 중엔 BODY, 운영 배포 땐 필요한 경우 INFO/ERROR로
+                level = HttpLoggingInterceptor.Level.BODY
+            }
             val client = OkHttpClient.Builder()
                 .addInterceptor(AuthInterceptor(context))
+                .addInterceptor(logging) // 2. loggingInterceptor 추가
                 .build()
 
             retrofit = Retrofit.Builder()
@@ -27,8 +34,6 @@ object RetrofitClient {
     fun getAuthApi(context: Context): AuthApiService {
         return getRetrofit(context).create(AuthApiService::class.java)
     }
-
-    //TODO: 다른 api도 getAuthApi처럼 get~~Api 와 같이 추가해서 쓰기
 
     fun getUserApi(context: Context): UserApiService {
         return getRetrofit(context).create(UserApiService::class.java)
@@ -64,5 +69,9 @@ object RetrofitClient {
 
     fun getUserRecipeApi(context: Context): UserRecipeApiService {
         return getRetrofit(context).create(UserRecipeApiService::class.java)
+    }
+
+    fun getRecipeSearchApi(context: Context): RecipeSearchApiService {
+        return getRetrofit(context).create(RecipeSearchApiService::class.java)
     }
 }
