@@ -1,10 +1,11 @@
 package com.example.mumuk.ui.recipe
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
@@ -27,7 +28,9 @@ class RecipeFragment : Fragment() {
     private var _binding: FragmentRecipeBinding? = null
     private val binding get() = _binding!!
 
-    private val recipeViewModel: RecipeViewModel by viewModels()
+    private val recipeViewModel: RecipeViewModel by viewModels {
+        RecipeViewModel.Factory(requireContext())
+    }
 
     private var currentRecipe: Recipe? = null
 
@@ -58,6 +61,7 @@ class RecipeFragment : Fragment() {
 
         recipeViewModel.allIngredients.observe(viewLifecycleOwner) { ingredients ->
             ingredientRV.adapter = IngredientAdapter(ingredients)
+            Log.d("RecipeFragment", "Ingredients updated: $ingredients")
         }
 
         fullBlogList = BlogRepository.getBlogList()
@@ -79,7 +83,17 @@ class RecipeFragment : Fragment() {
 
         recipeViewModel.shopItemList.observe(viewLifecycleOwner) { shopList ->
             shopAdapter.submitList(shopList)
+            Log.d("RecipeFragment", "Shop items updated: $shopList")
         }
+
+        recipeViewModel.userRecipeDetail.observe(viewLifecycleOwner) { detail ->
+            Log.d("RecipeFragment", "UserRecipeDetail 업데이트: $detail")
+            binding.recipeTitle.text = detail.title
+        }
+
+        val recipeId = arguments?.getLong("recipeId") ?: 4L
+        Log.d("RecipeFragment", "onViewCreated() - recipeId: $recipeId")
+        recipeViewModel.fetchRecipeDetail(recipeId)
 
         recipeViewModel.selectedRecipe.observe(viewLifecycleOwner) { recipe ->
             currentRecipe = recipe
@@ -108,14 +122,14 @@ class RecipeFragment : Fragment() {
                         call: Call<ClickLikeResponse>,
                         response: Response<ClickLikeResponse>
                     ) {
-                        // 성공 처리 (필요 시)
+                        Log.d("RecipeFragment", "Like API success: ${response.body()}")
                     }
 
                     override fun onFailure(
                         call: Call<ClickLikeResponse>,
                         t: Throwable
                     ) {
-                        // 실패 처리 (필요 시)
+                        Log.e("RecipeFragment", "Like API error: ${t.localizedMessage}", t)
                     }
                 })
             }
