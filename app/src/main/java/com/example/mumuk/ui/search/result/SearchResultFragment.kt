@@ -1,15 +1,23 @@
 package com.example.mumuk.ui.search.result
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.mumuk.R
 import com.example.mumuk.databinding.FragmentSearchResultBinding
+import com.example.mumuk.data.api.RetrofitClient
 import com.example.mumuk.data.model.Recipe
+import com.example.mumuk.data.model.search.RecipeSearchResponse
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class SearchResultFragment : Fragment() {
     private var _binding: FragmentSearchResultBinding? = null
@@ -17,40 +25,14 @@ class SearchResultFragment : Fragment() {
 
     private lateinit var adapter: SearchResultAdapter
 
-    private val dummyList = listOf(
-        Recipe(
-            id = 1,
-            img = R.drawable.bg_mosaic,
-            title = "연어 포케",
-            isLiked = false
-        ),
-        Recipe(
-            id = 2,
-            img = R.drawable.bg_mosaic,
-            title = "닭가슴살 포케",
-            isLiked = false
-        ),
-        Recipe(
-            id = 3,
-            img = R.drawable.bg_mosaic,
-            title = "아보카도 포케",
-            isLiked = false
-        ),
-        Recipe(
-            id = 4,
-            img = R.drawable.bg_mosaic,
-            title = "참치 포케",
-            isLiked = false
-        )
-    )
+    private var currentKeyword: String = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentSearchResultBinding.inflate(inflater, container, false)
-
-        adapter = SearchResultAdapter(dummyList.toMutableList()) { recipe ->
+        adapter = SearchResultAdapter(mutableListOf()) { recipe ->
             val bundle = Bundle().apply {
                 putLong("id", recipe.id)
                 putString("recipeTitle", recipe.title)
@@ -63,20 +45,91 @@ class SearchResultFragment : Fragment() {
         binding.searchResultRv.layoutManager = GridLayoutManager(context, 2)
         binding.searchResultRv.adapter = adapter
 
-        binding.searchResultEmpty.visibility =
-            if (dummyList.isEmpty()) View.VISIBLE else View.GONE
-        binding.searchResultRv.visibility =
-            if (dummyList.isEmpty()) View.GONE else View.VISIBLE
+        binding.searchResultBackBtn.setOnClickListener {
+            findNavController().navigate(R.id.action_searchResultFragment_to_searchFragment)
+        }
+
+        binding.searchResultEditEt.doOnTextChanged { text, _, _, _ ->
+            currentKeyword = text?.toString() ?: ""
+        }
+
+        binding.searchResultBtn.setOnClickListener {
+            Log.d("SearchResult", "검색 버튼 클릭됨: keyword = $currentKeyword")
+            fetchSearchResult(currentKeyword)
+        }
+
+        binding.searchResultEditEt.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                Log.d("SearchResult", "키보드 검색 액션: keyword = $currentKeyword")
+                fetchSearchResult(currentKeyword)
+                true
+            } else {
+                false
+            }
+        }
+
+        val initialKeyword = arguments?.getString("keyword") ?: ""
+        if (initialKeyword.isNotEmpty()) {
+            binding.searchResultEditEt.setText(initialKeyword)
+            currentKeyword = initialKeyword
+            Log.d("SearchResult", "초기 진입: keyword = $currentKeyword")
+            fetchSearchResult(currentKeyword)
+        }
 
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        binding.searchResultBackBtn.setOnClickListener {
-            findNavController().navigate(R.id.action_searchResultFragment_to_searchFragment)
+    private fun fetchSearchResult(keyword: String) {
+        if (keyword.isEmpty()) {
+            Log.d("SearchResult", "검색어가 비어있음")
+            showEmpty()
+            return
         }
+
+        Log.d("SearchResult", "검색 API 호출 시작: keyword = $keyword")
+        val api = RetrofitClient.getRecipeSearchApi(requireContext())
+        api.searchRecipes(keyword).enqueue(object : Callback<RecipeSearchResponse> {
+            override fun onResponse(
+                call: Call<RecipeSearchResponse>,
+                response: Response<RecipeSearchResponse>
+            ) {
+                Log.d("SearchResult", "API onResponse 호출됨")
+                Log.d("SearchResult", "response code = ${response.code()}, body = ${response.body()}")
+                val result = response.body()
+                val recipes = result?.data?.map {
+                    Recipe(
+                        id = it.recipeId,
+                        img = it.imgResId,
+                        title = it.name,
+                        isLiked = it.liked
+                    )
+                } ?: emptyList()
+                Log.d("SearchResult", "파싱된 레시피 개수 = ${recipes.size}")
+                adapter.updateList(recipes)
+                if (recipes.isEmpty()) {
+                    Log.d("SearchResult", "검색 결과 없음")
+                    showEmpty()
+                } else {
+                    Log.d("SearchResult", "검색 결과 있음")
+                    showResult()
+                }
+            }
+
+            override fun onFailure(call: Call<RecipeSearchResponse>, t: Throwable) {
+                Log.e("SearchResult", "API onFailure 호출됨: ${t.message}", t)
+                showEmpty()
+            }
+        })
+    }
+
+    private fun showEmpty() {
+        binding.searchResultEmpty.visibility = View.VISIBLE
+        binding.searchResultRv.visibility = View.GONE
+    }
+
+    private fun showResult() {
+        binding.searchResultEmpty.visibility = View.GONE
+        binding.searchResultRv.visibility = View.VISIBLE
     }
 
     override fun onDestroyView() {
