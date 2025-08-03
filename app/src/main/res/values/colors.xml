@@ -17,6 +17,7 @@
     <color name="search_suggest_keyword_bg">#D3FAE1</color>
     <color name="search_suggest_keyword_text">#29AB87</color>
     <color name="blue">#2238DF</color>
+    <color name="green_100">#D3FAE1</color>
     <color name="green_300">#7CE5B4</color>
     <color name="green_500">#29AB87</color>
     <color name="green_800">#0D6063</color>

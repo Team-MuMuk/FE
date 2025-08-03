@@ -7,14 +7,15 @@ import androidx.lifecycle.viewModelScope
 import com.example.mumuk.data.model.NutritionInfo
 import com.example.mumuk.data.model.ShopItem
 import com.example.mumuk.data.model.Recipe
-import com.example.mumuk.data.repository.NutritionInfoRepository
+import com.example.mumuk.data.model.RecipeIngredient
+import com.example.mumuk.data.repository.RecipeIngredientRepository
 import com.example.mumuk.data.repository.ShopRepository
 import kotlinx.coroutines.launch
 
 class RecipeViewModel : ViewModel() {
 
-    private val nutritionInfoRepository = NutritionInfoRepository()
     private val shopRepository = ShopRepository()
+    private val ingredientRepository = RecipeIngredientRepository()
 
     private val _nutritionInfoList = MutableLiveData<List<NutritionInfo>>()
     val nutritionInfoList: LiveData<List<NutritionInfo>> = _nutritionInfoList
@@ -28,20 +29,17 @@ class RecipeViewModel : ViewModel() {
     private val _selectedRecipe = MutableLiveData<Recipe>()
     val selectedRecipe: LiveData<Recipe> = _selectedRecipe
 
+    private val _allIngredients = MutableLiveData<List<RecipeIngredient>>()
+    val allIngredients: LiveData<List<RecipeIngredient>> = _allIngredients
+
     init {
-        loadNutritionInfo()
         loadShopItems()
+        loadIngredients()
         _recipeList.value = listOf(
             Recipe(id = 1, img = null, title = "두부유부초밥", isLiked = false),
             Recipe(id = 2, img = null, title = "김치볶음밥", isLiked = false)
         )
         _selectedRecipe.value = _recipeList.value?.firstOrNull()
-    }
-
-    private fun loadNutritionInfo() {
-        viewModelScope.launch {
-            _nutritionInfoList.value = nutritionInfoRepository.getNutritionInfoList()
-        }
     }
 
     private fun loadShopItems() {
@@ -57,6 +55,10 @@ class RecipeViewModel : ViewModel() {
         if (_selectedRecipe.value?.id == recipeId) {
             _selectedRecipe.value = _selectedRecipe.value?.copy(isLiked = isLiked)
         }
+    }
+
+    private fun loadIngredients() {
+        _allIngredients.value = ingredientRepository.getAllIngredients()
     }
 
     fun selectRecipe(recipe: Recipe) {

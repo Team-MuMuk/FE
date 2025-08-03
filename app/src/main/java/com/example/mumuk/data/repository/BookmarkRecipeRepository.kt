@@ -4,16 +4,27 @@ import com.example.mumuk.R
 import com.example.mumuk.data.model.Recipe
 
 class BookmarkRecipeRepository {
-    suspend fun getBookmarkedRecipes(): List<Recipe> {
+    suspend fun getWeightRecipes(): List<Recipe> {
         return listOf(
-            Recipe(1, R.drawable.img_food_sample, "두부유부초밥"),
-            Recipe(2, null, "저당 초콜릿 케이크"),
-            Recipe(3, null, "연어 포케"),
-            Recipe(4, R.drawable.img_food_sample, "닭가슴살 샐러드"),
-            Recipe(5, null, "두부유부초밥"),
-            Recipe(6, null, "저당 초콜릿 케이크"),
-            Recipe(7, null, "연어 포케"),
-            Recipe(8, null, "닭가슴살 샐러드")
+            Recipe(1, R.drawable.img_food_sample, "체중관리 식단1"),
+            Recipe(2, null, "체중관리 식단2"),
+            Recipe(3, R.drawable.img_food_sample, "체중관리 식단3")
+        )
+    }
+
+    suspend fun getHealthRecipes(): List<Recipe> {
+        return listOf(
+            Recipe(4, null, "건강식단1"),
+            Recipe(5, R.drawable.img_food_sample, "건강식단2"),
+            Recipe(6, null, "건강식단3")
+        )
+    }
+
+    suspend fun getRandomRecipes(): List<Recipe> {
+        return listOf(
+            Recipe(7, null, "랜덤식단1"),
+            Recipe(8, null, "랜덤식단2"),
+            Recipe(9, R.drawable.img_food_sample, "랜덤식단3")
         )
     }
 }

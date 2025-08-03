@@ -11,9 +11,14 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mumuk.databinding.FragmentRecipeBinding
 import com.example.mumuk.data.api.RetrofitClient
+import com.example.mumuk.data.model.Blog
 import com.example.mumuk.data.model.Recipe
 import com.example.mumuk.data.model.recipe.ClickLikeRequest
 import com.example.mumuk.data.model.recipe.ClickLikeResponse
+import com.example.mumuk.data.repository.BlogRepository
+import com.google.android.flexbox.FlexDirection
+import com.google.android.flexbox.FlexWrap
+import com.google.android.flexbox.FlexboxLayoutManager
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -25,6 +30,9 @@ class RecipeFragment : Fragment() {
     private val recipeViewModel: RecipeViewModel by viewModels()
 
     private var currentRecipe: Recipe? = null
+
+    private var isBlogExpanded = false
+    private lateinit var fullBlogList: List<Blog>
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -41,14 +49,26 @@ class RecipeFragment : Fragment() {
             findNavController().navigateUp()
         }
 
-        val nutritionInfoAdapter = NutritionInfoAdapter()
-        binding.infoRV.apply {
-            adapter = nutritionInfoAdapter
-            layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        val ingredientRV = binding.ingredientRV
+        val flexboxLayoutManager = FlexboxLayoutManager(requireContext()).apply {
+            flexDirection = FlexDirection.ROW
+            flexWrap = FlexWrap.WRAP
+        }
+        ingredientRV.layoutManager = flexboxLayoutManager
+
+        recipeViewModel.allIngredients.observe(viewLifecycleOwner) { ingredients ->
+            ingredientRV.adapter = IngredientAdapter(ingredients)
         }
 
-        recipeViewModel.nutritionInfoList.observe(viewLifecycleOwner) { infoList ->
-            nutritionInfoAdapter.submitList(infoList)
+        fullBlogList = BlogRepository.getBlogList()
+        val blogAdapter = BlogAdapter(emptyList())
+        binding.blogRV.adapter = blogAdapter
+        binding.blogRV.layoutManager = LinearLayoutManager(context)
+        setBlogListAndButton(blogAdapter)
+
+        binding.plusBtn.setOnClickListener {
+            isBlogExpanded = true
+            setBlogListAndButton(blogAdapter)
         }
 
         val shopAdapter = ShopAdapter()
@@ -88,14 +108,31 @@ class RecipeFragment : Fragment() {
                         call: Call<ClickLikeResponse>,
                         response: Response<ClickLikeResponse>
                     ) {
+                        // 성공 처리 (필요 시)
                     }
 
                     override fun onFailure(
                         call: Call<ClickLikeResponse>,
                         t: Throwable
                     ) {
+                        // 실패 처리 (필요 시)
                     }
                 })
+            }
+        }
+    }
+
+    private fun setBlogListAndButton(blogAdapter: BlogAdapter) {
+        if (fullBlogList.size < 5) {
+            blogAdapter.submitList(fullBlogList)
+            binding.plusBtn.visibility = View.GONE
+        } else {
+            if (isBlogExpanded) {
+                blogAdapter.submitList(fullBlogList)
+                binding.plusBtn.visibility = View.GONE
+            } else {
+                blogAdapter.submitList(fullBlogList.take(5))
+                binding.plusBtn.visibility = View.VISIBLE
             }
         }
     }

@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.example.mumuk.R
@@ -149,6 +150,14 @@ class SignupStep6Fragment : Fragment() {
                                 Log.e("Signup", "회원가입 실패: ${response.code()}")
                                 val errorBody = response.errorBody()?.string()
                                 Log.e("Signup", "에러 내용: $errorBody")
+
+                                try {
+                                    val jsonObject = org.json.JSONObject(errorBody)
+                                    val message = jsonObject.optString("message", "회원가입에 실패했습니다.")
+                                    Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+                                } catch (e: Exception) {
+                                    Toast.makeText(requireContext(), "회원가입에 실패했습니다.", Toast.LENGTH_SHORT).show()
+                                }
                             }
 
                         }
