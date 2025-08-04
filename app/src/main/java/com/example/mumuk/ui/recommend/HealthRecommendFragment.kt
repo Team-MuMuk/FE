@@ -1,16 +1,25 @@
 package com.example.mumuk.ui.recommend
 
+import android.animation.ObjectAnimator
+import android.app.Dialog
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.net.Uri
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.mumuk.R
 import com.example.mumuk.databinding.FragmentHealthRecommendBinding
 import com.example.mumuk.data.repository.HealthAiRepository
 import com.example.mumuk.data.model.Recipe
+import androidx.activity.result.contract.ActivityResultContracts
 
 class HealthRecommendFragment : Fragment() {
     private var _binding: FragmentHealthRecommendBinding? = null
@@ -19,6 +28,14 @@ class HealthRecommendFragment : Fragment() {
     private lateinit var aiRecipeList: List<Recipe>
     private lateinit var aiRecipeAdapter: HealthAiAdapter
     private var isExpanded = false
+
+    private val pickImageLauncher = registerForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+            uploadImageToServer(it)
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -43,7 +60,6 @@ class HealthRecommendFragment : Fragment() {
             },
             onHeartClick = { recipe, position ->
                 // 여기에서 찜 상태가 변경될 때 필요한 동작 추가 가능
-                // 예: 서버에 찜 상태 저장, Toast 등 (현재는 아무것도 하지 않음)
             }
         )
 
@@ -56,6 +72,10 @@ class HealthRecommendFragment : Fragment() {
             isExpanded = true
             updateAiRecipeList()
         }
+
+        binding.addImg.setOnClickListener {
+            pickImageLauncher.launch("image/*")
+        }
     }
 
     private fun updateAiRecipeList() {
@@ -66,6 +86,42 @@ class HealthRecommendFragment : Fragment() {
             aiRecipeAdapter.updateList(aiRecipeList)
             binding.plusBtn.visibility = View.GONE
         }
+    }
+
+    private fun uploadImageToServer(uri: Uri) {
+        // TODO: 서버로 이미지를 업로드하는 코드 구현
+
+        showAiRecommendDialog()
+    }
+
+    private fun showAiRecommendDialog() {
+        val dialog = Dialog(requireContext())
+        dialog.setContentView(R.layout.dialog_ai_recommend)
+        dialog.setCancelable(false)
+
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.window?.setDimAmount(0f)
+        dialog.window?.setLayout(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
+
+        val loadingImage = dialog.findViewById<ImageView>(R.id.loadingImage)
+        loadingImage?.let {
+            val animator = ObjectAnimator.ofFloat(it, "rotation", 0f, 360f)
+            animator.duration = 1000
+            animator.repeatCount = ObjectAnimator.INFINITE
+            animator.start()
+            dialog.setOnDismissListener { animator.cancel() }
+        }
+
+        dialog.show()
+
+        Handler(Looper.getMainLooper()).postDelayed({
+            if (dialog.isShowing) {
+                dialog.dismiss()
+            }
+        }, 3000)
     }
 
     override fun onDestroyView() {
