@@ -73,4 +73,8 @@ object RetrofitClient {
     fun getRandomRecipeApi(context: Context): RandomRecipeApiService {
         return getRetrofit(context).create(RandomRecipeApiService::class.java)
     }
+
+    fun getCategoryRecipeApi(context: Context): CategoryRecipeApiService {
+        return getRetrofit(context).create(CategoryRecipeApiService::class.java)
+    }
 }

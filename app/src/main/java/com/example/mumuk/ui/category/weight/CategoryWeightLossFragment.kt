@@ -9,10 +9,15 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.mumuk.R
+import com.example.mumuk.data.api.RetrofitClient
+import com.example.mumuk.data.model.category.CategoryRecipeResponse
 import com.example.mumuk.data.model.Recipe
 import com.example.mumuk.ui.category.CategoryRecipeCardAdapter
 import com.example.mumuk.databinding.FragmentCategoryWeightLossBinding
 import com.google.android.material.tabs.TabLayout
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class CategoryWeightLossFragment : Fragment() {
 
@@ -84,48 +89,50 @@ class CategoryWeightLossFragment : Fragment() {
         })
     }
 
-    private fun updateRecyclerWith(tabName: String) {
-        val items = when (tabName) {
-            "체중 감량" -> listOf(
-                Recipe(
-                    id = 1,
-                    img = R.drawable.bg_mosaic,
-                    title = "연어 포케",
-                    isLiked = false
-                ),
-                Recipe(
-                    id = 2,
-                    img = R.drawable.bg_mosaic,
-                    title = "닭가슴살 샐러드",
-                    isLiked = false
-                )
-            )
-            "근육 증가" -> listOf(
-                Recipe(
-                    id = 3,
-                    img = R.drawable.bg_mosaic,
-                    title = "닭가슴살 스테이크",
-                    isLiked = false
-                ),
-                Recipe(
-                    id = 4,
-                    img = R.drawable.bg_mosaic,
-                    title = "오트밀 스크램블",
-                    isLiked = false
-                )
-            )
-            else -> emptyList()
+    private fun getApiCategory(tabName: String): String {
+        return when (tabName) {
+            "체중 감량" -> "weight_loss"
+            "근육 증가" -> "muscle_gain"
+            else -> "other"
         }
+    }
 
-        binding.categoryRecipeRecyclerView.adapter = CategoryRecipeCardAdapter(items.toMutableList()) { recipe ->
-            val bundle = Bundle().apply {
-                putLong("id", recipe.id)
-                putString("title", recipe.title)
-                putInt("img", recipe.img ?: 0)
-                putBoolean("isLiked", recipe.isLiked)
+    private fun updateRecyclerWith(tabName: String) {
+        val apiCategory = getApiCategory(tabName)
+        val context = requireContext()
+        val api = RetrofitClient.getCategoryRecipeApi(context)
+        api.getRecommendedRecipes(apiCategory).enqueue(object : Callback<CategoryRecipeResponse> {
+            override fun onResponse(
+                call: Call<CategoryRecipeResponse>,
+                response: Response<CategoryRecipeResponse>
+            ) {
+                if (response.isSuccessful && response.body()?.data != null) {
+                    val recipes = response.body()!!.data.map { categoryRecipe ->
+                        Recipe(
+                            id = categoryRecipe.id,
+                            img = null,
+                            title = categoryRecipe.title,
+                            isLiked = false,
+                            recipeImageUrl = categoryRecipe.recipeImage
+                        )
+                    }
+                    binding.categoryRecipeRecyclerView.adapter =
+                        CategoryRecipeCardAdapter(recipes.toMutableList()) { recipe ->
+                            val bundle = Bundle().apply {
+                                putLong("id", recipe.id)
+                                putString("title", recipe.title)
+                                putInt("img", recipe.img ?: 0)
+                                putBoolean("isLiked", recipe.isLiked)
+                                putString("recipeImageUrl", recipe.recipeImageUrl)
+                            }
+                            findNavController().navigate(R.id.action_categoryWeightLossFragment_to_recipeFragment, bundle)
+                        }
+                }
             }
-            findNavController().navigate(R.id.action_categoryWeightLossFragment_to_recipeFragment, bundle)
-        }
+
+            override fun onFailure(call: Call<CategoryRecipeResponse>, t: Throwable) {
+            }
+        })
     }
 
     override fun onDestroyView() {
