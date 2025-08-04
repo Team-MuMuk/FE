@@ -88,12 +88,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
-                android:layout_marginTop="52dp"
+                android:layout_marginTop="24dp"
                 android:text="AI 건강맞춤 레시피"
                 android:textSize="24sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/materialCardView3" />
+                app:layout_constraintTop_toBottomOf="@+id/addImg" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/aiRecipeRV"
@@ -214,6 +214,60 @@
                     android:text="체중감량" />
             </androidx.cardview.widget.CardView>
 
+            <TextView
+                android:id="@+id/textView55"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="20dp"
+                android:text="사진첨부"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/filter1"
+                android:fontFamily="@font/pretendard_regular"
+                android:textSize="12sp"/>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/addImg"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="20dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView55"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="0dp">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/black_100">
+
+                    <ImageView
+                        android:id="@+id/imageView14"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"
+                        android:src="@drawable/ic_img"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/textView56"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:text="사진 업로드를 하려면 여기를 클릭하세요"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/imageView14"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:textSize="12sp"
+                        android:textColor="@color/black_300"/>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.cardview.widget.CardView>
+
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/materialCardView3"
                 android:layout_width="0dp"
@@ -222,6 +276,7 @@
                 android:layout_marginTop="32dp"
                 android:layout_marginEnd="20dp"
                 android:backgroundTint="@color/white"
+                android:visibility="gone"
                 app:cardCornerRadius="10dp"
                 app:cardElevation="0dp"
                 app:layout_constraintEnd_toEndOf="parent"
