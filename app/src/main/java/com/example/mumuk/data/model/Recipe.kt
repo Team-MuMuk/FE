@@ -4,5 +4,6 @@ data class Recipe(
     val id: Long,
     val img: Int?,
     val title: String,
-    var isLiked: Boolean = false
+    var isLiked: Boolean = false,
+    val recipeImageUrl: String? = null
 )

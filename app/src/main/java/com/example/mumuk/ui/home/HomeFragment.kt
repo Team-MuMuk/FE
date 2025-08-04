@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.PopupWindow
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
@@ -16,6 +17,7 @@ import com.example.mumuk.R
 import com.example.mumuk.data.api.RetrofitClient
 import com.example.mumuk.data.api.TokenManager
 import com.example.mumuk.data.model.Recipe
+import com.example.mumuk.data.model.category.RandomRecipeResponse
 import com.example.mumuk.data.model.mypage.UserProfileResponse
 import com.example.mumuk.data.repository.RecipeRankRepository
 import com.example.mumuk.databinding.FragmentHomeBinding
@@ -33,10 +35,11 @@ class HomeFragment : Fragment() {
     private var bottomNavSelector: BottomNavSelector? = null
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
-    private val recipeRepository = HomeRecipeRepository()
 
     private val recipeRankRepository = RecipeRankRepository()
     private lateinit var recipeRankAdapter: RecipeRankAdapter
+
+    private var randomRecipeList: MutableList<Recipe>? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -83,8 +86,48 @@ class HomeFragment : Fragment() {
             findNavController().navigate(R.id.action_navigation_home_to_healthRecommendFragment)
         }
 
-        setupRecyclerView(binding.todayRV, recipeRepository.getTodayRecipes())
+        fetchRandomRecipes()
+
         setupRankRecyclerView()
+    }
+
+    private fun fetchRandomRecipes() {
+        if (randomRecipeList != null) {
+            setupRecyclerView(binding.todayRV, randomRecipeList!!)
+            return
+        }
+        val api = RetrofitClient.getRandomRecipeApi(requireContext())
+        api.getRandomRecipes().enqueue(object : Callback<RandomRecipeResponse> {
+            override fun onResponse(
+                call: Call<RandomRecipeResponse>,
+                response: Response<RandomRecipeResponse>
+            ) {
+                if (response.isSuccessful && response.body()?.data != null) {
+                    val items = response.body()!!.data.map {
+                        Recipe(
+                            id = it.id,
+                            img = null,
+                            title = it.title,
+                            isLiked = false,
+                            recipeImageUrl = it.recipeImage
+                        )
+                    }.toMutableList()
+                    randomRecipeList = items
+                    setupRecyclerView(binding.todayRV, items)
+                } else {
+                    Toast.makeText(context, "오늘의 레시피 불러오기 실패", Toast.LENGTH_SHORT).show()
+                    setupRecyclerView(binding.todayRV, emptyList())
+                }
+            }
+
+            override fun onFailure(
+                call: Call<RandomRecipeResponse>,
+                t: Throwable
+            ) {
+                Toast.makeText(context, "네트워크 오류: ${t.message}", Toast.LENGTH_SHORT).show()
+                setupRecyclerView(binding.todayRV, emptyList())
+            }
+        })
     }
 
     private fun showInfoPopup(anchorView: View) {

@@ -3,6 +3,7 @@ package com.example.mumuk.ui.category
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.mumuk.R
 import com.example.mumuk.data.model.Recipe
 import com.example.mumuk.databinding.ItemRecipeBinding
@@ -51,10 +52,20 @@ class CategoryRecipeCardAdapter(
     class RecipeViewHolder(val binding: ItemRecipeBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(recipe: Recipe) {
-            if (recipe.img != null) {
-                binding.recipeImg.setImageResource(recipe.img)
-            } else {
-                binding.recipeImg.setImageResource(R.drawable.bg_mosaic)
+            when {
+                !recipe.recipeImageUrl.isNullOrEmpty() -> {
+                    Glide.with(binding.recipeImg.context)
+                        .load(recipe.recipeImageUrl)
+                        .placeholder(R.drawable.bg_mosaic)
+                        .error(R.drawable.bg_mosaic)
+                        .into(binding.recipeImg)
+                }
+                recipe.img != null -> {
+                    binding.recipeImg.setImageResource(recipe.img)
+                }
+                else -> {
+                    binding.recipeImg.setImageResource(R.drawable.bg_mosaic)
+                }
             }
             binding.recipeTitle.text = recipe.title
             binding.imageView6.setImageResource(
