@@ -9,10 +9,15 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.mumuk.R
+import com.example.mumuk.data.api.RetrofitClient
+import com.example.mumuk.data.model.category.CategoryRecipeResponse
 import com.example.mumuk.data.model.Recipe
 import com.example.mumuk.databinding.FragmentCategoryLowSugarBinding
 import com.example.mumuk.ui.category.CategoryRecipeCardAdapter
 import com.google.android.material.tabs.TabLayout
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class CategoryLowSugarFragment : Fragment() {
 
@@ -83,76 +88,52 @@ class CategoryLowSugarFragment : Fragment() {
         })
     }
 
-    private fun updateRecyclerWith(tabName: String) {
-        val items = when (tabName) {
-            "당 줄이기" -> mutableListOf(
-                Recipe(
-                    id = 1,
-                    title = "연어 포케",
-                    img = R.drawable.img_food_sample,
-                    isLiked = false
-                ),
-                Recipe(
-                    id = 2,
-                    title = "두부유부초밥",
-                    img = R.drawable.img_food_sample,
-                    isLiked = true
-                )
-            )
-            "혈압관리" -> mutableListOf(
-                Recipe(
-                    id = 3,
-                    title = "닭가슴살 샐러드",
-                    img = R.drawable.img_food_sample,
-                    isLiked = false
-                ),
-                Recipe(
-                    id = 4,
-                    title = "오트밀죽",
-                    img = R.drawable.img_food_sample,
-                    isLiked = false
-                )
-            )
-            "콜레스테롤 관리" -> mutableListOf(
-                Recipe(
-                    id = 5,
-                    title = "아보카도 샐러드",
-                    img = R.drawable.bg_mosaic,
-                    isLiked = false
-                ),
-                Recipe(
-                    id = 6,
-                    title = "병아리콩스튜",
-                    img = R.drawable.bg_mosaic,
-                    isLiked = false
-                )
-            )
-            "소화 건강" -> mutableListOf(
-                Recipe(
-                    id = 7,
-                    title = "요거트볼",
-                    img = R.drawable.bg_mosaic,
-                    isLiked = false
-                ),
-                Recipe(
-                    id = 8,
-                    title = "바나나 오트밀",
-                    img = R.drawable.bg_mosaic,
-                    isLiked = false
-                )
-            )
-            else -> mutableListOf()
+    private fun getApiCategory(tabName: String): String {
+        return when (tabName) {
+            "당 줄이기" -> "sugar_reduction"
+            "혈압관리" -> "blood_pressure"
+            "콜레스테롤 관리" -> "cholesterol"
+            "소화 건강" -> "digestion"
+            else -> "other"
         }
+    }
 
-        binding.categoryRecipeRecyclerView.adapter = CategoryRecipeCardAdapter(items) { recipe ->
-            val bundle = Bundle().apply {
-                putLong("id", recipe.id)
-                putString("title", recipe.title)
-                putInt("img", recipe.img ?: 0)
-                putBoolean("isLiked", recipe.isLiked)
+    private fun updateRecyclerWith(tabName: String) {
+        val apiCategory = getApiCategory(tabName)
+        val context = requireContext()
+        val api = RetrofitClient.getCategoryRecipeApi(context)
+        api.getRecommendedRecipes(apiCategory).enqueue(object : Callback<CategoryRecipeResponse> {
+            override fun onResponse(
+                call: Call<CategoryRecipeResponse>,
+                response: Response<CategoryRecipeResponse>
+            ) {
+                if (response.isSuccessful && response.body()?.data != null) {
+                    val recipes = response.body()!!.data.map { categoryRecipe ->
+                        Recipe(
+                            id = categoryRecipe.id,
+                            img = null,
+                            title = categoryRecipe.title,
+                            isLiked = false,
+                            recipeImageUrl = categoryRecipe.recipeImage
+                        )
+                    }
+                    binding.categoryRecipeRecyclerView.adapter =
+                        CategoryRecipeCardAdapter(recipes.toMutableList()) { recipe ->
+                            val bundle = Bundle().apply {
+                                putLong("id", recipe.id)
+                                putString("title", recipe.title)
+                                putInt("img", recipe.img ?: 0)
+                                putBoolean("isLiked", recipe.isLiked)
+                                putString("recipeImageUrl", recipe.recipeImageUrl)
+                            }
+                            findNavController().navigate(R.id.action_categoryLowSugarFragment_to_recipeFragment, bundle)
+                        }
+                }
             }
-            findNavController().navigate(R.id.action_categoryLowSugarFragment_to_recipeFragment, bundle)
-        }
+
+            override fun onFailure(call: Call<CategoryRecipeResponse>, t: Throwable) {
+            }
+        })
     }
 
     override fun onDestroyView() {
