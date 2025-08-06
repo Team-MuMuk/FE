@@ -44,7 +44,10 @@ class SearchAutocompleteFragment : Fragment() {
         Log.d("LifeDebug", "SearchAutocompleteFragment onCreateView")
         _binding = FragmentSearchAutocompleteBinding.inflate(inflater, container, false)
 
-        adapter = SearchAutocompleteAdapter(keywordList)
+        adapter = SearchAutocompleteAdapter(keywordList) { keyword ->
+            binding.searchAutocompleteEditEt.setText(keyword)
+            handleSearchAndNavigate()
+        }
         binding.searchAutocompleteRv.adapter = adapter
         binding.searchAutocompleteRv.layoutManager = LinearLayoutManager(context)
 
@@ -117,17 +120,21 @@ class SearchAutocompleteFragment : Fragment() {
             keywordList.clear()
             adapter.notifyDataSetChanged()
             binding.noRecipeTv.visibility = View.GONE
+            Log.d("AutoDebug", "Query is blank. Clearing list/adapter.")
             return
         }
         val context = context ?: return
+        Log.d("AutoDebug", "Calling API for query: $query")
         val api = RetrofitClient.getRecipeAutocompleteApi(context)
         api.getRecipeAutocomplete(query).enqueue(object : Callback<RecipeAutocompleteResponse> {
             override fun onResponse(
                 call: Call<RecipeAutocompleteResponse>,
                 response: Response<RecipeAutocompleteResponse>
             ) {
+                Log.d("AutoDebug", "onResponse: isSuccessful=${response.isSuccessful}, code=${response.code()}, body=${response.body()}")
                 val body = response.body()
                 val keywords = body?.data ?: emptyList()
+                Log.d("AutoDebug", "Parsed keywords: $keywords")
                 keywordList.clear()
                 keywords.forEachIndexed { idx, keyword ->
                     keywordList.add(SearchAutocompleteKeyword(keyword, idx == 0))
@@ -136,6 +143,7 @@ class SearchAutocompleteFragment : Fragment() {
                 binding.noRecipeTv.visibility = if (keywordList.isEmpty()) View.VISIBLE else View.GONE
             }
             override fun onFailure(call: Call<RecipeAutocompleteResponse>, t: Throwable) {
+                Log.e("AutoDebug", "onFailure: ${t.message}", t)
                 keywordList.clear()
                 adapter.notifyDataSetChanged()
                 binding.noRecipeTv.visibility = View.VISIBLE

@@ -57,6 +57,13 @@ class SearchFragment : Fragment() {
             findNavController().navigate(R.id.action_searchFragment_to_searchAutocompleteFragment)
         }
 
+        binding.searchBtn.setOnClickListener {
+            val keyword = binding.searchEditEt.text.toString().trim()
+            if (keyword.isNotEmpty()) {
+                goToSearchResult(keyword)
+            }
+        }
+
         val apiService = RetrofitClient.getRecipeApi(requireContext())
         recentRecipeViewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
             override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
@@ -83,7 +90,7 @@ class SearchFragment : Fragment() {
         recentKeywordAdapter = SearchRecentKeywordAdapter(
             recentKeywords,
             onKeywordClick = { keyword ->
-                binding.searchEditEt.setText(keyword)
+                goToSearchResult(keyword)
             },
             onDeleteClick = { item, position ->
                 deleteRecentKeyword(item.title ?: "", item.createdAt)
@@ -270,7 +277,7 @@ class SearchFragment : Fragment() {
                     val chipBinding = ItemSearchSuggestKeywordChipBinding.inflate(inflater, rowLayout, false)
                     chipBinding.searchSuggestKeywordTv.text = keywords[index]
                     chipBinding.searchSuggestKeywordTv.setOnClickListener {
-                        binding.searchEditEt.setText(keywords[index])
+                        goToSearchResult(keywords[index])
                     }
                     rowLayout.addView(chipBinding.root)
                 }
@@ -336,7 +343,7 @@ class SearchFragment : Fragment() {
             binding.searchPopularKeywordsRv.visibility = View.VISIBLE
             binding.popularEmptyTv.visibility = View.GONE
             val adapter = SearchPopularAdapter(popularKeywords) { keyword ->
-                binding.searchEditEt.setText(keyword)
+                goToSearchResult(keyword)
             }
             binding.searchPopularKeywordsRv.adapter = adapter
             binding.searchPopularKeywordsRv.layoutManager = GridLayoutManager(context, 2)
@@ -367,6 +374,11 @@ class SearchFragment : Fragment() {
             recentRecipeList.addAll(recipes)
             recentRecipeAdapter.notifyDataSetChanged()
         }
+    }
+
+    private fun goToSearchResult(keyword: String) {
+        val bundle = Bundle().apply { putString("keyword", keyword) }
+        findNavController().navigate(R.id.action_searchFragment_to_searchResultFragment, bundle)
     }
 
     override fun onDestroyView() {
