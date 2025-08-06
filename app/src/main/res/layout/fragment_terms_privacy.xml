@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white">
+
+    <LinearLayout
+        android:id="@+id/privacy_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <!-- 헤더 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp">
+
+            <ImageView
+                android:id="@+id/btn_back"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_arrowleft" />
+
+            <TextView
+                android:id="@+id/tv_privacy_menu"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:text="개인정보동의"
+                android:textSize="24sp"
+                android:textColor="@color/black"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- 구분선 -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#F3F3F3"
+            android:layout_marginStart="-20dp"
+            android:layout_marginEnd="-20dp"
+            android:layout_marginBottom="20dp" />
+
+        <!-- 전체 동의 -->
+        <LinearLayout
+            android:id="@+id/layout_all_agree"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp">
+
+            <FrameLayout
+                android:id="@+id/fl_check_all_agree"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:background="@drawable/ic_checkbox">
+
+                <ImageView
+                    android:id="@+id/iv_check_all_agree"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="2dp"
+                    android:src="@drawable/ic_check_blue"
+                    android:visibility="gone" />
+            </FrameLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="전체 동의하기"
+                android:textColor="@color/black"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_marginStart="16dp" />
+        </LinearLayout>
+
+        <!-- 구분선 -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#A2A2A2"
+            android:layout_marginBottom="28dp" />
+
+        <!-- 이용약관 동의 항목 -->
+        <LinearLayout
+            android:id="@+id/layout_terms_agree"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/iv_check_terms_agree"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginEnd="6dp"
+                android:src="@drawable/ic_check_gray" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="이용약관동의 "
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginStart="8dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="(필수)"
+                android:textColor="#306AF2"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- 이용약관 내용만 ScrollView -->
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:background="@drawable/gray_border_background"
+            android:layout_marginBottom="28dp"
+            android:fillViewport="true">
+
+            <TextView
+                android:id="@+id/tv_terms_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="12dp"
+                android:text="@string/terms_content"
+                android:textSize="16sp"
+                android:textColor="#595959"
+                android:textStyle="bold" />
+        </ScrollView>
+
+        <!-- 삭제 안내 동의 항목 -->
+        <LinearLayout
+            android:id="@+id/layout_delete_agree"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/iv_check_delete_agree"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginEnd="6dp"
+                android:src="@drawable/ic_check_gray" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="삭제 요청에 대한 안내 "
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginStart="8dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="(필수)"
+                android:textColor="#306AF2"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- 삭제 안내 내용 -->
+        <TextView
+            android:id="@+id/tv_delete_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/gray_border_background"
+            android:padding="16dp"
+            android:text="사용자는 업로드한 건강검진 데이터 및 분석 결과에 대해 언제든지 삭제를 요청할 수 있습니다. 삭제 요청 시 지체 없이 데이터는 파기됩니다."
+            android:textSize="16sp"
+            android:textColor="#595959"
+            android:textStyle="bold"
+            android:layout_marginBottom="28dp" />
+
+        <!-- 개인정보 동의 항목 -->
+        <LinearLayout
+            android:id="@+id/layout_confirm_agree"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="28dp"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/iv_check_confirm_agree"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_check_gray"
+                android:layout_marginEnd="12dp" />
+
+            <TextView
+                android:id="@+id/tv_confirm_agree_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                android:maxLines="2" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_sensitive_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="40dp"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/iv_check_sensitive_info"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_check_gray"
+                android:layout_marginEnd="12dp" />
+
+            <TextView
+                android:id="@+id/tv_sensitive_info_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                android:maxLines="2" />
+        </LinearLayout>
+
+        <!-- 동의 버튼 -->
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_agree"
+            android:layout_width="372dp"
+            android:layout_height="45dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="0dp"
+            android:background="@drawable/btn_confirm_border"
+            android:backgroundTint="#CFCFCF"
+            android:enabled="false"
+            android:text="동의합니다"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+</FrameLayout>

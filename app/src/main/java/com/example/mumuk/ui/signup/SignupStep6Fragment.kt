@@ -84,90 +84,13 @@ class SignupStep6Fragment : Fragment() {
             if (statusText == "비밀번호가 일치합니다") {
                 activity.confirmPassword = confirmPw
 
-                val request = SignupRequest(
-                    name = activity.name,
-                    nickname = activity.nickname,
-                    phoneNumber = activity.phoneNumber,
-                    loginId = activity.loginId,
-                    password = activity.password,
-                    confirmPassword = activity.confirmPassword
-                )
-
-                Log.d("Signup", "📦 요청 객체: $request")
-
-                RetrofitClient.getAuthApi(requireContext()).signUp(request)
-                    .enqueue(object : retrofit2.Callback<SignupResponse> {
-                        override fun onResponse(
-                            call: Call<SignupResponse>,
-                            response: Response<SignupResponse>
-                        ) {
-                            Log.d("Signup", "📡 응답 코드: ${response.code()}")
-
-                            if (response.isSuccessful) {
-                                val body = response.body()
-                                Log.d("Signup", "회원가입 성공: ${body?.message}")
-
-                                // 회원가입 성공 후 바로 로그인 요청
-                                val loginRequest = LoginRequest(
-                                    loginId = activity.loginId,
-                                    password = activity.password
-                                )
-
-                                RetrofitClient.getAuthApi(requireContext()).login(loginRequest)
-                                    .enqueue(object : Callback<LoginResponse> {
-                                        override fun onResponse(
-                                            call: Call<LoginResponse>,
-                                            response: Response<LoginResponse>
-                                        ) {
-                                            if (response.isSuccessful) {
-                                                val loginBody = response.body()
-                                                val tokenData = loginBody?.data
-
-                                                if (tokenData != null) {
-                                                    val accessToken = tokenData.accessToken
-                                                    val refreshToken = tokenData.refreshToken
-                                                    TokenManager.saveTokens(requireContext(), accessToken, refreshToken)
-                                                    Log.d("Login", "자동 로그인 성공 - accessToken: $accessToken")
-
-                                                    // MainActivity로 이동
-                                                    parentFragmentManager.beginTransaction()
-                                                        .replace(R.id.signup_container, SignupCompleteFragment())
-                                                        .addToBackStack(null)
-                                                        .commit()
-                                                } else {
-                                                    Log.e("Login", "로그인 응답에 토큰 없음")
-                                                }
-                                            } else {
-                                                Log.e("Login", "자동 로그인 실패: ${response.code()}")
-                                            }
-                                        }
-
-                                        override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
-                                            Log.e("Login", "자동 로그인 네트워크 오류: ${t.message}")
-                                        }
-                                    })
-                            } else {
-                                Log.e("Signup", "회원가입 실패: ${response.code()}")
-                                val errorBody = response.errorBody()?.string()
-                                Log.e("Signup", "에러 내용: $errorBody")
-
-                                try {
-                                    val jsonObject = org.json.JSONObject(errorBody)
-                                    val message = jsonObject.optString("message", "회원가입에 실패했습니다.")
-                                    Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
-                                } catch (e: Exception) {
-                                    Toast.makeText(requireContext(), "회원가입에 실패했습니다.", Toast.LENGTH_SHORT).show()
-                                }
-                            }
-
-                        }
-
-                        override fun onFailure(call: Call<SignupResponse>, t: Throwable) {
-                            Log.e("Signup", "네트워크 오류: ${t.message}")
-                        }
-                    })
+                parentFragmentManager.beginTransaction()
+                    .replace(R.id.signup_container, TermsPrivacyFragment())
+                    .addToBackStack(null)
+                    .commit()
             }
         }
+
 
 
 
