@@ -93,7 +93,7 @@ class HomeFragment : Fragment() {
 
     private fun fetchRandomRecipes() {
         if (randomRecipeList != null) {
-            setupRecyclerView(binding.todayRV, randomRecipeList!!)
+            setupRecyclerView(binding.todayRV, randomRecipeList!!.take(6))
             return
         }
         val api = RetrofitClient.getRandomRecipeApi(requireContext())
@@ -113,7 +113,7 @@ class HomeFragment : Fragment() {
                         )
                     }.toMutableList()
                     randomRecipeList = items
-                    setupRecyclerView(binding.todayRV, items)
+                    setupRecyclerView(binding.todayRV, items.take(6))
                 } else {
                     Toast.makeText(context, "오늘의 레시피 불러오기 실패", Toast.LENGTH_SHORT).show()
                     setupRecyclerView(binding.todayRV, emptyList())
