@@ -123,6 +123,9 @@
         <action
             android:id="@+id/action_searchFragment_to_recipeFragment"
             app:destination="@id/recipeFragment" />
+        <action
+            android:id="@+id/action_searchFragment_to_searchResultFragment"
+            app:destination="@id/searchResultFragment" />
     </fragment>
 
     <fragment

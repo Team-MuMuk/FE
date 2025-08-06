@@ -8,7 +8,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.mumuk.databinding.ItemSearchAutocompleteBinding
 
 class SearchAutocompleteAdapter(
-    private val keywords: List<SearchAutocompleteKeyword>
+    private val keywords: List<SearchAutocompleteKeyword>,
+    private val onItemClick: (String) -> Unit
 ) : RecyclerView.Adapter<SearchAutocompleteAdapter.ViewHolder>() {
 
     inner class ViewHolder(val binding: ItemSearchAutocompleteBinding) :
@@ -28,6 +29,9 @@ class SearchAutocompleteAdapter(
             if (item.isHighlight) Color.BLACK
             else ContextCompat.getColor(holder.itemView.context, android.R.color.darker_gray)
         )
+        holder.itemView.setOnClickListener {
+            onItemClick(item.text)
+        }
     }
 
     override fun getItemCount() = keywords.size
