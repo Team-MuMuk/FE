@@ -146,6 +146,10 @@ class LoginIntroActivity : AppCompatActivity() {
             val loginId = binding.etId.text.toString()
             val password = binding.etPassword.text.toString()
 
+
+
+            Log.d("LoginCheck", "🟡 로그인 시도: ID=[$loginId], PW=[$password]")
+
             var hasError = false
 
             if (loginId.isBlank()) {
@@ -171,35 +175,47 @@ class LoginIntroActivity : AppCompatActivity() {
 
             api.login(request).enqueue(object : Callback<LoginResponse> {
                 override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
+                    Log.d("LoginCheck", "응답 성공 여부: ${response.isSuccessful}")
+                    Log.d("LoginCheck", "응답 코드: ${response.code()}")
+
                     if (response.isSuccessful) {
                         val loginResponse = response.body()
+                        Log.d("LoginCheck", "서버 status: ${loginResponse?.status}")
+                        Log.d("LoginCheck", "서버 data: ${loginResponse?.data}")
+
                         if (loginResponse?.status == "OK" && loginResponse.data != null) {
                             TokenManager.saveTokens(this@LoginIntroActivity, loginResponse.data.accessToken, loginResponse.data.refreshToken)
                             TokenManager.saveLoginType(this@LoginIntroActivity, "LOCAL")
+
+                            Log.d("LoginCheck", "🎉 로그인 성공! MainActivity 이동")
 
                             startActivity(Intent(this@LoginIntroActivity, MainActivity::class.java).apply {
                                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                             })
                         } else {
+                            Log.e("LoginCheck", "로그인 실패 - 서버 응답은 왔지만 status가 OK가 아니거나 data가 없음")
                             showSimpleConfirmDialog(
                                 message = "등록되지 않은 아이디거나,\nID 또는 비밀번호를 \n잘못 입력하였습니다."
                             )
                         }
                     } else {
+                        val errorBody = response.errorBody()?.string()
+                        Log.e("LoginCheck", "응답 실패 - errorBody: $errorBody")
                         showSimpleConfirmDialog(
                             message = "등록되지 않은 아이디거나,\nID 또는 비밀번호를 \n잘못 입력하였습니다."
                         )
                     }
                 }
 
-
                 override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
+                    Log.e("LoginCheck", "네트워크 오류: ${t.message}")
                     showSimpleConfirmDialog(
                         message = "일시적인 오류로 로그인을 할 수 없습니다.\n잠시 후 다시 시도해 주세요."
                     )
                 }
             })
         }
+
 
         val watcher = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -292,6 +308,7 @@ class LoginIntroActivity : AppCompatActivity() {
             }
 
             override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
+
                 val body = response.body?.string()
                 try {
                     val json = JSONObject(body ?: return)

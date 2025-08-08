@@ -54,12 +54,21 @@ class SignupStep2Fragment : Fragment() {
 
         binding.btnNext.setOnClickListener {
             val nickname = binding.etNickname.text.toString()
-            if (nickname.isNotBlank() && nickname.length < 10) {
-                (requireActivity() as SignupActivity).nickname = nickname
-                parentFragmentManager.beginTransaction()
-                    .replace(R.id.signup_container, SignupStep3Fragment())
-                    .addToBackStack(null)
-                    .commit()
+
+            when {
+                nickname.isBlank() -> {
+                    setErrorStatus("닉네임을 입력해주세요.")
+                }
+                nickname.length >= 10 -> {
+                    setErrorStatus("글자 수가 초과되었습니다. 10자 이내로 입력해주세요.")
+                }
+                else -> {
+                    (requireActivity() as SignupActivity).nickname = nickname
+                    parentFragmentManager.beginTransaction()
+                        .replace(R.id.signup_container, SignupStep3Fragment())
+                        .addToBackStack(null)
+                        .commit()
+                }
             }
         }
 
@@ -76,6 +85,7 @@ class SignupStep2Fragment : Fragment() {
         binding.tvNicknameStatus.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
         binding.ivNicknameStatusIcon.setImageResource(R.drawable.ic_error)
         binding.ivNicknameStatusIcon.visibility = View.VISIBLE
+        binding.btnNext.isEnabled = false
     }
 
     private fun setSuccessStatus(message: String) {
@@ -83,6 +93,7 @@ class SignupStep2Fragment : Fragment() {
         binding.tvNicknameStatus.setTextColor(Color.parseColor("#306AF2"))
         binding.ivNicknameStatusIcon.setImageResource(R.drawable.ic_check)
         binding.ivNicknameStatusIcon.visibility = View.VISIBLE
+        binding.btnNext.isEnabled = true
     }
 
     private fun checkNicknameDuplicate(nickname: String) {

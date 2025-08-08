@@ -60,5 +60,8 @@ interface AuthApiService {
     ): Response<LoginResponse>
     @GET("/api/auth/exists/nickname")
     fun checkNicknameExists(@Query("value") nickname: String): Call<CommonResponse>
+    @GET("/api/auth/exists/phone-number")
+    fun checkPhoneNumberExists(@Query("value") phoneNumber: String): Call<CommonResponse>
+
 
 }
