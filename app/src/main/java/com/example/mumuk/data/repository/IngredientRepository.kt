@@ -26,7 +26,7 @@ class IngredientRepository(private val context: Context) {
     suspend fun registerIngredient(
         name: String, expireDate: String, daySetting: String = "D7"
     ): Response<IngredientRegisterResponse> = withContext(Dispatchers.IO) {
-        val request = IngredientRegisterRequest(name, expireDate, daySetting)
+        val request = IngredientRegisterRequest(name, expireDate)
         RetrofitClient.getIngredientApi(context).registerIngredient(request)
     }
 }
