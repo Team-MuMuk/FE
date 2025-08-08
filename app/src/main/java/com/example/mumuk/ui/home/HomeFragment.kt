@@ -103,7 +103,7 @@ class HomeFragment : Fragment() {
                 response: Response<RandomRecipeResponse>
             ) {
                 if (!isAdded || _binding == null) return
-                
+
                 if (response.isSuccessful && response.body()?.data != null) {
                     val items = response.body()!!.data.map {
                         Recipe(

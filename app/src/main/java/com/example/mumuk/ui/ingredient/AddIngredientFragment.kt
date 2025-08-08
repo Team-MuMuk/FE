@@ -58,15 +58,28 @@ class AddIngredientFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             val ingredientList = ingredientRepository.getIngredients()
             binding.ingredientRV.layoutManager = LinearLayoutManager(requireContext())
-            binding.ingredientRV.adapter = IngredientAdapter(ingredientList) { ingredient ->
-                val bundle = Bundle().apply {
-                    putSerializable("ingredient", ingredient)
+            binding.ingredientRV.adapter = IngredientAdapter(
+                ingredientList,
+                onItemClick = { ingredient ->
+                    // 상세보기 처리
+                },
+                onDeleteClick = { ingredient ->
+                    // 삭제 API 호출 & RecyclerView 갱신
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        try {
+                            val response = ingredientRepository.deleteIngredient(ingredient.id) // id 필드가 필요!
+                            if (response.isSuccessful && response.body()?.code == "INGREDIENT_200") {
+                                val newList = ingredientRepository.getIngredients()
+                                (binding.ingredientRV.adapter as? IngredientAdapter)?.submitList(newList)
+                            } else {
+                                // 실패 처리
+                            }
+                        } catch (e: Exception) {
+                            // 네트워크 오류 처리
+                        }
+                    }
                 }
-                findNavController().navigate(
-                    R.id.action_addIngredientFragment_to_ingredientDetailFragment,
-                    bundle
-                )
-            }
+            )
         }
 
         binding.calendarBtn.setOnClickListener {

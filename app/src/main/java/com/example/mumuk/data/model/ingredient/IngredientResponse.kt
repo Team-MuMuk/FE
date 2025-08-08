@@ -15,3 +15,10 @@ data class IngredientDto(
     val expireDate: String,
     val createdAt: String
 ) : Serializable
+
+data class IngredientDeleteResponse(
+    val status: String,
+    val code: String,
+    val message: String,
+    val data: String?
+)
