@@ -93,7 +93,6 @@ class SignupStep6Fragment : Fragment() {
 
 
 
-
         binding.btnBack.setOnClickListener {
             parentFragmentManager.beginTransaction()
                 .replace(R.id.signup_container, SignupStep5Fragment())
