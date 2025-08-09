@@ -62,6 +62,9 @@ interface AuthApiService {
     fun checkNicknameExists(@Query("value") nickname: String): Call<CommonResponse>
     @GET("/api/auth/exists/phone-number")
     fun checkPhoneNumberExists(@Query("value") phoneNumber: String): Call<CommonResponse>
+    @GET("/api/auth/exists/login-id")
+    fun checkLoginIdExists(@Query("value") loginId: String): Call<CommonResponse>
+
 
 
 }
