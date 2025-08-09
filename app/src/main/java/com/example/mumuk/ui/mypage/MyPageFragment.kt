@@ -277,11 +277,17 @@ class MyPageFragment : Fragment() {
 
     private fun bindProfile(profile: UserProfileData?) {
         if (profile == null) return
-        val nicknameText = "${profile.nickName}님!"
+
+        val nickname = profile.nickName?.takeIf { it.isNotBlank() } ?: "사용자"
+        val status   = profile.statusMessage?.takeIf { it.isNotBlank() } ?: ""
+        val imageKey = profile.profileImage?.takeIf { it.isNotBlank() } ?: "orange"
+
+        val nicknameText = "${nickname}님!"
         binding.tvNickname.text = nicknameText
-        binding.recipeText.text = "${profile.nickName}님이 최근 본 레시피"
-        binding.tvSubtitle.text = profile.statusMessage
-        val profileRes = when (profile.profileImage.ifBlank { "orange" }) {
+        binding.recipeText.text = "${nickname}님이 최근 본 레시피"
+        binding.tvSubtitle.text = status
+
+        val profileRes = when (imageKey) {
             "orange" -> R.drawable.ic_user_profile_orange
             "white"  -> R.drawable.ic_user_profile_white
             "green"  -> R.drawable.ic_user_profile_green
@@ -289,6 +295,9 @@ class MyPageFragment : Fragment() {
         }
         binding.imgProfile.setImageResource(profileRes)
     }
+
+
+
 
 
 
