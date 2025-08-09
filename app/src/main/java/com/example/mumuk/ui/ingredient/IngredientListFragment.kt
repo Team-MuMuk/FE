@@ -45,11 +45,9 @@ class IngredientListFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             val ingredientList = ingredientRepository.getIngredients()
 
-            // 1. adapter 변수 미리 선언 (lateinit 사용)
             lateinit var ingredientAdapter: IngredientAdapter
             lateinit var expiringAdapter: ExpiringIngredientAdapter
-
-            // 2. ingredientAdapter 먼저 할당
+            
             ingredientAdapter = IngredientAdapter(
                 ingredientList,
                 onItemClick = { ingredient ->
@@ -87,11 +85,10 @@ class IngredientListFragment : Fragment() {
             binding.ingredientRV.layoutManager = LinearLayoutManager(requireContext())
             binding.ingredientRV.adapter = ingredientAdapter
 
-            // 3. expiringAdapter 할당
             val expiringList = ingredientList.filter {
                 val today = LocalDate.now()
                 val expiry = LocalDate.parse(it.expiryDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-                ChronoUnit.DAYS.between(today, expiry) in 0..3
+                ChronoUnit.DAYS.between(today, expiry) in 0..7
             }.toMutableList()
             expiringAdapter = ExpiringIngredientAdapter(
                 expiringList,
