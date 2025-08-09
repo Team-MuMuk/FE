@@ -15,7 +15,6 @@ import com.example.mumuk.data.api.TokenManager
 import com.example.mumuk.data.model.allergy.AllergyOptionsResponse
 import com.example.mumuk.data.model.allergy.ToggleAllergyRequest
 import com.example.mumuk.data.model.allergy.ToggleAllergyResponse
-import com.example.mumuk.utils.JwtUtils
 import com.google.android.material.button.MaterialButton
 import retrofit2.Call
 import retrofit2.Callback
@@ -219,18 +218,13 @@ class HealthEditFragment : Fragment() {
 
     private fun setNicknameForHealthTitle() {
         val loginType = TokenManager.getLoginType(requireContext()) ?: "LOCAL"
+
         if (loginType == "KAKAO" || loginType == "NAVER") {
             val savedNickname = TokenManager.getNickName(requireContext())
             val nickname = if (!savedNickname.isNullOrBlank()) savedNickname else "사용자"
             binding.textView50.text = "${nickname}님이 설정한 건강정보입니다"
         } else {
-            val accessToken = TokenManager.getAccessToken(requireContext())
-            val userId = JwtUtils.getUserIdFromToken(accessToken ?: "")
-            if (userId == null) {
-                binding.textView50.text = "사용자님이 설정한 건강정보입니다"
-                return
-            }
-            RetrofitClient.getUserApi(requireContext()).getUserProfile(userId)
+            RetrofitClient.getUserApi(requireContext()).getUserProfile()
                 .enqueue(object : Callback<com.example.mumuk.data.model.mypage.UserProfileResponse> {
                     override fun onResponse(
                         call: Call<com.example.mumuk.data.model.mypage.UserProfileResponse>,
@@ -238,7 +232,7 @@ class HealthEditFragment : Fragment() {
                     ) {
                         if (response.isSuccessful) {
                             val profile = response.body()?.data
-                            val nickname = profile?.nickName ?: "사용자"
+                            val nickname = profile?.nickName?.takeIf { it.isNotBlank() } ?: "사용자"
                             binding.textView50.text = "${nickname}님이 설정한 건강정보입니다"
                         } else {
                             binding.textView50.text = "사용자님이 설정한 건강정보입니다"
@@ -253,6 +247,7 @@ class HealthEditFragment : Fragment() {
                 })
         }
     }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
