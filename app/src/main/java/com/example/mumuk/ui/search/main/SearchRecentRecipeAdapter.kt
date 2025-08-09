@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.mumuk.R
 import com.example.mumuk.data.model.search.RecentRecipe
-import com.example.mumuk.databinding.ItemRecentRecipeBinding
+import com.example.mumuk.databinding.ItemRecipeBinding
 import com.example.mumuk.data.api.RetrofitClient
 import com.example.mumuk.data.model.recipe.ClickLikeRequest
 import com.example.mumuk.data.model.recipe.ClickLikeResponse
@@ -20,7 +20,7 @@ class SearchRecentRecipeAdapter(
 ) : RecyclerView.Adapter<SearchRecentRecipeAdapter.RecipeViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecipeViewHolder {
-        val binding = ItemRecentRecipeBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = ItemRecipeBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return RecipeViewHolder(binding)
     }
 
@@ -30,7 +30,7 @@ class SearchRecentRecipeAdapter(
         holder.itemView.setOnClickListener {
             onItemClick(recipe)
         }
-        holder.binding.ivRecipeHeart.setOnClickListener {
+        holder.binding.imageView6.setOnClickListener {
             val context = holder.binding.root.context
             val newLiked = !recipe.liked
             recipe.liked = newLiked
@@ -50,15 +50,15 @@ class SearchRecentRecipeAdapter(
 
     override fun getItemCount(): Int = recipes.size
 
-    class RecipeViewHolder(val binding: ItemRecentRecipeBinding) :
+    class RecipeViewHolder(val binding: ItemRecipeBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(recipe: RecentRecipe) {
-            binding.tvRecipeTitle.text = recipe.title
-            Glide.with(binding.ivRecipeImage)
+            binding.recipeTitle.text = recipe.title
+            Glide.with(binding.recipeImg)
                 .load(recipe.imageUrl)
                 .placeholder(R.drawable.bg_mosaic)
-                .into(binding.ivRecipeImage)
-            binding.ivRecipeHeart.setImageResource(
+                .into(binding.recipeImg)
+            binding.imageView6.setImageResource(
                 if (recipe.liked) R.drawable.btn_heart_fill else R.drawable.btn_heart_blank
             )
         }
