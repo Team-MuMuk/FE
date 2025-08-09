@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
 import com.example.mumuk.R
 import com.example.mumuk.data.api.RetrofitClient
 import com.example.mumuk.data.api.TokenManager
@@ -250,10 +251,16 @@ class MyPageFragment : Fragment() {
         if (loginType == "KAKAO" || loginType == "NAVER") {
             val savedNickname = TokenManager.getNickName(requireContext())
             val nicknameText = if (!savedNickname.isNullOrBlank()) "${savedNickname}님!" else "사용자님!"
+            val profileImageUrl = TokenManager.getProfileImage(requireContext())
             binding.tvNickname.text = nicknameText
             binding.recipeText.text = "${nicknameText.replace("님!", "")}님이 최근 본 레시피"
             binding.tvSubtitle.text = ""
-            binding.imgProfile.setImageResource(R.drawable.ic_user_profile_orange)
+            Glide.with(this)
+                .load(profileImageUrl)
+                .placeholder(R.drawable.ic_user_profile_orange)
+                .error(R.drawable.ic_user_profile_orange)
+                .circleCrop()
+                .into(binding.imgProfile)
         } else {
             RetrofitClient.getUserApi(requireContext()).getUserProfile()
                 .enqueue(object : Callback<UserProfileResponse> {
