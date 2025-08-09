@@ -32,14 +32,20 @@ class IntroActivity : AppCompatActivity() {
         val loginType = prefs.getString("loginType", "LOCAL") ?: "LOCAL"
 
         if (refreshToken != null) {
+            val loginType = TokenManager.getLoginType(this) ?: "LOCAL"
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     val response = RetrofitClient.getAuthApi(this@IntroActivity)
                         .reissueToken(refreshToken, loginType)
+
                     withContext(Dispatchers.Main) {
                         if (response.isSuccessful && response.body()?.data != null) {
                             val tokenData = response.body()!!.data!!
-                            TokenManager.saveTokens(this@IntroActivity, tokenData.accessToken, tokenData.refreshToken)
+                            TokenManager.saveTokens(
+                                this@IntroActivity,
+                                tokenData.accessToken,
+                                tokenData.refreshToken
+                            )
                             startActivity(Intent(this@IntroActivity, MainActivity::class.java))
                             finish()
                         } else {
@@ -54,7 +60,12 @@ class IntroActivity : AppCompatActivity() {
                     }
                 }
             }
-            return
+        } else {
+            // 자동 로그인이 아닐 경우, 3초 후 로그인 화면으로 이동
+            Handler(Looper.getMainLooper()).postDelayed({
+                startActivity(Intent(this, LoginIntroActivity::class.java))
+                finish()
+            }, 3000)
         }
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
@@ -64,13 +75,13 @@ class IntroActivity : AppCompatActivity() {
         }
 
 //        handleKakaoRedirect(intent)
-        handleNaverRedirect(intent)
+//        handleNaverRedirect(intent)
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
 //        handleKakaoRedirect(intent)
-        handleNaverRedirect(intent)
+//        handleNaverRedirect(intent)
     }
 
     // 카카오 로그인 처리
@@ -124,61 +135,61 @@ class IntroActivity : AppCompatActivity() {
 //    }
 
     // 네이버 로그인 처리 추가
-    private fun handleNaverRedirect(intent: Intent?) {
-        val uri = intent?.data
-        if (uri?.scheme == "mumuk" &&
-            uri.host == "login" &&
-            uri.path == "/oauth2/code/naver") {
+//    private fun handleNaverRedirect(intent: Intent?) {
+//        val uri = intent?.data
+//        if (uri?.scheme == "mumuk" &&
+//            uri.host == "login" &&
+//            uri.path == "/oauth2/code/naver") {
+//
+//            val code = uri.getQueryParameter("code")
+//            val state = uri.getQueryParameter("state")
+//            Log.d("NaverLogin", "IntroActivity: 네이버 redirect 감지됨 → code=$code, state=$state")
+//
+//            if (!code.isNullOrEmpty()) {
+//                sendNaverCodeToBackend(code, state ?: "")
+//            }
+//        } else {
+//            // 네이버가 아닐 경우에도 로그인 화면으로 진입
+//            Handler(Looper.getMainLooper()).postDelayed({
+//                startActivity(Intent(this, LoginIntroActivity::class.java))
+//                finish()
+//            }, 3000)
+//        }
+//    }
 
-            val code = uri.getQueryParameter("code")
-            val state = uri.getQueryParameter("state")
-            Log.d("NaverLogin", "IntroActivity: 네이버 redirect 감지됨 → code=$code, state=$state")
-
-            if (!code.isNullOrEmpty()) {
-                sendNaverCodeToBackend(code, state ?: "")
-            }
-        } else {
-            // 네이버가 아닐 경우에도 로그인 화면으로 진입
-            Handler(Looper.getMainLooper()).postDelayed({
-                startActivity(Intent(this, LoginIntroActivity::class.java))
-                finish()
-            }, 3000)
-        }
-    }
-
-    private fun sendNaverCodeToBackend(code: String, state: String) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val response = RetrofitClient.getAuthApi(this@IntroActivity).naverLogin(code, state)
-                if (response.isSuccessful) {
-                    val user = response.body()?.data
-                    withContext(Dispatchers.Main) {
-                        if (user != null) {
-                            TokenManager.saveLoginType(this@IntroActivity, "NAVER")
-                            TokenManager.saveTokens(this@IntroActivity, "", user.refreshToken)
-                            TokenManager.saveUserInfo(this@IntroActivity, user.email, user.nickName, user.profileImage)
-
-                            startActivity(Intent(this@IntroActivity, MainActivity::class.java))
-                            finish()
-                        } else {
-                            fallbackToLogin("네이버 로그인 실패: 사용자 정보 없음")
-                        }
-                    }
-                } else {
-                    val msg = response.errorBody()?.string()
-                    Log.e("NaverLogin", "로그인 실패: $msg")
-                    withContext(Dispatchers.Main) {
-                        fallbackToLogin("네이버 로그인 실패\n${response.code()}: $msg")
-                    }
-                }
-            } catch (e: Exception) {
-                Log.e("NaverLogin", "예외 발생: ${e.message}")
-                withContext(Dispatchers.Main) {
-                    fallbackToLogin("네이버 로그인 예외: ${e.message}")
-                }
-            }
-        }
-    }
+//    private fun sendNaverCodeToBackend(code: String, state: String) {
+//        CoroutineScope(Dispatchers.IO).launch {
+//            try {
+//                val response = RetrofitClient.getAuthApi(this@IntroActivity).naverLogin(code, state)
+//                if (response.isSuccessful) {
+//                    val user = response.body()?.data
+//                    withContext(Dispatchers.Main) {
+//                        if (user != null) {
+//                            TokenManager.saveLoginType(this@IntroActivity, "NAVER")
+//                            TokenManager.saveTokens(this@IntroActivity, "", user.refreshToken)
+//                            TokenManager.saveUserInfo(this@IntroActivity, user.email, user.nickName, user.profileImage)
+//
+//                            startActivity(Intent(this@IntroActivity, MainActivity::class.java))
+//                            finish()
+//                        } else {
+//                            fallbackToLogin("네이버 로그인 실패: 사용자 정보 없음")
+//                        }
+//                    }
+//                } else {
+//                    val msg = response.errorBody()?.string()
+//                    Log.e("NaverLogin", "로그인 실패: $msg")
+//                    withContext(Dispatchers.Main) {
+//                        fallbackToLogin("네이버 로그인 실패\n${response.code()}: $msg")
+//                    }
+//                }
+//            } catch (e: Exception) {
+//                Log.e("NaverLogin", "예외 발생: ${e.message}")
+//                withContext(Dispatchers.Main) {
+//                    fallbackToLogin("네이버 로그인 예외: ${e.message}")
+//                }
+//            }
+//        }
+//    }
 
     private fun fallbackToLogin(message: String) {
         Log.w("Intro", "로그인 실패 fallback → LoginIntroActivity 이동")
