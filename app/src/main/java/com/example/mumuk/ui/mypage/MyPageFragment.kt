@@ -21,12 +21,12 @@ import com.example.mumuk.R
 import com.example.mumuk.data.api.RetrofitClient
 import com.example.mumuk.data.api.TokenManager
 import com.example.mumuk.data.model.auth.CommonResponse
+import com.example.mumuk.data.model.mypage.UserProfileData
 import com.example.mumuk.data.model.mypage.UserProfileResponse
 import com.example.mumuk.databinding.DialogDeleteAccountBinding
 import com.example.mumuk.databinding.DialogLogoutBinding
 import com.example.mumuk.databinding.FragmentMyPageBinding
 import com.example.mumuk.ui.login.LoginIntroActivity
-import com.example.mumuk.utils.JwtUtils
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -249,50 +249,47 @@ class MyPageFragment : Fragment() {
 
         if (loginType == "KAKAO" || loginType == "NAVER") {
             val savedNickname = TokenManager.getNickName(requireContext())
-            val nicknameText = if (!savedNickname.isNullOrBlank()) {
-                "${savedNickname}님!"
-            } else {
-                "사용자님!"
-            }
+            val nicknameText = if (!savedNickname.isNullOrBlank()) "${savedNickname}님!" else "사용자님!"
             binding.tvNickname.text = nicknameText
             binding.recipeText.text = "${nicknameText.replace("님!", "")}님이 최근 본 레시피"
             binding.tvSubtitle.text = ""
             binding.imgProfile.setImageResource(R.drawable.ic_user_profile_orange)
-
         } else {
-            val accessToken = TokenManager.getAccessToken(requireContext())
-            val userId = JwtUtils.getUserIdFromToken(accessToken ?: "")
-            if (userId == null) {
-                Log.e("MyPage", "userId 추출 실패")
-                return
-            }
-            RetrofitClient.getUserApi(requireContext()).getUserProfile(userId)
+            RetrofitClient.getUserApi(requireContext()).getUserProfile()
                 .enqueue(object : Callback<UserProfileResponse> {
                     override fun onResponse(
                         call: Call<UserProfileResponse>,
                         response: Response<UserProfileResponse>
                     ) {
                         if (response.isSuccessful) {
-                            val profile = response.body()?.data ?: return
-                            val nicknameText = "${profile.nickName}님!"
-                            binding.tvNickname.text = nicknameText
-                            binding.recipeText.text = "${profile.nickName}님이 최근 본 레시피"
-                            binding.tvSubtitle.text = profile.statusMessage
-                            val profileRes = when (profile.profileImage ?: "orange") {
-                                "orange" -> R.drawable.ic_user_profile_orange
-                                "white" -> R.drawable.ic_user_profile_white
-                                "green" -> R.drawable.ic_user_profile_green
-                                else -> R.drawable.ic_user_profile_orange
-                            }
-                            binding.imgProfile.setImageResource(profileRes)
+                            bindProfile(response.body()?.data) // ✅ UserProfileData
                         } else {
                             Log.e("MyPage", "프로필 API 실패: ${response.code()}")
                         }
                     }
+
                     override fun onFailure(call: Call<UserProfileResponse>, t: Throwable) {
                         Log.e("MyPage", "네트워크 오류", t)
                     }
                 })
         }
     }
+
+    private fun bindProfile(profile: UserProfileData?) {
+        if (profile == null) return
+        val nicknameText = "${profile.nickName}님!"
+        binding.tvNickname.text = nicknameText
+        binding.recipeText.text = "${profile.nickName}님이 최근 본 레시피"
+        binding.tvSubtitle.text = profile.statusMessage
+        val profileRes = when (profile.profileImage.ifBlank { "orange" }) {
+            "orange" -> R.drawable.ic_user_profile_orange
+            "white"  -> R.drawable.ic_user_profile_white
+            "green"  -> R.drawable.ic_user_profile_green
+            else     -> R.drawable.ic_user_profile_orange
+        }
+        binding.imgProfile.setImageResource(profileRes)
+    }
+
+
+
 }

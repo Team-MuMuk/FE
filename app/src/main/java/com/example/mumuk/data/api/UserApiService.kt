@@ -10,13 +10,10 @@ import retrofit2.http.PATCH
 import retrofit2.http.Path
 
 interface UserApiService {
-    @GET("/api/users/{id}")
-    fun getUserProfile(
-        @Path("id") userId: Long
-    ): Call<UserProfileResponse>
-    @PATCH("/api/users/{id}")
+    @GET("/api/user/profile")
+    fun getUserProfile(): Call<UserProfileResponse>
+    @PATCH("/api/user/profile")
     fun updateUserProfile(
-        @Path("id") userId: Long,
         @Body request: UserProfileUpdateRequest
     ): Call<CommonResponse>
 }
