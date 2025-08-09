@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/autocomplete_keyword_tv"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:text="연어포케"
-    android:textSize="16sp"
-    android:fontFamily="@font/pretendard_medium"
-    android:paddingVertical="8dp"
-    android:paddingHorizontal="4dp" />
+    android:orientation="vertical"
+    android:paddingVertical="12dp"
+    android:paddingHorizontal="8dp">
+
+    <TextView
+        android:id="@+id/autocompleteKeywordTv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:textColor="@android:color/black"
+        android:fontFamily="@font/pretendard_medium"/>
+</LinearLayout>
