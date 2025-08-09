@@ -102,6 +102,8 @@ class HomeFragment : Fragment() {
                 call: Call<RandomRecipeResponse>,
                 response: Response<RandomRecipeResponse>
             ) {
+                if (!isAdded || _binding == null) return
+
                 if (response.isSuccessful && response.body()?.data != null) {
                     val items = response.body()!!.data.map {
                         Recipe(

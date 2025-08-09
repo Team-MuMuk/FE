@@ -11,7 +11,8 @@ import java.time.temporal.ChronoUnit
 
 class ExpiringIngredientAdapter(
     private val items: MutableList<Ingredient>,
-    private val onItemClick: (Ingredient) -> Unit
+    private val onItemClick: (Ingredient) -> Unit,
+    private val onDeleteClick: (Ingredient) -> Unit
 ) : RecyclerView.Adapter<ExpiringIngredientAdapter.ViewHolder>() {
 
     inner class ViewHolder(val binding: ItemIngredientExpiringBinding) :
@@ -31,10 +32,7 @@ class ExpiringIngredientAdapter(
             }
 
             binding.btnDelete.setOnClickListener {
-                items.removeAt(adapterPosition)
-                notifyItemRemoved(adapterPosition)
-                notifyItemRangeChanged(adapterPosition, items.size)
-                // 필요하다면 이곳에서 데이터베이스/서버에서도 삭제 처리
+                onDeleteClick(item)
             }
         }
     }
@@ -53,4 +51,10 @@ class ExpiringIngredientAdapter(
     }
 
     override fun getItemCount(): Int = items.size
+
+    fun submitList(newItems: List<Ingredient>) {
+        items.clear()
+        items.addAll(newItems)
+        notifyDataSetChanged()
+    }
 }
