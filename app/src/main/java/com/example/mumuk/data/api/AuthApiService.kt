@@ -42,11 +42,13 @@ interface AuthApiService {
     fun findId(@Body request: FindIdRequest): Call<CommonResponse>
     @DELETE("/api/auth/withdraw")
     fun withdraw(): Call<CommonResponse>
-    @POST("/api/auth/kakao-login")
-    suspend fun kakaoLogin(
-        @Query("code") code: String,
-        @Query("state") state: String = "mumukDefaultState"
-    ): Response<KakaoLoginResponse>
+
+    @GET("/api/auth/kakao-login")
+    fun kakaoLogin(
+        @Query("access_token") accessToken: String,
+        @Query("state") state: String
+    ): Call<KakaoLoginResponse>
+
     @POST("/api/auth/naver-login")
     suspend fun naverLogin(
         @Query("code") code: String,

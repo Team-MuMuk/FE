@@ -1,12 +1,15 @@
 package com.example.mumuk.ui.login
 
+import android.app.Dialog
 import android.content.Intent
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.text.Editable
 import android.text.InputType
 import android.text.TextWatcher
 import android.util.Log
 import android.view.View
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -17,12 +20,12 @@ import androidx.fragment.app.commit
 import com.example.mumuk.R
 import com.example.mumuk.data.api.RetrofitClient
 import com.example.mumuk.data.api.TokenManager
+import com.example.mumuk.data.model.auth.KakaoLoginResponse
 import com.example.mumuk.data.model.auth.LoginRequest
 import com.example.mumuk.data.model.auth.LoginResponse
 import com.example.mumuk.databinding.ActivityLoginIntroBinding
 import com.example.mumuk.ui.MainActivity
 import com.example.mumuk.ui.signup.SignupActivity
-import com.example.mumuk.data.model.login.openKakaoLoginPage // 기존 코드에서 사용했던 경우 남겨둠
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
@@ -36,10 +39,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.io.IOException
-import android.app.Dialog
-import android.graphics.drawable.ColorDrawable
-import android.widget.TextView
-
+import java.util.UUID // UUID import
 
 class LoginIntroActivity : AppCompatActivity() {
 
@@ -49,49 +49,58 @@ class LoginIntroActivity : AppCompatActivity() {
         private const val TAG = "LoginIntroActivity"
     }
 
+    private fun loginToServerWithKakaoToken(kakaoAccessToken: String) {
+        val authApi = RetrofitClient.getAuthApi(this)
+        val state = UUID.randomUUID().toString()
 
-    // 카카오 로그인 콜백
-    private val kakaoLoginCallback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
-        if (error != null) {
-            Log.e(TAG, "카카오 로그인 실패", error)
-            Toast.makeText(this, "카카오 로그인 실패: ${error.localizedMessage}", Toast.LENGTH_SHORT).show()
-        } else if (token != null) {
-            Log.i(TAG, "카카오 로그인 성공 ${token.accessToken}")
-            // 토큰 저장
-            TokenManager.saveTokens(this, token.accessToken, token.refreshToken ?: "")
-            TokenManager.saveLoginType(this, "KAKAO")
+        authApi.kakaoLogin(kakaoAccessToken, state).enqueue(object : Callback<KakaoLoginResponse> {
+            override fun onResponse(
+                call: Call<KakaoLoginResponse>,
+                response: Response<KakaoLoginResponse>
+            ) {
+                if (response.isSuccessful) {
+                    val backendResponse = response.body()
+                    val userData = backendResponse?.data
 
-            UserApiClient.instance.me { user, error ->
-                if (error != null) {
-                    Log.e(TAG, "사용자 정보 요청 실패", error)
-                } else if (user != null) {
-                    val nickname = user.kakaoAccount?.profile?.nickname ?: ""
-                    val email = user.kakaoAccount?.email ?: ""
+                    if (backendResponse?.status == "OK" && userData != null) {
 
-                    // 로컬에 저장
-                    TokenManager.saveUserInfo(this, email, nickname, "orange")
+                        TokenManager.saveTokens(this@LoginIntroActivity, userData.accessToken, userData.refreshToken)
+                        TokenManager.saveUserInfo(this@LoginIntroActivity, userData.email, userData.nickName, userData.profileImage)
+                        TokenManager.saveLoginType(this@LoginIntroActivity, "KAKAO")
 
-                    runOnUiThread {
-                        Toast.makeText(this, "${nickname}님 환영합니다!", Toast.LENGTH_SHORT).show()
-
-                        val intent = Intent(this, MainActivity::class.java)
+                        val intent = Intent(this@LoginIntroActivity, MainActivity::class.java)
                         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                         startActivity(intent)
                         finish()
+                    } else {
+                        Log.e(TAG, "백엔드 로그인 실패: ${response.code()} / ${backendResponse?.message}")
+                        showSimpleConfirmDialog("카카오 로그인에 실패했습니다.\n(서버 오류: ${backendResponse?.message})")
                     }
+                } else {
+                    Log.e(TAG, "백엔드 로그인 응답 실패: ${response.code()}")
+                    showSimpleConfirmDialog("카카오 로그인에 실패했습니다.\n(응답 코드: ${response.code()})")
                 }
             }
 
+            override fun onFailure(call: Call<KakaoLoginResponse>, t: Throwable) {
+                Log.e(TAG, "백엔드 로그인 네트워크 오류", t)
+                showSimpleConfirmDialog("서버 통신에 실패했습니다.\n네트워크 상태를 확인해주세요.")
+            }
+        })
+    }
 
-            // MainActivity로 이동
-            val intent = Intent(this, MainActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            startActivity(intent)
-            finish()
+    // 카카오 로그인 콜백 (Access Token 방식)
+    private val kakaoLoginCallback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
+        if (error != null) {
+            Log.e(TAG, "카카오 SDK 로그인 실패", error)
+            Toast.makeText(this, "카카오 로그인에 실패했습니다. 다시 시도해주세요.", Toast.LENGTH_SHORT).show()
+        } else if (token != null) {
+            Log.i(TAG, "카카오 SDK 로그인 성공, AccessToken: ${token.accessToken}")
+            loginToServerWithKakaoToken(token.accessToken)
         }
     }
 
-    // 카카오 로그인 시작
+    // 카카오 로그인 시작 (Access Token 방식)
     private fun startKakaoLogin() {
         if (UserApiClient.instance.isKakaoTalkLoginAvailable(this)) {
             UserApiClient.instance.loginWithKakaoTalk(this) { token, error ->
@@ -111,6 +120,7 @@ class LoginIntroActivity : AppCompatActivity() {
         }
     }
 
+    // ... (onCreate 및 나머지 코드는 이전과 동일)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -145,8 +155,6 @@ class LoginIntroActivity : AppCompatActivity() {
         binding.btnLogin.setOnClickListener {
             val loginId = binding.etId.text.toString()
             val password = binding.etPassword.text.toString()
-
-
 
             Log.d("LoginCheck", "🟡 로그인 시도: ID=[$loginId], PW=[$password]")
 
@@ -192,6 +200,7 @@ class LoginIntroActivity : AppCompatActivity() {
                             startActivity(Intent(this@LoginIntroActivity, MainActivity::class.java).apply {
                                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                             })
+                            finish() // finish() 추가
                         } else {
                             Log.e("LoginCheck", "로그인 실패 - 서버 응답은 왔지만 status가 OK가 아니거나 data가 없음")
                             showSimpleConfirmDialog(
@@ -373,6 +382,4 @@ class LoginIntroActivity : AppCompatActivity() {
             Log.e("KeyHash", "키 해시 얻기 실패", e)
         }
     }
-
-
 }
