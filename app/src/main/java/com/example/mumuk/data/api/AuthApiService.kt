@@ -16,6 +16,7 @@ import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
+import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.PATCH
 import retrofit2.http.POST
@@ -57,4 +58,13 @@ interface AuthApiService {
         @Header("X-Refresh-Token") refreshToken: String,
         @Header("X-Login-Type") loginType: String
     ): Response<LoginResponse>
+    @GET("/api/auth/exists/nickname")
+    fun checkNicknameExists(@Query("value") nickname: String): Call<CommonResponse>
+    @GET("/api/auth/exists/phone-number")
+    fun checkPhoneNumberExists(@Query("value") phoneNumber: String): Call<CommonResponse>
+    @GET("/api/auth/exists/login-id")
+    fun checkLoginIdExists(@Query("value") loginId: String): Call<CommonResponse>
+
+
+
 }

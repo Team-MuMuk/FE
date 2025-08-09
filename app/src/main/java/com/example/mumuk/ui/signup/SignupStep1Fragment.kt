@@ -4,7 +4,6 @@ import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -34,51 +33,57 @@ class SignupStep1Fragment : Fragment() {
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 val nickname = s.toString()
-                when {
-                    nickname.isBlank() -> {
-                        binding.tvNameStatus.text = "이름을 입력해주세요."
-                        binding.tvNameStatus.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
-                        binding.ivNameStatusIcon.setImageResource(R.drawable.ic_error)
-                        binding.ivNameStatusIcon.visibility = View.VISIBLE
-                    }
-
-                    nickname.length >= 10 -> {
-                        binding.tvNameStatus.text = "글자 수가 초과되었습니다. 10자 이내로 입력해주세요."
-                        binding.tvNameStatus.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
-                        binding.ivNameStatusIcon.setImageResource(R.drawable.ic_error)
-                        binding.ivNameStatusIcon.visibility = View.VISIBLE
-                    }
-
-                    else -> {
-                        binding.tvNameStatus.text = "정상적으로 확인되었습니다"
-                        binding.tvNameStatus.setTextColor(Color.parseColor("#306AF2"))
-                        binding.ivNameStatusIcon.setImageResource(R.drawable.ic_check)
-                        binding.ivNameStatusIcon.visibility = View.VISIBLE
-                    }
-                }
+                updateNameStatus(nickname)
             }
         })
 
-
         binding.btnNext.setOnClickListener {
             val nickname = binding.etName.text.toString()
+
             if (nickname.isNotBlank() && nickname.length < 10) {
                 (requireActivity() as SignupActivity).name = nickname
                 parentFragmentManager.beginTransaction()
                     .replace(R.id.signup_container, SignupStep2Fragment())
                     .addToBackStack(null)
                     .commit()
+            } else {
+                updateNameStatus(nickname)
             }
         }
-
-
-
 
         binding.btnBack.setOnClickListener {
             parentFragmentManager.beginTransaction()
                 .replace(R.id.signup_container, SignupStep0Fragment())
                 .addToBackStack(null)
                 .commit()
+        }
+    }
+
+    private fun updateNameStatus(nickname: String) {
+        when {
+            nickname.isBlank() -> {
+                binding.tvNameStatus.text = "이름을 입력해주세요."
+                binding.tvNameStatus.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
+                binding.ivNameStatusIcon.setImageResource(R.drawable.ic_error)
+                binding.ivNameStatusIcon.visibility = View.VISIBLE
+                binding.btnNext.isEnabled = false
+            }
+
+            nickname.length >= 10 -> {
+                binding.tvNameStatus.text = "글자 수가 초과되었습니다. 10자 이내로 입력해주세요."
+                binding.tvNameStatus.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
+                binding.ivNameStatusIcon.setImageResource(R.drawable.ic_error)
+                binding.ivNameStatusIcon.visibility = View.VISIBLE
+                binding.btnNext.isEnabled = false
+            }
+
+            else -> {
+                binding.tvNameStatus.text = "정상적으로 확인되었습니다"
+                binding.tvNameStatus.setTextColor(Color.parseColor("#306AF2"))
+                binding.ivNameStatusIcon.setImageResource(R.drawable.ic_check)
+                binding.ivNameStatusIcon.visibility = View.VISIBLE
+                binding.btnNext.isEnabled = true
+            }
         }
     }
 
