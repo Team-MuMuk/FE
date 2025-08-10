@@ -46,72 +46,65 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // accessToken 체크만 (선택)
         val accessToken = TokenManager.getAccessToken(requireContext())
-
-
         if (accessToken.isNullOrBlank()) {
             Log.e("Profile", "accessToken 없음")
             return
         }
 
-        val userId = JwtUtils.getUserIdFromToken(accessToken)
+        RetrofitClient.getUserApi(requireContext()).getUserProfile()
+            .enqueue(object : Callback<UserProfileResponse> {
+                override fun onResponse(
+                    call: Call<UserProfileResponse>,
+                    response: Response<UserProfileResponse>
+                ) {
+                    Log.d("Profile", "프로필 API 응답 코드: ${response.code()}")
+                    if (response.isSuccessful) {
+                        response.body()?.data?.let { profile ->
+                            Log.d("Profile", "프로필 정보 수신 성공: $profile")
 
-        if (userId == null) {
-            Log.e("Profile", "accessToken에서 userId 추출 실패")
-        } else {
-            Log.d("Profile", "추출된 userId: $userId")
-
-            RetrofitClient.getUserApi(requireContext()).getUserProfile(userId)
-                .enqueue(object : Callback<UserProfileResponse> {
-                    override fun onResponse(
-                        call: Call<UserProfileResponse>,
-                        response: Response<UserProfileResponse>
-                    ) {
-                        Log.d("Profile", "프로필 API 응답 코드: ${response.code()}")
-
-                        if (response.isSuccessful) {
-                            response.body()?.data?.let { profile ->
-                                Log.d("Profile", "프로필 정보 수신 성공: $profile")
-
-                                if (profile.name.isNullOrBlank()) {
-                                    binding.editName.setText("")
-                                    binding.editName.hint = "이름을 입력하세요"
-                                } else {
-                                    binding.editName.setText(profile.name)
-                                }
-
-                                if (profile.nickName.isNullOrBlank()) {
-                                    binding.editNickname.setText("")
-                                    binding.editNickname.hint = "닉네임을 입력하세요"
-                                } else {
-                                    binding.editNickname.setText(profile.nickName)
-                                }
-
-                                if (profile.statusMessage.isNullOrBlank()) {
-                                    binding.editStatus.setText("")
-                                    binding.editStatus.hint = "상태 메시지를 입력하세요"
-                                } else {
-                                    binding.editStatus.setText(profile.statusMessage)
-                                }
-                                val profileRes = when (profile.profileImage ?: "orange") {
-                                    "orange" -> R.drawable.ic_user_profile_orange
-                                    "white" -> R.drawable.ic_user_profile_white
-                                    "green" -> R.drawable.ic_user_profile_green
-                                    else -> R.drawable.ic_user_profile_orange
-                                }
-                                binding.icProfile.setImageResource(profileRes)
-                                selectedProfileImageResId = profileRes
+                            if (profile.name?.isBlank() != false) { // null이거나 blank일 경우
+                                binding.editName.setText("")
+                                binding.editName.hint = "이름을 입력하세요"
+                            } else {
+                                binding.editName.setText(profile.name)
                             }
-                        } else {
-                            Log.e("Profile", "프로필 응답 실패: ${response.code()} / ${response.message()}")
-                        }
-                    }
 
-                    override fun onFailure(call: Call<UserProfileResponse>, t: Throwable) {
-                        Log.e("Profile", "프로필 API 호출 실패", t)
+                            if (profile.nickName?.isBlank() != false) {
+                                binding.editNickname.setText("")
+                                binding.editNickname.hint = "닉네임을 입력하세요"
+                            } else {
+                                binding.editNickname.setText(profile.nickName)
+                            }
+
+
+                            if (profile.statusMessage?.isBlank() != false) {
+                                binding.editStatus.setText("")
+                                binding.editStatus.hint = "상태 메시지를 입력하세요"
+                            } else {
+                                binding.editStatus.setText(profile.statusMessage)
+                            }
+
+                            val profileRes = when (profile.profileImage?.ifBlank { "orange" }) {
+                                "orange" -> R.drawable.ic_user_profile_orange
+                                "white"  -> R.drawable.ic_user_profile_white
+                                "green"  -> R.drawable.ic_user_profile_green
+                                else     -> R.drawable.ic_user_profile_orange
+                            }
+                            binding.icProfile.setImageResource(profileRes)
+                            selectedProfileImageResId = profileRes
+                        }
+                    } else {
+                        Log.e("Profile", "프로필 응답 실패: ${response.code()} / ${response.message()}")
                     }
-                })
-        }
+                }
+
+                override fun onFailure(call: Call<UserProfileResponse>, t: Throwable) {
+                    Log.e("Profile", "프로필 API 호출 실패", t)
+                }
+            })
+
 
         setEditMode(binding.editName, binding.editNamePen, false, "")
         setEditMode(binding.editNickname, binding.editNicknamePen, false, "")
@@ -144,29 +137,21 @@ class ProfileFragment : Fragment() {
             val name = binding.editName.text.toString()
             val nickname = binding.editNickname.text.toString()
             val status = binding.editStatus.text.toString()
-            val profileImageUrl = when (selectedProfileImageResId) {
+            val profileImageKey = when (selectedProfileImageResId) {
                 R.drawable.ic_user_profile_orange -> "orange"
-                R.drawable.ic_user_profile_white -> "white"
-                R.drawable.ic_user_profile_green -> "green"
+                R.drawable.ic_user_profile_white  -> "white"
+                R.drawable.ic_user_profile_green  -> "green"
                 else -> "orange"
-            }
-
-            val accessToken = TokenManager.getAccessToken(requireContext())
-            val userId = JwtUtils.getUserIdFromToken(accessToken ?: "")
-
-            if (userId == null) {
-                Log.e("Profile", "userId 추출 실패 (수정 요청 취소)")
-                return@setOnClickListener
             }
 
             val request = UserProfileUpdateRequest(
                 name = name,
                 nickName = nickname,
-                profileImage = profileImageUrl,
+                profileImage = profileImageKey,
                 statusMessage = status
             )
 
-            RetrofitClient.getUserApi(requireContext()).updateUserProfile(userId, request)
+            RetrofitClient.getUserApi(requireContext()).updateUserProfile(request)
                 .enqueue(object : Callback<CommonResponse> {
                     override fun onResponse(call: Call<CommonResponse>, response: Response<CommonResponse>) {
                         if (response.isSuccessful && response.body()?.message?.contains("성공") == true) {
@@ -182,6 +167,7 @@ class ProfileFragment : Fragment() {
                     }
                 })
         }
+
     }
 
     private fun showProfileImageDialog() {

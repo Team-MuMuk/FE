@@ -16,6 +16,7 @@ import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
+import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.PATCH
 import retrofit2.http.POST
@@ -24,37 +25,55 @@ import retrofit2.http.Query
 interface AuthApiService {
     @POST("/api/auth/login")
     fun login(@Body request: LoginRequest): Call<LoginResponse>
+
     @POST("/api/auth/sign-up")
     fun signUp(@Body request: SignupRequest): Call<SignupResponse>
+
     @POST("/api/auth/check-current-pw")
     fun checkCurrentPassword(@Body request: CheckCurrentPwRequest): Call<CommonResponse>
+
     @PATCH("/api/auth/reissue-pw")
     fun reissuePassword(@Body request: ReissuePwRequest): Call<CommonResponse>
+
     @PATCH("/api/auth/logout")
     fun logout(
         @Header("X-Refresh-Token") refreshToken: String,
         @Header("X-Login-Type") loginType: String
     ): Call<CommonResponse>
+
     @PATCH("/api/auth/find-pw")
     fun findPassword(@Body request: FindPwRequest): Call<CommonResponse>
+
     @PATCH("/api/auth/find-id")
     fun findId(@Body request: FindIdRequest): Call<CommonResponse>
+
     @DELETE("/api/auth/withdraw")
     fun withdraw(): Call<CommonResponse>
-    @POST("/api/auth/kakao-login")
-    suspend fun kakaoLogin(
-        @Query("code") code: String,
-        @Query("state") state: String = "mumukDefaultState"
-    ): Response<KakaoLoginResponse>
-    @POST("/api/auth/naver-login")
-    suspend fun naverLogin(
-        @Query("code") code: String,
-        @Query("state") state: String = "mumukDefaultState"
-    ): Response<NaverLoginResponse>
+
+    @GET("/api/auth/kakao-login")
+    fun kakaoLogin(
+        @Query("access_token") accessToken: String,
+        @Query("state") state: String
+    ): Call<KakaoLoginResponse>
+
+    @GET("/api/auth/naver-login")
+    fun naverLogin(
+        @Query("access_token") accessToken: String,
+        @Query("state") state: String
+    ): Call<NaverLoginResponse>
 
     @POST("/api/auth/reissue")
     suspend fun reissueToken(
         @Header("X-Refresh-Token") refreshToken: String,
         @Header("X-Login-Type") loginType: String
     ): Response<LoginResponse>
+
+    @GET("/api/auth/exists/nickname")
+    fun checkNicknameExists(@Query("value") nickname: String): Call<CommonResponse>
+
+    @GET("/api/auth/exists/phone-number")
+    fun checkPhoneNumberExists(@Query("value") phoneNumber: String): Call<CommonResponse>
+
+    @GET("/api/auth/exists/login-id")
+    fun checkLoginIdExists(@Query("value") loginId: String): Call<CommonResponse>
 }

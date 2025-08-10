@@ -8,7 +8,8 @@ import com.example.mumuk.databinding.ItemIngredientBinding
 
 class IngredientAdapter(
     private var items: List<Ingredient>,
-    private val onItemClick: (Ingredient) -> Unit
+    private val onItemClick: (Ingredient) -> Unit,
+    private val onDeleteClick: (Ingredient) -> Unit
 ) : RecyclerView.Adapter<IngredientAdapter.IngredientViewHolder>() {
 
     inner class IngredientViewHolder(val binding: ItemIngredientBinding) :
@@ -18,6 +19,9 @@ class IngredientAdapter(
             binding.date.text = "유통기한: ${item.expiryDate}"
             binding.root.setOnClickListener {
                 onItemClick(item)
+            }
+            binding.delBtn.setOnClickListener {
+                onDeleteClick(item)
             }
         }
     }

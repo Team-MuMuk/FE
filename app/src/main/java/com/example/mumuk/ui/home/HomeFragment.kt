@@ -22,7 +22,6 @@ import com.example.mumuk.data.model.category.RandomRecipeResponse
 import com.example.mumuk.data.model.mypage.UserProfileResponse
 import com.example.mumuk.data.repository.RecipeRankRepository
 import com.example.mumuk.databinding.FragmentHomeBinding
-import com.example.mumuk.utils.JwtUtils
 import com.google.android.material.card.MaterialCardView
 import retrofit2.Call
 import retrofit2.Callback
@@ -103,6 +102,8 @@ class HomeFragment : Fragment() {
                 call: Call<RandomRecipeResponse>,
                 response: Response<RandomRecipeResponse>
             ) {
+                if (!isAdded || _binding == null) return
+
                 if (response.isSuccessful && response.body()?.data != null) {
                     val items = response.body()!!.data.map {
                         Recipe(
@@ -188,38 +189,30 @@ class HomeFragment : Fragment() {
             val nickname = if (!savedNickname.isNullOrBlank()) savedNickname else "사용자"
             _binding?.textView15?.text = "${nickname}님, 오늘은 뭐 해먹을까요?"
         } else {
-            val accessToken = TokenManager.getAccessToken(requireContext())
-            val userId = JwtUtils.getUserIdFromToken(accessToken ?: "")
-            if (userId == null) {
-                _binding?.textView15?.text = "사용자님, 오늘은 뭐 해먹을까요?"
-                return
-            }
-
-            RetrofitClient.getUserApi(requireContext()).getUserProfile(userId)
+            RetrofitClient.getUserApi(requireContext()).getUserProfile()
                 .enqueue(object : Callback<UserProfileResponse> {
                     override fun onResponse(
                         call: Call<UserProfileResponse>,
                         response: Response<UserProfileResponse>
                     ) {
-                        _binding?.let {
-                            if (response.isSuccessful) {
-                                val profile = response.body()?.data
-                                val nickname = profile?.nickName ?: "사용자"
-                                it.textView15.text = "${nickname}님, 오늘은 뭐 해먹을까요?"
-                            } else {
-                                it.textView15.text = "사용자님, 오늘은 뭐 해먹을까요?"
-                            }
+                        if (!isAdded || _binding == null) return
+                        if (response.isSuccessful) {
+                            val profile = response.body()?.data
+                            val nickname = profile?.nickName?.takeIf { it.isNotBlank() } ?: "사용자"
+                            _binding?.textView15?.text = "${nickname}님, 오늘은 뭐 해먹을까요?"
+                        } else {
+                            _binding?.textView15?.text = "사용자님, 오늘은 뭐 해먹을까요?"
                         }
                     }
 
                     override fun onFailure(call: Call<UserProfileResponse>, t: Throwable) {
-                        _binding?.let {
-                            it.textView15.text = "사용자님, 오늘은 뭐 해먹을까요?"
-                        }
+                        if (!isAdded || _binding == null) return
+                        _binding?.textView15?.text = "사용자님, 오늘은 뭐 해먹을까요?"
                     }
                 })
         }
     }
+
 
     override fun onDetach() {
         super.onDetach()

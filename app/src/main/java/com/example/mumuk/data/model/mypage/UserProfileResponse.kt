@@ -7,8 +7,8 @@ data class UserProfileResponse(
     val data: UserProfileData
 )
 data class UserProfileData(
-    val name: String,
-    val nickName: String,
-    val profileImage: String,
-    val statusMessage: String
+    val name: String?,
+    val nickName: String?,
+    val profileImage: String?,
+    val statusMessage: String?
 )

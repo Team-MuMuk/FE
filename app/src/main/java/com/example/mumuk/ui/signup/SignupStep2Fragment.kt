@@ -4,13 +4,19 @@ import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.example.mumuk.R
+import com.example.mumuk.data.api.RetrofitClient
+import com.example.mumuk.data.model.auth.CommonResponse
 import com.example.mumuk.databinding.FragmentSignupStep2Binding
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class SignupStep2Fragment : Fragment() {
 
@@ -35,37 +41,34 @@ class SignupStep2Fragment : Fragment() {
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 val nickname = s.toString()
-                when {
-                    nickname.isBlank() -> {
-                        binding.tvNicknameStatus.text = "닉네임을 입력해주세요."
-                        binding.tvNicknameStatus.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
-                        binding.ivNicknameStatusIcon.setImageResource(R.drawable.ic_error)
-                        binding.ivNicknameStatusIcon.visibility = View.VISIBLE
-                    }
-                    nickname.length >= 10 -> {
-                        binding.tvNicknameStatus.text = "글자 수가 초과되었습니다. 10자 이내로 입력해주세요."
-                        binding.tvNicknameStatus.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
-                        binding.ivNicknameStatusIcon.setImageResource(R.drawable.ic_error)
-                        binding.ivNicknameStatusIcon.visibility = View.VISIBLE
-                    }
-                    else -> {
-                        binding.tvNicknameStatus.text = "정상적으로 확인되었습니다"
-                        binding.tvNicknameStatus.setTextColor(Color.parseColor("#306AF2"))
-                        binding.ivNicknameStatusIcon.setImageResource(R.drawable.ic_check)
-                        binding.ivNicknameStatusIcon.visibility = View.VISIBLE
-                    }
+
+                if (nickname.isBlank()) {
+                    setErrorStatus("닉네임을 입력해주세요.")
+                } else if (nickname.length >= 10) {
+                    setErrorStatus("글자 수가 초과되었습니다. 10자 이내로 입력해주세요.")
+                } else {
+                    checkNicknameDuplicate(nickname)
                 }
             }
         })
 
         binding.btnNext.setOnClickListener {
             val nickname = binding.etNickname.text.toString()
-            if (nickname.isNotBlank() && nickname.length < 10) {
-                (requireActivity() as SignupActivity).nickname = nickname
-                parentFragmentManager.beginTransaction()
-                    .replace(R.id.signup_container, SignupStep3Fragment())
-                    .addToBackStack(null)
-                    .commit()
+
+            when {
+                nickname.isBlank() -> {
+                    setErrorStatus("닉네임을 입력해주세요.")
+                }
+                nickname.length >= 10 -> {
+                    setErrorStatus("글자 수가 초과되었습니다. 10자 이내로 입력해주세요.")
+                }
+                else -> {
+                    (requireActivity() as SignupActivity).nickname = nickname
+                    parentFragmentManager.beginTransaction()
+                        .replace(R.id.signup_container, SignupStep3Fragment())
+                        .addToBackStack(null)
+                        .commit()
+                }
             }
         }
 
@@ -77,8 +80,60 @@ class SignupStep2Fragment : Fragment() {
         }
     }
 
+    private fun setErrorStatus(message: String) {
+        binding.tvNicknameStatus.text = message
+        binding.tvNicknameStatus.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
+        binding.ivNicknameStatusIcon.setImageResource(R.drawable.ic_error)
+        binding.ivNicknameStatusIcon.visibility = View.VISIBLE
+        binding.btnNext.isEnabled = false
+    }
+
+    private fun setSuccessStatus(message: String) {
+        binding.tvNicknameStatus.text = message
+        binding.tvNicknameStatus.setTextColor(Color.parseColor("#306AF2"))
+        binding.ivNicknameStatusIcon.setImageResource(R.drawable.ic_check)
+        binding.ivNicknameStatusIcon.visibility = View.VISIBLE
+        binding.btnNext.isEnabled = true
+    }
+
+    private fun checkNicknameDuplicate(nickname: String) {
+        RetrofitClient.getAuthApi(requireContext()).checkNicknameExists(nickname)
+            .enqueue(object : Callback<CommonResponse> {
+                override fun onResponse(call: Call<CommonResponse>, response: Response<CommonResponse>) {
+                    if (response.isSuccessful) {
+                        val message = response.body()?.data?.toString() ?: ""
+                        Log.d("NicknameCheck", "응답 메시지: $message")
+
+                        when {
+                            message.contains("사용 가능") -> {
+                                setSuccessStatus("사용 가능한 닉네임입니다.")
+                            }
+                            message.contains("이미 사용") -> {
+                                setErrorStatus("이미 존재하는 닉네임입니다. 다시 입력해주세요.")
+                            }
+                            else -> {
+                                setErrorStatus("응답을 이해할 수 없습니다.")
+                            }
+                        }
+                    } else {
+                        Log.e("NicknameCheck", "응답 실패: ${response.code()} - ${response.errorBody()?.string()}")
+                        setErrorStatus("서버 오류가 발생했습니다.")
+                    }
+                }
+
+                override fun onFailure(call: Call<CommonResponse>, t: Throwable) {
+                    Log.e("NicknameCheck", "네트워크 오류: ${t.message}")
+                    setErrorStatus("네트워크 오류가 발생했습니다.")
+                }
+            })
+    }
+
+
+
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 }
+

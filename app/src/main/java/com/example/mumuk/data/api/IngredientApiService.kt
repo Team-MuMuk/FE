@@ -1,12 +1,15 @@
 package com.example.mumuk.data.api
 
+import com.example.mumuk.data.model.ingredient.IngredientDeleteResponse
 import com.example.mumuk.data.model.ingredient.IngredientRegisterRequest
 import com.example.mumuk.data.model.ingredient.IngredientRegisterResponse
 import com.example.mumuk.data.model.ingredient.IngredientResponse
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Path
 
 interface IngredientApiService {
     @GET("/api/ingredient/retrieve")
@@ -16,4 +19,9 @@ interface IngredientApiService {
     suspend fun registerIngredient(
         @Body request: IngredientRegisterRequest
     ): Response<IngredientRegisterResponse>
+
+    @DELETE("/api/ingredient/{ingredientId}/delete")
+    suspend fun deleteIngredient(
+        @Path("ingredientId") ingredientId: Int
+    ): Response<IngredientDeleteResponse>
 }
