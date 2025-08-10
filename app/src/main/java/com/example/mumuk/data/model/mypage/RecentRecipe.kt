@@ -1,4 +1,4 @@
-package com.example.mumuk.ui.mypage
+package com.example.mumuk.data.model.mypage
 
 data class RecentRecipe(
     val name: String,

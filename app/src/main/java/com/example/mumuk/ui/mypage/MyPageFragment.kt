@@ -23,6 +23,7 @@ import com.example.mumuk.R
 import com.example.mumuk.data.api.RetrofitClient
 import com.example.mumuk.data.api.TokenManager
 import com.example.mumuk.data.model.auth.CommonResponse
+import com.example.mumuk.data.model.mypage.RecentRecipe
 import com.example.mumuk.data.model.mypage.RecentRecipeListResponse
 import com.example.mumuk.data.model.mypage.UserProfileData
 import com.example.mumuk.data.model.mypage.UserProfileResponse
@@ -245,26 +246,36 @@ class MyPageFragment : Fragment() {
             },
             onHeartClick = { item, pos ->
                 val id = item.recipeId ?: return@RecentRecipeAdapter
-                val willLike = !item.liked
+                val old = item.liked
+                // UI 먼저 토글(빠른 반응)
+                recentAdapter.updateLikeAt(pos, !old)
 
                 RetrofitClient.getUserRecipeApi(requireContext())
-                    .clickLike(ClickLikeRequest(recipeId = id))
+                    .clickLike(ClickLikeRequest(id))
                     .enqueue(object : Callback<ClickLikeResponse> {
                         override fun onResponse(
                             call: Call<ClickLikeResponse>,
                             response: Response<ClickLikeResponse>
                         ) {
-                            if (response.isSuccessful) {
-                                recentAdapter.updateLikeAt(pos, willLike)
+                            if (response.isSuccessful && response.body()?.status == "OK") {
+                                // 성공 -> 그대로 유지
                             } else {
+                                // 실패 -> 롤백
+                                recentAdapter.updateLikeAt(pos, old)
                                 Toast.makeText(requireContext(), "찜 실패 (${response.code()})", Toast.LENGTH_SHORT).show()
+                                Log.w("MyPage", "clickLike fail code=${response.code()} body=${response.errorBody()?.string()}")
                             }
                         }
                         override fun onFailure(call: Call<ClickLikeResponse>, t: Throwable) {
+                            recentAdapter.updateLikeAt(pos, old)
                             Toast.makeText(requireContext(), "네트워크 오류: ${t.message}", Toast.LENGTH_SHORT).show()
+                            Log.e("MyPage","clickLike error", t)
                         }
                     })
             }
+
+
+
         )
 
 

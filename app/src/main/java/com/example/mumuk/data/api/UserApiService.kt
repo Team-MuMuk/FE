@@ -10,18 +10,14 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.PATCH
 import retrofit2.http.POST
-import retrofit2.http.Path
 
 interface UserApiService {
     @GET("/api/user/profile")
     fun getUserProfile(): Call<UserProfileResponse>
     @PATCH("/api/user/profile")
-    fun updateUserProfile(
-        @Body request: UserProfileUpdateRequest
-    ): Call<CommonResponse>
+    fun updateUserProfile(@Body req: UserProfileUpdateRequest): Call<CommonResponse>
     @GET("/api/user-recipe/recent-recipe")
     fun getRecentRecipes(): Call<RecentRecipeListResponse>
     @POST("/api/user-recipe/recent-recipe")
     fun addRecentRecipe(@Body req: RecentViewRequest): Call<CommonResponse>
-
 }

@@ -6,7 +6,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.mumuk.R
 import com.example.mumuk.databinding.ItemRecipeBinding
-import com.example.mumuk.ui.mypage.RecentRecipe
 
 class RecentRecipeAdapter(
     private val items: MutableList<RecentRecipe>,
@@ -14,9 +13,10 @@ class RecentRecipeAdapter(
     private val onHeartClick: (RecentRecipe, Int) -> Unit
 ) : RecyclerView.Adapter<RecentRecipeAdapter.VH>() {
 
+    companion object { private const val PAYLOAD_LIKE = "payload_like" }
+
     inner class VH(val binding: ItemRecipeBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: RecentRecipe, pos: Int) = with(binding) {
-            // 홈/검색과 동일한 바인딩 id 사용
+        fun bind(item: RecentRecipe) = with(binding) {
             recipeTitle.text = item.name
             Glide.with(recipeImg.context)
                 .load(item.image)
@@ -29,17 +29,36 @@ class RecentRecipeAdapter(
             )
 
             root.setOnClickListener { onItemClick(item) }
-            imageView6.setOnClickListener { onHeartClick(item, pos) }
+
+            imageView6.setOnClickListener {
+                val p = bindingAdapterPosition
+                if (p != RecyclerView.NO_POSITION) {
+                    onHeartClick(items[p], p)
+                }
+            }
+        }
+
+        fun bindLikeOnly(isLiked: Boolean) {
+            binding.imageView6.setImageResource(
+                if (isLiked) R.drawable.btn_heart_fill else R.drawable.btn_heart_blank
+            )
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
-        val binding = ItemRecipeBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return VH(binding)
+        return VH(ItemRecipeBinding.inflate(LayoutInflater.from(parent.context), parent, false))
     }
 
     override fun onBindViewHolder(holder: VH, position: Int) {
-        holder.bind(items[position], position)
+        holder.bind(items[position])
+    }
+
+    override fun onBindViewHolder(holder: VH, position: Int, payloads: MutableList<Any>) {
+        if (payloads.contains(PAYLOAD_LIKE)) {
+            holder.bindLikeOnly(items[position].liked)
+        } else {
+            super.onBindViewHolder(holder, position, payloads)
+        }
     }
 
     override fun getItemCount(): Int = items.size
@@ -51,10 +70,9 @@ class RecentRecipeAdapter(
     }
 
     fun updateLikeAt(position: Int, liked: Boolean) {
-        if (position in items.indices) {
-            val old = items[position]
-            items[position] = old.copy(liked = liked)
-            notifyItemChanged(position)
-        }
+        if (position !in items.indices) return
+        val old = items[position]
+        items[position] = old.copy(liked = liked)
+        notifyItemChanged(position, PAYLOAD_LIKE)
     }
 }
