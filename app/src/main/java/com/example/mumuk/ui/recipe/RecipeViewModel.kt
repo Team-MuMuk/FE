@@ -8,15 +8,19 @@ import com.example.mumuk.data.model.Recipe
 import com.example.mumuk.data.model.RecipeIngredient
 import com.example.mumuk.data.model.recipe.SearchedBlog
 import com.example.mumuk.data.model.search.UserRecipeDetailData
+import com.example.mumuk.data.repository.OgImageRepository
 import com.example.mumuk.data.repository.RecipeIngredientRepository
 import com.example.mumuk.data.repository.ShopRepository
 import com.example.mumuk.data.repository.UserRecipeRepository
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 
 class RecipeViewModel(private val userRecipeRepository: UserRecipeRepository) : ViewModel() {
 
     private val shopRepository = ShopRepository()
     private val ingredientRepository = RecipeIngredientRepository()
+    private val ogImageRepository = OgImageRepository
 
     private val _shopItemList = MutableLiveData<List<ShopItem>>()
     val shopItemList: LiveData<List<ShopItem>> = _shopItemList
@@ -67,8 +71,8 @@ class RecipeViewModel(private val userRecipeRepository: UserRecipeRepository) : 
                     Log.d("RecipeViewModel", "API success. Response body: ${response.body()}")
                     response.body()?.data?.let {
                         Log.d("RecipeViewModel", "Parsed detail data: $it")
-                        _userRecipeDetail.postValue(it) // 백그라운드 스레드이므로 postValue 사용
-                        fetchBlogs(it.title) // 레시피 제목으로 블로그 검색
+                        _userRecipeDetail.postValue(it)
+                        fetchBlogs(it.title)
                     }
                 } else {
                     val errorBody = response.errorBody()?.string() ?: "No error body"
@@ -86,8 +90,18 @@ class RecipeViewModel(private val userRecipeRepository: UserRecipeRepository) : 
             try {
                 val response = userRecipeRepository.searchBlogs(keyword)
                 if (response.isSuccessful) {
-                    _blogList.postValue(response.body()?.blogs ?: emptyList())
-                    Log.d("RecipeViewModel", "Blog search API success. Found ${response.body()?.blogs?.size ?: 0} blogs.")
+                    val blogs = response.body()?.blogs ?: emptyList()
+                    Log.d("RecipeViewModel", "Blog search API success. Found ${blogs.size} blogs.")
+
+                    val updatedBlogs = blogs.map { blog ->
+                        async {
+                            val ogImage = ogImageRepository.fetchOgImage(blog.link)
+                            blog.ogImageUrl = ogImage
+                            blog
+                        }
+                    }.awaitAll()
+
+                    _blogList.postValue(updatedBlogs)
                 } else {
                     val errorBody = response.errorBody()?.string() ?: "No error body"
                     Log.e("RecipeViewModel", "Blog search API error: code=${response.code()}, message=${response.message()}, errorBody=$errorBody")

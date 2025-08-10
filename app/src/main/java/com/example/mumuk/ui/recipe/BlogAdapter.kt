@@ -17,15 +17,19 @@ class BlogAdapter(private var blogs: List<SearchedBlog>) :
         fun bind(blog: SearchedBlog) {
             binding.title.text = blog.title
             binding.text.text = blog.description
-            Glide.with(binding.img.context)
-                .load(blog.blogImageUrl)
-                .error(R.drawable.bg_mosaic) // 에러 시 보여줄 이미지
-                .into(binding.img)
 
-            // 아이템 클릭 시 블로그 링크로 이동
+            Glide.with(binding.img.context)
+                .load(blog.ogImageUrl)
+                .error(R.drawable.bg_mosaic)
+                .into(binding.img)
+            
             binding.root.setOnClickListener {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(blog.link))
-                binding.root.context.startActivity(intent)
+                try {
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(blog.link))
+                    binding.root.context.startActivity(intent)
+                } catch (e: Exception) {
+                    // 잘못된 URL 등 예외 처리
+                }
             }
         }
     }
