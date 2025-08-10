@@ -22,6 +22,7 @@ import com.example.mumuk.R
 import com.example.mumuk.data.api.RetrofitClient
 import com.example.mumuk.data.api.TokenManager
 import com.example.mumuk.data.model.auth.CommonResponse
+import com.example.mumuk.data.model.mypage.RecentRecipeListResponse
 import com.example.mumuk.data.model.mypage.UserProfileData
 import com.example.mumuk.data.model.mypage.UserProfileResponse
 import com.example.mumuk.databinding.DialogDeleteAccountBinding
@@ -31,10 +32,15 @@ import com.example.mumuk.ui.login.LoginIntroActivity
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import com.example.mumuk.data.model.mypage.RecentRecipeAdapter
+import com.example.mumuk.data.api.UserApiService
+
 
 class MyPageFragment : Fragment() {
     private var _binding: FragmentMyPageBinding? = null
     private val binding get() = _binding!!
+    private lateinit var recentAdapter: RecentRecipeAdapter
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -221,29 +227,63 @@ class MyPageFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val recentList = mutableListOf(
-            RecentRecipe("연어 포케", R.drawable.bg_mosaic, liked = true),
-            RecentRecipe("훈제오리 포케", R.drawable.bg_mosaic, liked = false),
-            RecentRecipe("그린포케", R.drawable.bg_mosaic, liked = true),
-            RecentRecipe("플레인 포케", R.drawable.bg_mosaic, liked = false),
-            RecentRecipe("참치 포케", R.drawable.bg_mosaic, liked = true),
-            RecentRecipe("스테이크 포케", R.drawable.bg_mosaic, liked = true),
-            RecentRecipe("아보카도 포케", R.drawable.bg_mosaic, liked = false)
-        )
-
-        binding.rvRecentRecipes.apply {
-            adapter = RecentRecipeAdapter(recentList,
-                onItemClick = { recipe ->
-                    findNavController().navigate(R.id.recipeFragment)
-                },
-                onHeartClick = { recipe, position ->
-                }
-            )
-            layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-        }
-
+        setupRecentRecycler()
+        loadRecentRecipes()
         loadUserProfile()
     }
+
+    private fun setupRecentRecycler() {
+        binding.rvRecentRecipes.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        recentAdapter = RecentRecipeAdapter(
+            mutableListOf(),
+            onItemClick = { item ->
+                val args = androidx.core.os.bundleOf("recipeId" to (item.recipeId ?: return@RecentRecipeAdapter))
+                findNavController().navigate(R.id.recipeFragment, args)
+            },
+            onHeartClick = { _, _ -> }
+        )
+
+        binding.rvRecentRecipes.adapter = recentAdapter
+    }
+
+
+    private fun loadRecentRecipes() {
+        RetrofitClient.getUserApi(requireContext())
+            .getRecentRecipes()
+            .enqueue(object : Callback<RecentRecipeListResponse> {
+                override fun onResponse(
+                    call: Call<RecentRecipeListResponse>,
+                    response: Response<RecentRecipeListResponse>
+                ) {
+                    if (!isAdded) return
+                    if (response.isSuccessful) {
+                        val items = response.body()?.data?.recentRecipes.orEmpty()
+
+
+                        val uiList = items.map {
+                            RecentRecipe(
+                                name = it.name,
+                                image = it.imageUrl,
+                                liked = it.liked,
+                                recipeId = it.recipeId
+                            )
+                        }
+
+                        recentAdapter.submitList(uiList)
+
+                    } else {
+                        Log.e("MyPage", "최근 레시피 실패 code=${response.code()}")
+                    }
+                }
+
+                override fun onFailure(call: Call<RecentRecipeListResponse>, t: Throwable) {
+                    if (!isAdded) return
+                    Log.e("MyPage", "최근 레시피 네트워크 오류", t)
+                }
+            })
+    }
+
 
     private fun loadUserProfile() {
         val loginType = TokenManager.getLoginType(requireContext()) ?: "LOCAL"
@@ -269,7 +309,7 @@ class MyPageFragment : Fragment() {
                         response: Response<UserProfileResponse>
                     ) {
                         if (response.isSuccessful) {
-                            bindProfile(response.body()?.data) // ✅ UserProfileData
+                            bindProfile(response.body()?.data)
                         } else {
                             Log.e("MyPage", "프로필 API 실패: ${response.code()}")
                         }
@@ -301,6 +341,11 @@ class MyPageFragment : Fragment() {
             else     -> R.drawable.ic_user_profile_orange
         }
         binding.imgProfile.setImageResource(profileRes)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (_binding != null) loadRecentRecipes()
     }
 
 

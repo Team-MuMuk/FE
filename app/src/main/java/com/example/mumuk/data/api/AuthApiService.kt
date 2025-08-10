@@ -12,6 +12,7 @@ import com.example.mumuk.data.model.auth.NaverLoginResponse
 import com.example.mumuk.data.model.auth.ReissuePwRequest
 import com.example.mumuk.data.model.auth.SignupRequest
 import com.example.mumuk.data.model.auth.SignupResponse
+import com.example.mumuk.data.model.mypage.RecentRecipeListResponse
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.Body
@@ -76,4 +77,7 @@ interface AuthApiService {
 
     @GET("/api/auth/exists/login-id")
     fun checkLoginIdExists(@Query("value") loginId: String): Call<CommonResponse>
+
+
+
 }

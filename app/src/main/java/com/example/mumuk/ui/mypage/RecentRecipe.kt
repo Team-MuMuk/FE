@@ -1,7 +1,9 @@
 package com.example.mumuk.ui.mypage
 
 data class RecentRecipe(
-    val title: String,
-    val imageResId: Int,
-    var liked: Boolean
+    val name: String,
+    val image: String,
+    var liked: Boolean,
+    val recipeId: Long? = null
 )
+

@@ -3,6 +3,7 @@ package com.example.mumuk.ui.mypage
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.mumuk.R
 import com.example.mumuk.databinding.ItemRecentRecipeBinding
 
@@ -14,25 +15,34 @@ class RecentRecipeAdapter(
 
     inner class RecipeViewHolder(val binding: ItemRecentRecipeBinding) :
         RecyclerView.ViewHolder(binding.root) {
+
         init {
             binding.root.setOnClickListener {
-                val position = bindingAdapterPosition
-                if (position != RecyclerView.NO_POSITION) {
-                    onItemClick(recipes[position])
-                }
+                val pos = bindingAdapterPosition
+                if (pos != RecyclerView.NO_POSITION) onItemClick(recipes[pos])
             }
         }
-        fun bind(recipe: RecentRecipe, position: Int) {
-            binding.tvRecipeTitle.text = recipe.title
-            binding.ivRecipeImage.setImageResource(recipe.imageResId)
-            binding.ivRecipeHeart.setImageResource(
-                if (recipe.liked) R.drawable.ic_heart_full else R.drawable.ic_heart_empty
+
+        fun bind(recipe: RecentRecipe, position: Int) = with(binding) {
+            tvRecipeTitle.text = recipe.name
+
+            Glide.with(root)
+                .load(recipe.image)
+                .placeholder(R.drawable.bg_mosaic)
+                .error(R.drawable.bg_mosaic)
+                .centerCrop()
+                .into(ivRecipeImage)
+
+            ivRecipeHeart.setImageResource(
+                if (recipe.liked) R.drawable.btn_heart_fill else R.drawable.btn_heart_blank
             )
 
-            binding.ivRecipeHeart.setOnClickListener {
-                recipes[position].liked = !recipes[position].liked
-                notifyItemChanged(position)
-                onHeartClick?.invoke(recipes[position], position)
+            ivRecipeHeart.setOnClickListener {
+                val pos = bindingAdapterPosition
+                if (pos == RecyclerView.NO_POSITION) return@setOnClickListener
+                recipes[pos] = recipes[pos].copy(liked = !recipes[pos].liked)
+                notifyItemChanged(pos)
+                onHeartClick?.invoke(recipes[pos], pos)
             }
         }
     }
@@ -49,4 +59,10 @@ class RecentRecipeAdapter(
     }
 
     override fun getItemCount(): Int = recipes.size
+
+    fun submitList(newItems: List<RecentRecipe>) {
+        recipes.clear()
+        recipes.addAll(newItems)
+        notifyDataSetChanged()
+    }
 }

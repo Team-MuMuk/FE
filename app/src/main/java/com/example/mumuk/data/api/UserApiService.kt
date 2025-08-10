@@ -1,12 +1,15 @@
 package com.example.mumuk.data.api
 
 import com.example.mumuk.data.model.auth.CommonResponse
+import com.example.mumuk.data.model.mypage.RecentRecipeListResponse
+import com.example.mumuk.data.model.mypage.RecentViewRequest
 import com.example.mumuk.data.model.mypage.UserProfileResponse
 import com.example.mumuk.data.model.mypage.UserProfileUpdateRequest
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.PATCH
+import retrofit2.http.POST
 import retrofit2.http.Path
 
 interface UserApiService {
@@ -16,4 +19,9 @@ interface UserApiService {
     fun updateUserProfile(
         @Body request: UserProfileUpdateRequest
     ): Call<CommonResponse>
+    @GET("/api/user-recipe/recent-recipe")
+    fun getRecentRecipes(): Call<RecentRecipeListResponse>
+    @POST("/api/user-recipe/recent-recipe")
+    fun addRecentRecipe(@Body req: RecentViewRequest): Call<CommonResponse>
+
 }
