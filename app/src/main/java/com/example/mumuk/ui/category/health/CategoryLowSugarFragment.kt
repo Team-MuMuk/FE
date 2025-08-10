@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
@@ -119,13 +120,7 @@ class CategoryLowSugarFragment : Fragment() {
                     }
                     binding.categoryRecipeRecyclerView.adapter =
                         CategoryRecipeCardAdapter(recipes.toMutableList()) { recipe ->
-                            val bundle = Bundle().apply {
-                                putLong("id", recipe.id)
-                                putString("title", recipe.title)
-                                putInt("img", recipe.img ?: 0)
-                                putBoolean("isLiked", recipe.isLiked)
-                                putString("recipeImageUrl", recipe.recipeImageUrl)
-                            }
+                            val bundle = bundleOf("recipeId" to recipe.id)
                             findNavController().navigate(R.id.action_categoryLowSugarFragment_to_recipeFragment, bundle)
                         }
                 }

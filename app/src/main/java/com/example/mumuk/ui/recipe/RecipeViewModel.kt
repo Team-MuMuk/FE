@@ -18,14 +18,8 @@ class RecipeViewModel(private val userRecipeRepository: UserRecipeRepository) : 
     private val shopRepository = ShopRepository()
     private val ingredientRepository = RecipeIngredientRepository()
 
-    private val _nutritionInfoList = MutableLiveData<List<NutritionInfo>>()
-    val nutritionInfoList: LiveData<List<NutritionInfo>> = _nutritionInfoList
-
     private val _shopItemList = MutableLiveData<List<ShopItem>>()
     val shopItemList: LiveData<List<ShopItem>> = _shopItemList
-
-    private val _recipeList = MutableLiveData<List<Recipe>>()
-    val recipeList: LiveData<List<Recipe>> = _recipeList
 
     private val _selectedRecipe = MutableLiveData<Recipe>()
     val selectedRecipe: LiveData<Recipe> = _selectedRecipe
@@ -39,11 +33,6 @@ class RecipeViewModel(private val userRecipeRepository: UserRecipeRepository) : 
     init {
         loadShopItems()
         loadIngredients()
-        _recipeList.value = listOf(
-            Recipe(id = 1, img = null, title = "두부유부초밥", isLiked = false),
-            Recipe(id = 2, img = null, title = "김치볶음밥", isLiked = false)
-        )
-        _selectedRecipe.value = _recipeList.value?.firstOrNull()
     }
 
     private fun loadShopItems() {
@@ -53,9 +42,6 @@ class RecipeViewModel(private val userRecipeRepository: UserRecipeRepository) : 
     }
 
     fun updateRecipeLike(recipeId: Long, isLiked: Boolean) {
-        _recipeList.value = _recipeList.value?.map { recipe ->
-            if (recipe.id == recipeId) recipe.copy(isLiked = isLiked) else recipe
-        }
         if (_selectedRecipe.value?.id == recipeId) {
             _selectedRecipe.value = _selectedRecipe.value?.copy(isLiked = isLiked)
         }
@@ -69,6 +55,7 @@ class RecipeViewModel(private val userRecipeRepository: UserRecipeRepository) : 
         _selectedRecipe.value = recipe
     }
 
+    // --- 이 함수가 핵심입니다 ---
     fun fetchRecipeDetail(recipeId: Long) {
         Log.d("RecipeViewModel", "fetchRecipeDetail() called with recipeId: $recipeId")
         viewModelScope.launch {
@@ -78,16 +65,20 @@ class RecipeViewModel(private val userRecipeRepository: UserRecipeRepository) : 
                     Log.d("RecipeViewModel", "API success. Response body: ${response.body()}")
                     response.body()?.data?.let {
                         Log.d("RecipeViewModel", "Parsed detail data: $it")
-                        _userRecipeDetail.value = it
+                        _userRecipeDetail.postValue(it) // 백그라운드 스레드이므로 postValue 사용
                     }
                 } else {
-                    Log.e("RecipeViewModel", "API error: code=${response.code()}, message=${response.message()}")
+                    // --- 서버가 보낸 실제 에러 메시지를 확인하기 위한 로그 ---
+                    val errorBody = response.errorBody()?.string() ?: "No error body"
+                    Log.e("RecipeViewModel", "API error: code=${response.code()}, message=${response.message()}, errorBody=$errorBody")
+                    // ----------------------------------------------------
                 }
             } catch (e: Exception) {
                 Log.e("RecipeViewModel", "Exception in fetchRecipeDetail: ${e.localizedMessage}", e)
             }
         }
     }
+    // -------------------------
 
     class Factory(private val context: Context) :
         ViewModelProvider.Factory {

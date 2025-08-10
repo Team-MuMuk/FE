@@ -10,6 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
 import com.example.mumuk.databinding.FragmentRecipeBinding
 import com.example.mumuk.data.api.RetrofitClient
 import com.example.mumuk.data.model.Blog
@@ -32,7 +33,8 @@ class RecipeFragment : Fragment() {
         RecipeViewModel.Factory(requireContext())
     }
 
-    private var currentRecipe: Recipe? = null
+    private var currentRecipeId: Long? = null
+    private var isCurrentlyLiked: Boolean = false
 
     private var isBlogExpanded = false
     private lateinit var fullBlogList: List<Blog>
@@ -42,28 +44,73 @@ class RecipeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentRecipeBinding.inflate(inflater, container, false)
+        Log.d("RecipeFragment", "onCreateView: View has been created.")
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        Log.d("RecipeFragment", "onViewCreated: Lifecycle method started.")
 
+        setupClickListeners()
+        setupRecyclerViews()
+        observeViewModel()
+
+        val recipeId = arguments?.getLong("recipeId") ?: 4L
+        currentRecipeId = recipeId
+        Log.d("RecipeFragment", "onViewCreated: Starting to fetch details for recipeId: $recipeId")
+        recipeViewModel.fetchRecipeDetail(recipeId)
+    }
+
+    private fun setupClickListeners() {
+        Log.d("RecipeFragment", "setupClickListeners: Initializing.")
         binding.backBtn.setOnClickListener {
+            Log.d("RecipeFragment", "Back button clicked.")
             findNavController().navigateUp()
         }
 
-        val ingredientRV = binding.ingredientRV
-        val flexboxLayoutManager = FlexboxLayoutManager(requireContext()).apply {
+        binding.likeBtn.setOnClickListener {
+            Log.d("RecipeFragment", "Like button clicked.")
+            currentRecipeId?.let { id ->
+                val newLikedState = !isCurrentlyLiked
+                updateLikeButton(newLikedState)
+
+                Log.d("RecipeFragment", "Calling 'clickLike' API for recipeId: $id")
+                val api = RetrofitClient.getUserRecipeApi(requireContext())
+                val request = ClickLikeRequest(recipeId = id)
+                api.clickLike(request).enqueue(object : Callback<ClickLikeResponse> {
+                    override fun onResponse(call: Call<ClickLikeResponse>, response: Response<ClickLikeResponse>) {
+                        if (response.isSuccessful) {
+                            isCurrentlyLiked = newLikedState
+                            Log.d("RecipeFragment", "Like API call successful. Response: ${response.body()}")
+                        } else {
+                            updateLikeButton(isCurrentlyLiked)
+                            // --- 중요: 서버의 실제 에러 메시지를 확인하기 위한 로그 ---
+                            val errorBody = response.errorBody()?.string() ?: "No error body"
+                            Log.e("RecipeFragment", "Like API call failed. Code: ${response.code()}, ErrorBody: $errorBody")
+                            // ----------------------------------------------------
+                        }
+                    }
+
+                    override fun onFailure(call: Call<ClickLikeResponse>, t: Throwable) {
+                        updateLikeButton(isCurrentlyLiked)
+                        Log.e("RecipeFragment", "Like API call failure (Network/Exception). Message: ${t.localizedMessage}", t)
+                    }
+                })
+            }
+        }
+    }
+
+    private fun setupRecyclerViews() {
+        Log.d("RecipeFragment", "setupRecyclerViews: Initializing.")
+        // Ingredient RecyclerView
+        binding.ingredientRV.layoutManager = FlexboxLayoutManager(requireContext()).apply {
             flexDirection = FlexDirection.ROW
             flexWrap = FlexWrap.WRAP
         }
-        ingredientRV.layoutManager = flexboxLayoutManager
+        binding.ingredientRV.adapter = IngredientAdapter(emptyList())
 
-        recipeViewModel.allIngredients.observe(viewLifecycleOwner) { ingredients ->
-            ingredientRV.adapter = IngredientAdapter(ingredients)
-            Log.d("RecipeFragment", "Ingredients updated: $ingredients")
-        }
-
+        // Blog RecyclerView
         fullBlogList = BlogRepository.getBlogList()
         val blogAdapter = BlogAdapter(emptyList())
         binding.blogRV.adapter = blogAdapter
@@ -75,65 +122,59 @@ class RecipeFragment : Fragment() {
             setBlogListAndButton(blogAdapter)
         }
 
-        val shopAdapter = ShopAdapter()
-        binding.shopRV.apply {
-            adapter = shopAdapter
-            layoutManager = GridLayoutManager(context, 2)
-        }
+        // Shop RecyclerView
+        binding.shopRV.adapter = ShopAdapter()
+        binding.shopRV.layoutManager = GridLayoutManager(context, 2)
+    }
 
-        recipeViewModel.shopItemList.observe(viewLifecycleOwner) { shopList ->
-            shopAdapter.submitList(shopList)
-            Log.d("RecipeFragment", "Shop items updated: $shopList")
-        }
-
+    private fun observeViewModel() {
+        Log.d("RecipeFragment", "observeViewModel: Setting up observers.")
+        // API 응답 데이터를 관찰하여 UI 업데이트
         recipeViewModel.userRecipeDetail.observe(viewLifecycleOwner) { detail ->
-            Log.d("RecipeFragment", "UserRecipeDetail 업데이트: $detail")
-            binding.recipeTitle.text = detail.title
-        }
+            Log.i("RecipeFragment", "userRecipeDetail observer triggered. Data received: $detail")
+            isCurrentlyLiked = detail.liked
+            binding.apply {
+                Log.d("RecipeFragment", "Applying data to UI elements.")
+                // 기본 정보
+                recipeTitle.text = detail.title
+                textView9.text = detail.description
+                textView10.text = "소요시간 : ${detail.cookingTime}분"
+                textView12.text = "칼로리 : ${detail.calories} kcal"
+                updateLikeButton(detail.liked)
 
-        val recipeId = arguments?.getLong("recipeId") ?: 4L
-        Log.d("RecipeFragment", "onViewCreated() - recipeId: $recipeId")
-        recipeViewModel.fetchRecipeDetail(recipeId)
+                // 영양 정보
+                carbText.text = "${detail.carbohydrate} / 158g"
+                protText.text = "${detail.protein} / 63g"
+                fatText.text = "${detail.fat} / 32g"
 
-        recipeViewModel.selectedRecipe.observe(viewLifecycleOwner) { recipe ->
-            currentRecipe = recipe
-            binding.recipeTitle.text = recipe.title
-            binding.imageView7.setImageResource(
-                if (recipe.isLiked) com.example.mumuk.R.drawable.btn_heart_fill
-                else com.example.mumuk.R.drawable.btn_heart_blank
-            )
-        }
+                // Glide를 사용한 이미지 로딩
+                Glide.with(this@RecipeFragment)
+                    .load(detail.recipeImage)
+                    .error(com.example.mumuk.R.drawable.bg_mosaic)
+                    .into(binding.imageView4)
 
-        binding.likeBtn.setOnClickListener {
-            currentRecipe?.let { recipe ->
-                val context = requireContext()
-                recipe.isLiked = !recipe.isLiked
-                binding.imageView7.setImageResource(
-                    if (recipe.isLiked) com.example.mumuk.R.drawable.btn_heart_fill
-                    else com.example.mumuk.R.drawable.btn_heart_blank
-                )
+                Glide.with(this@RecipeFragment)
+                    .load(detail.recipeImage)
+                    .error(com.example.mumuk.R.drawable.bg_mosaic)
+                    .into(binding.recipeImg)
 
-                recipeViewModel.updateRecipeLike(recipe.id, recipe.isLiked)
-
-                val api = RetrofitClient.getUserRecipeApi(context)
-                val request = ClickLikeRequest(recipeId = recipe.id)
-                api.clickLike(request).enqueue(object : Callback<ClickLikeResponse> {
-                    override fun onResponse(
-                        call: Call<ClickLikeResponse>,
-                        response: Response<ClickLikeResponse>
-                    ) {
-                        Log.d("RecipeFragment", "Like API success: ${response.body()}")
-                    }
-
-                    override fun onFailure(
-                        call: Call<ClickLikeResponse>,
-                        t: Throwable
-                    ) {
-                        Log.e("RecipeFragment", "Like API error: ${t.localizedMessage}", t)
-                    }
-                })
+                // 재료 목록 RecyclerView 업데이트
+                (ingredientRV.adapter as? IngredientAdapter)?.updateData(detail.recipeIngredients)
             }
         }
+
+        // shopItemList 관찰
+        recipeViewModel.shopItemList.observe(viewLifecycleOwner) { shopList ->
+            Log.d("RecipeFragment", "shopItemList observer triggered. Item count: ${shopList.size}")
+            (binding.shopRV.adapter as? ShopAdapter)?.submitList(shopList)
+        }
+    }
+
+    private fun updateLikeButton(isLiked: Boolean) {
+        binding.imageView7.setImageResource(
+            if (isLiked) com.example.mumuk.R.drawable.btn_heart_fill
+            else com.example.mumuk.R.drawable.btn_heart_blank
+        )
     }
 
     private fun setBlogListAndButton(blogAdapter: BlogAdapter) {
@@ -153,6 +194,7 @@ class RecipeFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        Log.d("RecipeFragment", "onDestroyView: View is being destroyed.")
         _binding = null
     }
 }

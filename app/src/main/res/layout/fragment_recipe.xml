@@ -135,11 +135,11 @@
                 android:layout_width="140dp"
                 android:layout_height="140dp"
                 android:layout_marginStart="20dp"
-                android:layout_marginTop="8dp"
                 app:cardCornerRadius="4dp"
                 app:cardElevation="0dp"
+                app:layout_constraintBottom_toBottomOf="@+id/macronutrientScroll"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/recipeTitle">
+                app:layout_constraintTop_toTopOf="@+id/textView9">
 
                 <ImageView
                     android:id="@+id/recipeImg"
@@ -154,12 +154,13 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
+                android:layout_marginTop="8dp"
                 android:layout_marginEnd="20dp"
                 android:text="탄수 걱정없는 두부유부초밥입니다 :)"
                 android:textSize="12sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/cardView"
-                app:layout_constraintTop_toTopOf="@+id/cardView" />
+                app:layout_constraintTop_toBottomOf="@+id/recipeTitle" />
 
             <TextView
                 android:id="@+id/textView10"
@@ -211,12 +212,13 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
+                android:layout_marginTop="4dp"
                 android:layout_marginEnd="20dp"
                 android:fillViewport="true"
                 android:scrollbars="none"
-                app:layout_constraintBottom_toBottomOf="@+id/cardView"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/cardView">
+                app:layout_constraintStart_toEndOf="@+id/cardView"
+                app:layout_constraintTop_toBottomOf="@+id/textView11">
 
                 <LinearLayout
                     android:layout_width="wrap_content"

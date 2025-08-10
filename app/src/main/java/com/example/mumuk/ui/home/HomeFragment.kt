@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.PopupWindow
 import android.widget.Toast
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
@@ -157,8 +158,9 @@ class HomeFragment : Fragment() {
     private fun setupRecyclerView(recyclerView: RecyclerView, recipeList: List<Recipe>) {
         recyclerView.apply {
             layoutManager = GridLayoutManager(requireContext(), 2)
-            adapter = HomeRecipeAdapter(recipeList.toMutableList()) {
-                findNavController().navigate(R.id.action_navigation_home_to_recipeFragment)
+            adapter = HomeRecipeAdapter(recipeList.toMutableList()) { clickedRecipe ->
+                val bundle = bundleOf("recipeId" to clickedRecipe.id)
+                findNavController().navigate(R.id.action_navigation_home_to_recipeFragment, bundle)
             }
         }
     }
