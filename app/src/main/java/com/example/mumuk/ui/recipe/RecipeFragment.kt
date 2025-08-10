@@ -36,7 +36,6 @@ class RecipeFragment : Fragment() {
 
     private var isBlogExpanded = false
     private var fullBlogList: List<SearchedBlog> = emptyList()
-    private var recordedRecent = false
 
 
     override fun onCreateView(
@@ -60,32 +59,6 @@ class RecipeFragment : Fragment() {
         currentRecipeId = recipeId
         Log.d("RecipeFragment", "onViewCreated: Starting to fetch details for recipeId: $recipeId")
         recipeViewModel.fetchRecipeDetail(recipeId)
-
-        if (!recordedRecent) {
-            recordedRecent = true
-            RetrofitClient.getUserApi(requireContext())
-                .addRecentRecipe(com.example.mumuk.data.model.mypage.RecentViewRequest(recipeId))
-                .enqueue(object : retrofit2.Callback<com.example.mumuk.data.model.auth.CommonResponse> {
-                    override fun onResponse(
-                        call: retrofit2.Call<com.example.mumuk.data.model.auth.CommonResponse>,
-                        response: retrofit2.Response<com.example.mumuk.data.model.auth.CommonResponse>
-                    ) {
-                        if (response.isSuccessful) {
-                            val msg = response.body()?.message ?: "no message"
-                            Log.d("RecipeFragment", "최근본 등록 성공: $msg")
-                        } else {
-                            val err = try { response.errorBody()?.string() } catch (_: Exception) { null }
-                            Log.w("RecipeFragment", "최근본 등록 실패 code=${response.code()}, body=$err")
-                        }
-                    }
-                    override fun onFailure(
-                        call: retrofit2.Call<com.example.mumuk.data.model.auth.CommonResponse>,
-                        t: Throwable
-                    ) {
-                        Log.e("RecipeFragment", "최근본 등록 네트워크 오류: ${t.message}", t)
-                    }
-                })
-        }
 
     }
 

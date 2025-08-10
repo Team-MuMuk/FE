@@ -13,6 +13,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import androidx.navigation.fragment.findNavController
@@ -33,7 +34,8 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import com.example.mumuk.data.model.mypage.RecentRecipeAdapter
-import com.example.mumuk.data.api.UserApiService
+import com.example.mumuk.data.model.recipe.ClickLikeRequest
+import com.example.mumuk.data.model.recipe.ClickLikeResponse
 
 
 class MyPageFragment : Fragment() {
@@ -238,11 +240,34 @@ class MyPageFragment : Fragment() {
         recentAdapter = RecentRecipeAdapter(
             mutableListOf(),
             onItemClick = { item ->
-                val args = androidx.core.os.bundleOf("recipeId" to (item.recipeId ?: return@RecentRecipeAdapter))
+                val args = bundleOf("recipeId" to (item.recipeId ?: return@RecentRecipeAdapter))
                 findNavController().navigate(R.id.recipeFragment, args)
             },
-            onHeartClick = { _, _ -> }
+            onHeartClick = { item, pos ->
+                val id = item.recipeId ?: return@RecentRecipeAdapter
+                val willLike = !item.liked
+
+                RetrofitClient.getUserRecipeApi(requireContext())
+                    .clickLike(ClickLikeRequest(recipeId = id))
+                    .enqueue(object : Callback<ClickLikeResponse> {
+                        override fun onResponse(
+                            call: Call<ClickLikeResponse>,
+                            response: Response<ClickLikeResponse>
+                        ) {
+                            if (response.isSuccessful) {
+                                recentAdapter.updateLikeAt(pos, willLike)
+                            } else {
+                                Toast.makeText(requireContext(), "찜 실패 (${response.code()})", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                        override fun onFailure(call: Call<ClickLikeResponse>, t: Throwable) {
+                            Toast.makeText(requireContext(), "네트워크 오류: ${t.message}", Toast.LENGTH_SHORT).show()
+                        }
+                    })
+            }
         )
+
+
 
         binding.rvRecentRecipes.adapter = recentAdapter
     }
