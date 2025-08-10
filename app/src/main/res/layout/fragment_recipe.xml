@@ -70,7 +70,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/img_food_sample" />
+                    android:src="@drawable/bg_mosaic" />
             </androidx.cardview.widget.CardView>
 
             <TextView
@@ -146,7 +146,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/img_food_sample" />
+                    android:src="@drawable/bg_mosaic" />
             </androidx.cardview.widget.CardView>
 
             <TextView

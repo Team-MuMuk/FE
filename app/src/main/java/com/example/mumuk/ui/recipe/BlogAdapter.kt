@@ -2,6 +2,8 @@ package com.example.mumuk.ui.recipe
 
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
+import android.text.Html
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -15,14 +17,20 @@ class BlogAdapter(private var blogs: List<SearchedBlog>) :
 
     inner class BlogViewHolder(private val binding: ItemBlogBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(blog: SearchedBlog) {
-            binding.title.text = blog.title
-            binding.text.text = blog.description
+            binding.title.text = Html.fromHtml(blog.title, Html.FROM_HTML_MODE_LEGACY).toString()
+            val descriptionText = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                Html.fromHtml(blog.description, Html.FROM_HTML_MODE_LEGACY)
+            } else {
+                @Suppress("DEPRECATION")
+                Html.fromHtml(blog.description)
+            }
+            binding.text.text = descriptionText
 
             Glide.with(binding.img.context)
                 .load(blog.ogImageUrl)
                 .error(R.drawable.bg_mosaic)
                 .into(binding.img)
-            
+
             binding.root.setOnClickListener {
                 try {
                     val intent = Intent(Intent.ACTION_VIEW, Uri.parse(blog.link))
