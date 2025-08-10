@@ -67,25 +67,25 @@ class SignupStep5Fragment : Fragment() {
                     if (hasLetter)
                         Pair(R.drawable.ic_check, "영문자 사용")
                     else
-                        Pair(R.drawable.ic_error, "영문자를 포함시켜주세요")
+                        Pair(R.drawable.ic_error, "영문자를 포함해주세요.")
                 )
                 messageList.add(
                     if (hasDigit)
                         Pair(R.drawable.ic_check, "숫자 사용")
                     else
-                        Pair(R.drawable.ic_error, "숫자를 포함시켜주세요")
+                        Pair(R.drawable.ic_error, "숫자를 포함해주세요.")
                 )
                 messageList.add(
                     if (hasSpecial)
                         Pair(R.drawable.ic_check, "특수문자 사용")
                     else
-                        Pair(R.drawable.ic_error, "특수문자를 포함하여 입력해주세요")
+                        Pair(R.drawable.ic_error, "특수문자를 포함해주세요.")
                 )
                 messageList.add(
                     if (lengthValid)
                         Pair(R.drawable.ic_check, "글자수 충족")
                     else
-                        Pair(R.drawable.ic_error, "8자 이상 15자 이내로 입력해주세요")
+                        Pair(R.drawable.ic_error, "8자 이상 15자 이내로 입력해주세요.")
                 )
 
                 containers.forEach { it.visibility = View.GONE }

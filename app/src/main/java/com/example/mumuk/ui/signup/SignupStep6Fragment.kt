@@ -4,25 +4,14 @@ import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.example.mumuk.R
-import com.example.mumuk.data.api.RetrofitClient
-import com.example.mumuk.data.api.TokenManager
-import com.example.mumuk.data.model.auth.LoginRequest
-import com.example.mumuk.data.model.auth.LoginResponse
-import com.example.mumuk.data.model.auth.SignupRequest
-import com.example.mumuk.data.model.auth.SignupResponse
 import com.example.mumuk.databinding.FragmentSignupStep6Binding
-import com.example.mumuk.ui.MainActivity
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+
 
 class SignupStep6Fragment : Fragment() {
 
@@ -69,7 +58,7 @@ class SignupStep6Fragment : Fragment() {
                     else -> {
                         binding.ivPwStatusIcon.setImageResource(R.drawable.ic_check)
                         binding.ivPwStatusIcon.visibility = View.VISIBLE
-                        binding.tvPwStatus.text = "비밀번호가 일치합니다"
+                        binding.tvPwStatus.text = "비밀번호가 일치합니다."
                         binding.tvPwStatus.setTextColor(Color.parseColor("#306AF2"))
                         binding.layoutPw.error = null
                     }
@@ -81,7 +70,7 @@ class SignupStep6Fragment : Fragment() {
             val confirmPw = binding.etPw.text.toString()
             val statusText = binding.tvPwStatus.text.toString()
 
-            if (statusText == "비밀번호가 일치합니다") {
+            if (statusText == "비밀번호가 일치합니다.") {
                 activity.confirmPassword = confirmPw
 
                 parentFragmentManager.beginTransaction()
