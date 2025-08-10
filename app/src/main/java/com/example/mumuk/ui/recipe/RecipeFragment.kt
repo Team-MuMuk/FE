@@ -13,11 +13,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.example.mumuk.databinding.FragmentRecipeBinding
 import com.example.mumuk.data.api.RetrofitClient
-import com.example.mumuk.data.model.Blog
-import com.example.mumuk.data.model.Recipe
 import com.example.mumuk.data.model.recipe.ClickLikeRequest
 import com.example.mumuk.data.model.recipe.ClickLikeResponse
-import com.example.mumuk.data.repository.BlogRepository
+import com.example.mumuk.data.model.recipe.SearchedBlog
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
@@ -37,7 +35,7 @@ class RecipeFragment : Fragment() {
     private var isCurrentlyLiked: Boolean = false
 
     private var isBlogExpanded = false
-    private lateinit var fullBlogList: List<Blog>
+    private var fullBlogList: List<SearchedBlog> = emptyList()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -85,10 +83,8 @@ class RecipeFragment : Fragment() {
                             Log.d("RecipeFragment", "Like API call successful. Response: ${response.body()}")
                         } else {
                             updateLikeButton(isCurrentlyLiked)
-                            // --- 중요: 서버의 실제 에러 메시지를 확인하기 위한 로그 ---
                             val errorBody = response.errorBody()?.string() ?: "No error body"
                             Log.e("RecipeFragment", "Like API call failed. Code: ${response.code()}, ErrorBody: $errorBody")
-                            // ----------------------------------------------------
                         }
                     }
 
@@ -98,6 +94,11 @@ class RecipeFragment : Fragment() {
                     }
                 })
             }
+        }
+
+        binding.plusBtn.setOnClickListener {
+            isBlogExpanded = true
+            updateBlogList()
         }
     }
 
@@ -111,16 +112,8 @@ class RecipeFragment : Fragment() {
         binding.ingredientRV.adapter = IngredientAdapter(emptyList())
 
         // Blog RecyclerView
-        fullBlogList = BlogRepository.getBlogList()
-        val blogAdapter = BlogAdapter(emptyList())
-        binding.blogRV.adapter = blogAdapter
+        binding.blogRV.adapter = BlogAdapter(emptyList())
         binding.blogRV.layoutManager = LinearLayoutManager(context)
-        setBlogListAndButton(blogAdapter)
-
-        binding.plusBtn.setOnClickListener {
-            isBlogExpanded = true
-            setBlogListAndButton(blogAdapter)
-        }
 
         // Shop RecyclerView
         binding.shopRV.adapter = ShopAdapter()
@@ -129,7 +122,7 @@ class RecipeFragment : Fragment() {
 
     private fun observeViewModel() {
         Log.d("RecipeFragment", "observeViewModel: Setting up observers.")
-        // API 응답 데이터를 관찰하여 UI 업데이트
+        // 레시피 상세 정보 관찰
         recipeViewModel.userRecipeDetail.observe(viewLifecycleOwner) { detail ->
             Log.i("RecipeFragment", "userRecipeDetail observer triggered. Data received: $detail")
             isCurrentlyLiked = detail.liked
@@ -163,6 +156,13 @@ class RecipeFragment : Fragment() {
             }
         }
 
+        // 블로그 리스트 관찰
+        recipeViewModel.blogList.observe(viewLifecycleOwner) { blogs ->
+            Log.d("RecipeFragment", "blogList observer triggered. Item count: ${blogs.size}")
+            this.fullBlogList = blogs
+            updateBlogList()
+        }
+
         // shopItemList 관찰
         recipeViewModel.shopItemList.observe(viewLifecycleOwner) { shopList ->
             Log.d("RecipeFragment", "shopItemList observer triggered. Item count: ${shopList.size}")
@@ -177,7 +177,9 @@ class RecipeFragment : Fragment() {
         )
     }
 
-    private fun setBlogListAndButton(blogAdapter: BlogAdapter) {
+    private fun updateBlogList() {
+        val blogAdapter = binding.blogRV.adapter as? BlogAdapter ?: return
+
         if (fullBlogList.size < 5) {
             blogAdapter.submitList(fullBlogList)
             binding.plusBtn.visibility = View.GONE
