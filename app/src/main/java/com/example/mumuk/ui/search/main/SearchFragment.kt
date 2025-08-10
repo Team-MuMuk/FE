@@ -317,7 +317,6 @@ class SearchFragment : Fragment() {
     private fun setupRecentRecipeList() {
         recentRecipeAdapter = SearchRecentRecipeAdapter(recentRecipeList) { recipe ->
             val bundle = bundleOf("recipeId" to recipe.id)
-            Log.d("RecentRecipe", "최근 본 레시피 클릭: $recipe")
             findNavController().navigate(R.id.action_searchFragment_to_recipeFragment, bundle)
         }
         binding.searchRecentRecipeRv.adapter = recentRecipeAdapter
