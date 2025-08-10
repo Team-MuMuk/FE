@@ -101,4 +101,6 @@ dependencies {
 
     //firebase
     implementation("com.google.firebase:firebase-messaging:24.0.0")
+
+    implementation("org.jsoup:jsoup:1.17.2")
 }

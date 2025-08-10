@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -315,12 +316,8 @@ class SearchFragment : Fragment() {
 
     private fun setupRecentRecipeList() {
         recentRecipeAdapter = SearchRecentRecipeAdapter(recentRecipeList) { recipe ->
-            val bundle = Bundle().apply {
-                putLong("recipeId", recipe.id)
-                putString("name", recipe.title)
-                putString("imageUrl", recipe.imageUrl)
-                putBoolean("liked", recipe.liked)
-            }
+            val bundle = bundleOf("recipeId" to recipe.id)
+            Log.d("RecentRecipe", "최근 본 레시피 클릭: $recipe")
             findNavController().navigate(R.id.action_searchFragment_to_recipeFragment, bundle)
         }
         binding.searchRecentRecipeRv.adapter = recentRecipeAdapter

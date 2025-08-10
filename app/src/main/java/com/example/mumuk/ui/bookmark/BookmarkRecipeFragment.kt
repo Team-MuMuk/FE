@@ -1,13 +1,14 @@
 package com.example.mumuk.ui.bookmark
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.mumuk.R
@@ -37,10 +38,15 @@ class BookmarkRecipeFragment : Fragment() {
 
         val recipeAdapter = BookmarkRecipeAdapter()
 
-        recipeAdapter.onItemClick = {
-            findNavController().navigate(R.id.action_bookmarkRecipeFragment_to_recipeFragment)
+        recipeAdapter.onItemClick = { recipe ->
+            Log.d("BookmarkFragment", "Recipe clicked. ID: ${recipe.id}")
+            // 2. bundleOf를 사용하여 recipeId를 RecipeFragment로 전달합니다.
+            val bundle = bundleOf("recipeId" to recipe.id)
+            findNavController().navigate(R.id.action_bookmarkRecipeFragment_to_recipeFragment, bundle)
         }
+
         recipeAdapter.onHeartClick = { recipe, position ->
+            // 좋아요 버튼 클릭 로직
         }
 
         binding.recipeRV.apply {
@@ -71,8 +77,9 @@ class BookmarkRecipeFragment : Fragment() {
             }
         }
 
-        // 최초 진입시 첫 번째 버튼 선택
         selectButton(binding.button)
+        bookmarkViewModel.loadRecipes(RecipeCategory.WEIGHT)
+
 
         binding.button.setOnClickListener {
             selectButton(binding.button)

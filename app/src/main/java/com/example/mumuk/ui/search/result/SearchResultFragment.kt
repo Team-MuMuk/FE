@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
+import androidx.core.os.bundleOf
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -33,10 +34,7 @@ class SearchResultFragment : Fragment() {
     ): View {
         _binding = FragmentSearchResultBinding.inflate(inflater, container, false)
         adapter = SearchResultAdapter(mutableListOf()) { recipe ->
-            val bundle = Bundle().apply {
-                putLong("id", recipe.id)
-                putString("recipeTitle", recipe.title)
-            }
+            val bundle = bundleOf("recipeId" to recipe.id)
             findNavController().navigate(
                 R.id.action_searchResultFragment_to_recipeFragment,
                 bundle

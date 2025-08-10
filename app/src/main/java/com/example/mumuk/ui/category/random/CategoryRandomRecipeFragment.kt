@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
@@ -129,13 +130,7 @@ class CategoryRandomRecipeFragment : Fragment() {
     private fun updateRecyclerWith(items: MutableList<Recipe>) {
         binding.categoryRecipeRecyclerView.adapter =
             CategoryRecipeCardAdapter(items) { recipe ->
-                val bundle = Bundle().apply {
-                    putLong("id", recipe.id)
-                    putString("title", recipe.title)
-                    putInt("img", recipe.img ?: 0)
-                    putBoolean("isLiked", recipe.isLiked)
-                    putString("recipeImageUrl", recipe.recipeImageUrl)
-                }
+                val bundle = bundleOf("recipeId" to recipe.id)
                 findNavController().navigate(
                     R.id.action_categoryRandomRecipeFragment_to_recipeFragment,
                     bundle

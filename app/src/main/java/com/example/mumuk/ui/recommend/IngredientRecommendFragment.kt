@@ -1,9 +1,11 @@
 package com.example.mumuk.ui.recommend
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -48,7 +50,9 @@ class IngredientRecommendFragment : Fragment() {
             aiRecipeAdapter = IngredientAiRecipeAdapter(
                 aiRecipeList.toMutableList(),
                 onItemClick = { recipe ->
-                    findNavController().navigate(R.id.action_ingredientRecommendFragment_to_recipeFragment)
+                    Log.d("IngredientRecommend", "Recipe clicked. ID: ${recipe.id}")
+                    val bundle = bundleOf("recipeId" to recipe.id)
+                    findNavController().navigate(R.id.action_ingredientRecommendFragment_to_recipeFragment, bundle)
                 },
                 onHeartClick = { recipe, position ->
                 }

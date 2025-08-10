@@ -3,29 +3,27 @@ package com.example.mumuk.ui.recipe
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.*
-import com.example.mumuk.data.model.NutritionInfo
 import com.example.mumuk.data.model.ShopItem
 import com.example.mumuk.data.model.Recipe
 import com.example.mumuk.data.model.RecipeIngredient
+import com.example.mumuk.data.model.recipe.SearchedBlog
 import com.example.mumuk.data.model.search.UserRecipeDetailData
+import com.example.mumuk.data.repository.OgImageRepository
 import com.example.mumuk.data.repository.RecipeIngredientRepository
 import com.example.mumuk.data.repository.ShopRepository
 import com.example.mumuk.data.repository.UserRecipeRepository
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 
 class RecipeViewModel(private val userRecipeRepository: UserRecipeRepository) : ViewModel() {
 
     private val shopRepository = ShopRepository()
     private val ingredientRepository = RecipeIngredientRepository()
-
-    private val _nutritionInfoList = MutableLiveData<List<NutritionInfo>>()
-    val nutritionInfoList: LiveData<List<NutritionInfo>> = _nutritionInfoList
+    private val ogImageRepository = OgImageRepository
 
     private val _shopItemList = MutableLiveData<List<ShopItem>>()
     val shopItemList: LiveData<List<ShopItem>> = _shopItemList
-
-    private val _recipeList = MutableLiveData<List<Recipe>>()
-    val recipeList: LiveData<List<Recipe>> = _recipeList
 
     private val _selectedRecipe = MutableLiveData<Recipe>()
     val selectedRecipe: LiveData<Recipe> = _selectedRecipe
@@ -36,14 +34,12 @@ class RecipeViewModel(private val userRecipeRepository: UserRecipeRepository) : 
     private val _userRecipeDetail = MutableLiveData<UserRecipeDetailData>()
     val userRecipeDetail: LiveData<UserRecipeDetailData> = _userRecipeDetail
 
+    private val _blogList = MutableLiveData<List<SearchedBlog>>()
+    val blogList: LiveData<List<SearchedBlog>> = _blogList
+
     init {
         loadShopItems()
         loadIngredients()
-        _recipeList.value = listOf(
-            Recipe(id = 1, img = null, title = "두부유부초밥", isLiked = false),
-            Recipe(id = 2, img = null, title = "김치볶음밥", isLiked = false)
-        )
-        _selectedRecipe.value = _recipeList.value?.firstOrNull()
     }
 
     private fun loadShopItems() {
@@ -53,9 +49,6 @@ class RecipeViewModel(private val userRecipeRepository: UserRecipeRepository) : 
     }
 
     fun updateRecipeLike(recipeId: Long, isLiked: Boolean) {
-        _recipeList.value = _recipeList.value?.map { recipe ->
-            if (recipe.id == recipeId) recipe.copy(isLiked = isLiked) else recipe
-        }
         if (_selectedRecipe.value?.id == recipeId) {
             _selectedRecipe.value = _selectedRecipe.value?.copy(isLiked = isLiked)
         }
@@ -78,13 +71,43 @@ class RecipeViewModel(private val userRecipeRepository: UserRecipeRepository) : 
                     Log.d("RecipeViewModel", "API success. Response body: ${response.body()}")
                     response.body()?.data?.let {
                         Log.d("RecipeViewModel", "Parsed detail data: $it")
-                        _userRecipeDetail.value = it
+                        _userRecipeDetail.postValue(it)
+                        fetchBlogs(it.title)
                     }
                 } else {
-                    Log.e("RecipeViewModel", "API error: code=${response.code()}, message=${response.message()}")
+                    val errorBody = response.errorBody()?.string() ?: "No error body"
+                    Log.e("RecipeViewModel", "API error: code=${response.code()}, message=${response.message()}, errorBody=$errorBody")
                 }
             } catch (e: Exception) {
                 Log.e("RecipeViewModel", "Exception in fetchRecipeDetail: ${e.localizedMessage}", e)
+            }
+        }
+    }
+
+    private fun fetchBlogs(keyword: String) {
+        Log.d("RecipeViewModel", "fetchBlogs() called with keyword: $keyword")
+        viewModelScope.launch {
+            try {
+                val response = userRecipeRepository.searchBlogs(keyword)
+                if (response.isSuccessful) {
+                    val blogs = response.body()?.blogs ?: emptyList()
+                    Log.d("RecipeViewModel", "Blog search API success. Found ${blogs.size} blogs.")
+
+                    val updatedBlogs = blogs.map { blog ->
+                        async {
+                            val ogImage = ogImageRepository.fetchOgImage(blog.link)
+                            blog.ogImageUrl = ogImage
+                            blog
+                        }
+                    }.awaitAll()
+
+                    _blogList.postValue(updatedBlogs)
+                } else {
+                    val errorBody = response.errorBody()?.string() ?: "No error body"
+                    Log.e("RecipeViewModel", "Blog search API error: code=${response.code()}, message=${response.message()}, errorBody=$errorBody")
+                }
+            } catch (e: Exception) {
+                Log.e("RecipeViewModel", "Exception in fetchBlogs: ${e.localizedMessage}", e)
             }
         }
     }

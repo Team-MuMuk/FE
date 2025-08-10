@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,6 +21,7 @@ import com.example.mumuk.databinding.FragmentHealthRecommendBinding
 import com.example.mumuk.data.repository.HealthAiRepository
 import com.example.mumuk.data.model.Recipe
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.os.bundleOf
 
 class HealthRecommendFragment : Fragment() {
     private var _binding: FragmentHealthRecommendBinding? = null
@@ -56,7 +58,9 @@ class HealthRecommendFragment : Fragment() {
         aiRecipeAdapter = HealthAiAdapter(
             emptyList(),
             onItemClick = { recipe ->
-                findNavController().navigate(R.id.action_healthRecommendFragment_to_recipeFragment)
+                Log.d("IngredientRecommend", "Recipe clicked. ID: ${recipe.id}")
+                val bundle = bundleOf("recipeId" to recipe.id)
+                findNavController().navigate(R.id.action_ingredientRecommendFragment_to_recipeFragment, bundle)
             },
             onHeartClick = { recipe, position ->
                 // 여기에서 찜 상태가 변경될 때 필요한 동작 추가 가능
