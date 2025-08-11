@@ -5,6 +5,6 @@ import retrofit2.Call
 import retrofit2.http.GET
 
 interface RandomRecipeApiService {
-    @GET("/api/recipe/recommend/random")
+    @GET("/api/v1/recipe/recommend/random")
     fun getRandomRecipes(): Call<RandomRecipeResponse>
 }
