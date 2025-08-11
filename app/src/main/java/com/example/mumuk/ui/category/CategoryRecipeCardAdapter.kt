@@ -52,22 +52,18 @@ class CategoryRecipeCardAdapter(
     class RecipeViewHolder(val binding: ItemRecipeBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(recipe: Recipe) {
-            when {
-                !recipe.recipeImageUrl.isNullOrEmpty() -> {
-                    Glide.with(binding.recipeImg.context)
-                        .load(recipe.recipeImageUrl)
-                        .placeholder(R.drawable.bg_mosaic)
-                        .error(R.drawable.bg_mosaic)
-                        .into(binding.recipeImg)
-                }
-                recipe.img != null -> {
-                    binding.recipeImg.setImageResource(recipe.img)
-                }
-                else -> {
-                    binding.recipeImg.setImageResource(R.drawable.bg_mosaic)
-                }
+            if (!recipe.recipeImageUrl.isNullOrEmpty()) {
+                Glide.with(binding.recipeImg.context)
+                    .load(recipe.recipeImageUrl)
+                    .placeholder(R.drawable.bg_mosaic)
+                    .error(R.drawable.bg_mosaic)
+                    .into(binding.recipeImg)
+            } else if (recipe.img != null) {
+                binding.recipeImg.setImageResource(recipe.img)
+            } else {
+                binding.recipeImg.setImageResource(R.drawable.bg_mosaic)
             }
-            binding.recipeTitle.text = recipe.title
+            binding.recipeTitle.text = recipe.title ?: ""
             binding.imageView6.setImageResource(
                 if (recipe.isLiked) R.drawable.btn_heart_fill else R.drawable.btn_heart_blank
             )
