@@ -1,6 +1,7 @@
 package com.example.mumuk.ui.search.main
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -108,11 +109,13 @@ class SearchFragment : Fragment() {
     private fun fetchRecentKeywordsFromApi() {
         val context = context ?: return
         val api = RetrofitClient.getRecentSearchApi(context)
+        Log.d("SearchFragment/API", "[RecentKeywords] fetchRecentKeywordsFromApi - 요청 시작")
         api.getRecentSearches().enqueue(object : Callback<RecentSearchResponse> {
             override fun onResponse(
                 call: Call<RecentSearchResponse>,
                 response: Response<RecentSearchResponse>
             ) {
+                Log.d("SearchFragment/API", "[RecentKeywords] onResponse: code=${response.code()}, body=${response.body()}, errorBody=${response.errorBody()?.string()}")
                 if (response.isSuccessful) {
                     val body = response.body()
                     if (body?.status == "OK" && body.data != null) {
@@ -146,6 +149,7 @@ class SearchFragment : Fragment() {
                 }
             }
             override fun onFailure(call: Call<RecentSearchResponse>, t: Throwable) {
+                Log.d("SearchFragment/API", "[RecentKeywords] onFailure: ${t.message}")
                 recentKeywords.clear()
                 recentKeywordAdapter.notifyDataSetChanged()
                 setRecentKeywordEmptyView(true)
@@ -179,12 +183,17 @@ class SearchFragment : Fragment() {
     fun saveRecentKeyword(keyword: String) {
         val context = context ?: return
         val api = RetrofitClient.getRecentSearchApi(context)
+        Log.d("SearchFragment/API", "[RecentKeywords] saveRecentKeyword - keyword=$keyword, 요청 시작")
         api.saveRecentSearch(keyword).enqueue(object : Callback<RecentSearchResponse> {
             override fun onResponse(
                 call: Call<RecentSearchResponse>,
                 response: Response<RecentSearchResponse>
-            ) {}
-            override fun onFailure(call: Call<RecentSearchResponse>, t: Throwable) {}
+            ) {
+                Log.d("SearchFragment/API", "[RecentKeywords] saveRecentKeyword onResponse: code=${response.code()}, body=${response.body()}, errorBody=${response.errorBody()?.string()}")
+            }
+            override fun onFailure(call: Call<RecentSearchResponse>, t: Throwable) {
+                Log.d("SearchFragment/API", "[RecentKeywords] saveRecentKeyword onFailure: ${t.message}")
+            }
         })
     }
 
@@ -192,29 +201,37 @@ class SearchFragment : Fragment() {
         val context = context ?: return
         val api = RetrofitClient.getRecentSearchApi(context)
         val request = RecentSearch(title, createdAt)
+        Log.d("SearchFragment/API", "[RecentKeywords] deleteRecentKeyword - title=$title, createdAt=$createdAt, 요청 시작")
         api.deleteRecentSearch(request).enqueue(object : Callback<RecentSearchResponse> {
             override fun onResponse(
                 call: Call<RecentSearchResponse>,
                 response: Response<RecentSearchResponse>
-            ) {}
-            override fun onFailure(call: Call<RecentSearchResponse>, t: Throwable) {}
+            ) {
+                Log.d("SearchFragment/API", "[RecentKeywords] deleteRecentKeyword onResponse: code=${response.code()}, body=${response.body()}, errorBody=${response.errorBody()?.string()}")
+            }
+            override fun onFailure(call: Call<RecentSearchResponse>, t: Throwable) {
+                Log.d("SearchFragment/API", "[RecentKeywords] deleteRecentKeyword onFailure: ${t.message}")
+            }
         })
     }
 
     private fun fetchSuggestKeywordsFromApi(inflater: LayoutInflater) {
         val context = context ?: return
         val api = RetrofitClient.getSuggestKeywordApi(context)
+        Log.d("SearchFragment/API", "[SuggestKeywords] fetchSuggestKeywordsFromApi - 요청 시작")
         api.getSuggestKeywords().enqueue(object : Callback<SuggestKeywordResponse> {
             override fun onResponse(
                 call: Call<SuggestKeywordResponse>,
                 response: Response<SuggestKeywordResponse>
             ) {
+                Log.d("SearchFragment/API", "[SuggestKeywords] onResponse: code=${response.code()}, body=${response.body()}, errorBody=${response.errorBody()?.string()}")
                 val body = response.body()
                 val keywords = body?.data ?: emptyList()
                 suggestKeywords = keywords
                 setupSuggestKeywordChips(inflater)
             }
             override fun onFailure(call: Call<SuggestKeywordResponse>, t: Throwable) {
+                Log.d("SearchFragment/API", "[SuggestKeywords] onFailure: ${t.message}")
                 suggestKeywords = emptyList()
                 setupSuggestKeywordChips(inflater)
             }
@@ -260,11 +277,13 @@ class SearchFragment : Fragment() {
     private fun fetchPopularKeywordsFromApi() {
         val context = context ?: return
         val api = RetrofitClient.getPopularKeywordApi(context)
+        Log.d("SearchFragment/API", "[PopularKeywords] fetchPopularKeywordsFromApi - 요청 시작")
         api.getPopularKeywords().enqueue(object : Callback<PopularKeywordResponse> {
             override fun onResponse(
                 call: Call<PopularKeywordResponse>,
                 response: Response<PopularKeywordResponse>
             ) {
+                Log.d("SearchFragment/API", "[PopularKeywords] onResponse: code=${response.code()}, body=${response.body()}, errorBody=${response.errorBody()?.string()}")
                 val body = response.body()
                 val keywords = body?.data?.trendKeywordList
                 val timeRaw = body?.data?.localDateTime
@@ -280,6 +299,7 @@ class SearchFragment : Fragment() {
                 }
             }
             override fun onFailure(call: Call<PopularKeywordResponse>, t: Throwable) {
+                Log.d("SearchFragment/API", "[PopularKeywords] onFailure: ${t.message}")
                 popularKeywords = emptyList()
                 setupPopularKeywordList()
                 binding.searchPopularTimeTv.text = "없음"
@@ -326,6 +346,7 @@ class SearchFragment : Fragment() {
 
     private fun observeRecentRecipes() {
         recentRecipeViewModel.recentRecipes.observe(viewLifecycleOwner) { recipes ->
+            Log.d("SearchFragment/API", "[RecentRecipes] observeRecentRecipes: items=${recipes.size}, list=$recipes")
             for (r in recipes) {
                 android.util.Log.d("RecentRecipeList", "id=${r.id}, title=${r.title}, imageUrl=${r.imageUrl}, liked=${r.liked}")
             }
