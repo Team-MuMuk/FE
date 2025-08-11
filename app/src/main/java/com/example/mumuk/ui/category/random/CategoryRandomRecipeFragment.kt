@@ -106,7 +106,7 @@ class CategoryRandomRecipeFragment : Fragment() {
                         Recipe(
                             id = it.id,
                             img = null,
-                            title = it.title,
+                            title = it.title ?: "알 수 없음",
                             isLiked = false,
                             recipeImageUrl = it.recipeImage
                         )

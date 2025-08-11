@@ -110,7 +110,7 @@ class SearchResultFragment : Fragment() {
                     Recipe(
                         id = it.recipeId,
                         img = null,
-                        title = it.name,
+                        title = it.name ?: "알 수 없음",
                         isLiked = it.liked,
                         recipeImageUrl = it.imageUrl
                     )

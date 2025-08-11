@@ -5,6 +5,6 @@ import retrofit2.Call
 import retrofit2.http.GET
 
 interface PopularKeywordApiService {
-    @GET("/api/search/search-trends")
+    @GET("/api/search/trends/recipe-title")
     fun getPopularKeywords(): Call<PopularKeywordResponse>
 }
