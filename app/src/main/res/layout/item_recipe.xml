@@ -15,6 +15,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:strokeColor="@color/black_300"
         app:strokeWidth="1dp"
+        android:layout_marginTop="4dp"
         android:layout_marginEnd="12dp"
         android:layout_marginBottom="16dp">
 
