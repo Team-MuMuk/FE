@@ -193,11 +193,20 @@ class MyPageFragment : Fragment() {
         }
 
         binding.itemPwChange.setOnClickListener {
-            childFragmentManager.commit {
-                replace(R.id.mypage_container, SubChangePw1Fragment())
-                addToBackStack(null)
+            val loginType = TokenManager.getLoginType(requireContext()) ?: "LOCAL"
+            if (loginType == "KAKAO" || loginType == "NAVER") {
+                showSimpleConfirmDialog(
+                    message = "소셜로그인 이용자는\n비밀번호 변경이 불가합니다.",
+                    buttonText = "확인"
+                )
+            } else {
+                childFragmentManager.commit {
+                    replace(R.id.mypage_container, SubChangePw1Fragment())
+                    addToBackStack(null)
+                }
             }
         }
+
 
         return binding.root
     }
@@ -247,7 +256,6 @@ class MyPageFragment : Fragment() {
             onHeartClick = { item, pos ->
                 val id = item.recipeId ?: return@RecentRecipeAdapter
                 val old = item.liked
-                // UI 먼저 토글(빠른 반응)
                 recentAdapter.updateLikeAt(pos, !old)
 
                 RetrofitClient.getUserRecipeApi(requireContext())

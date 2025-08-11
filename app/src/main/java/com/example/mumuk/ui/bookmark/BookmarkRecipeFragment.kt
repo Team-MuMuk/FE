@@ -40,7 +40,6 @@ class BookmarkRecipeFragment : Fragment() {
 
         recipeAdapter.onItemClick = { recipe ->
             Log.d("BookmarkFragment", "Recipe clicked. ID: ${recipe.id}")
-            // 2. bundleOf를 사용하여 recipeId를 RecipeFragment로 전달합니다.
             val bundle = bundleOf("recipeId" to recipe.id)
             findNavController().navigate(R.id.action_bookmarkRecipeFragment_to_recipeFragment, bundle)
         }
