@@ -13,6 +13,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import androidx.navigation.fragment.findNavController
@@ -22,6 +23,8 @@ import com.example.mumuk.R
 import com.example.mumuk.data.api.RetrofitClient
 import com.example.mumuk.data.api.TokenManager
 import com.example.mumuk.data.model.auth.CommonResponse
+import com.example.mumuk.data.model.mypage.RecentRecipe
+import com.example.mumuk.data.model.search.RecentRecipeResponse
 import com.example.mumuk.data.model.mypage.UserProfileData
 import com.example.mumuk.data.model.mypage.UserProfileResponse
 import com.example.mumuk.databinding.DialogDeleteAccountBinding
@@ -31,10 +34,16 @@ import com.example.mumuk.ui.login.LoginIntroActivity
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import com.example.mumuk.data.model.mypage.RecentRecipeAdapter
+import com.example.mumuk.data.model.recipe.ClickLikeRequest
+import com.example.mumuk.data.model.recipe.ClickLikeResponse
+
 
 class MyPageFragment : Fragment() {
     private var _binding: FragmentMyPageBinding? = null
     private val binding get() = _binding!!
+    private lateinit var recentAdapter: RecentRecipeAdapter
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -184,11 +193,20 @@ class MyPageFragment : Fragment() {
         }
 
         binding.itemPwChange.setOnClickListener {
-            childFragmentManager.commit {
-                replace(R.id.mypage_container, SubChangePw1Fragment())
-                addToBackStack(null)
+            val loginType = TokenManager.getLoginType(requireContext()) ?: "LOCAL"
+            if (loginType == "KAKAO" || loginType == "NAVER") {
+                showSimpleConfirmDialog(
+                    message = "소셜로그인 이용자는\n비밀번호 변경이 불가합니다.",
+                    buttonText = "확인"
+                )
+            } else {
+                childFragmentManager.commit {
+                    replace(R.id.mypage_container, SubChangePw1Fragment())
+                    addToBackStack(null)
+                }
             }
         }
+
 
         return binding.root
     }
@@ -221,29 +239,123 @@ class MyPageFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val recentList = mutableListOf(
-            RecentRecipe("연어 포케", R.drawable.bg_mosaic, liked = true),
-            RecentRecipe("훈제오리 포케", R.drawable.bg_mosaic, liked = false),
-            RecentRecipe("그린포케", R.drawable.bg_mosaic, liked = true),
-            RecentRecipe("플레인 포케", R.drawable.bg_mosaic, liked = false),
-            RecentRecipe("참치 포케", R.drawable.bg_mosaic, liked = true),
-            RecentRecipe("스테이크 포케", R.drawable.bg_mosaic, liked = true),
-            RecentRecipe("아보카도 포케", R.drawable.bg_mosaic, liked = false)
-        )
-
-        binding.rvRecentRecipes.apply {
-            adapter = RecentRecipeAdapter(recentList,
-                onItemClick = { recipe ->
-                    findNavController().navigate(R.id.recipeFragment)
-                },
-                onHeartClick = { recipe, position ->
-                }
-            )
-            layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-        }
-
+        setupRecentRecycler()
+        loadRecentRecipes()
         loadUserProfile()
     }
+
+    private fun setupRecentRecycler() {
+        binding.rvRecentRecipes.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        recentAdapter = RecentRecipeAdapter(
+            mutableListOf(),
+            onItemClick = { item ->
+                val args = bundleOf("recipeId" to (item.recipeId))
+                findNavController().navigate(R.id.recipeFragment, args)
+            },
+            onHeartClick = { item, pos ->
+                val id = item.recipeId
+                val old = item.liked
+                recentAdapter.updateLikeAt(pos, !old)
+
+                RetrofitClient.getUserRecipeApi(requireContext())
+                    .clickLike(ClickLikeRequest(id))
+                    .enqueue(object : Callback<ClickLikeResponse> {
+                        override fun onResponse(
+                            call: Call<ClickLikeResponse>,
+                            response: Response<ClickLikeResponse>
+                        ) {
+                            if (response.isSuccessful && response.body()?.status == "OK") {
+                                // 성공 -> 그대로 유지
+                            } else {
+                                // 실패 -> 롤백
+                                recentAdapter.updateLikeAt(pos, old)
+                                Toast.makeText(requireContext(), "찜 실패 (${response.code()})", Toast.LENGTH_SHORT).show()
+                                Log.w("MyPage", "clickLike fail code=${response.code()} body=${response.errorBody()?.string()}")
+                            }
+                        }
+                        override fun onFailure(call: Call<ClickLikeResponse>, t: Throwable) {
+                            recentAdapter.updateLikeAt(pos, old)
+                            Toast.makeText(requireContext(), "네트워크 오류: ${t.message}", Toast.LENGTH_SHORT).show()
+                            Log.e("MyPage","clickLike error", t)
+                        }
+                    })
+            }
+
+
+
+        )
+
+
+
+        binding.rvRecentRecipes.adapter = recentAdapter
+    }
+
+
+    private fun loadRecentRecipes() {
+        Log.d("MyPage", "[recent] call start")
+
+        RetrofitClient.getRecentRecipeApi(requireContext())
+            .getRecentRecipes()
+            .enqueue(object : Callback<RecentRecipeResponse> {
+                override fun onResponse(
+                    call: Call<RecentRecipeResponse>,
+                    response: Response<RecentRecipeResponse>
+                ) {
+                    Log.d("MyPage", "[recent] onResponse code=${response.code()} isSuccessful=${response.isSuccessful}")
+
+                    if (!isAdded) {
+                        Log.w("MyPage", "[recent] fragment not added, skip")
+                        return
+                    }
+
+                    if (response.isSuccessful) {
+                        val body: RecentRecipeResponse? = response.body()
+                        Log.d("MyPage", "[recent] body.status=${body?.status}, code=${body?.code}, msg=${body?.message}")
+
+                        val items: List<com.example.mumuk.data.model.search.RecentRecipe> =
+                            body?.data?.recipeSummaries ?: emptyList()
+
+                        Log.d("MyPage", "[recent] items.size=${items.size}")
+                        if (items.isNotEmpty()) {
+                            val first = items.first()
+                        }
+
+                        val uiList = items.map { dto ->
+                            RecentRecipe(
+                                recipeId = dto.id,
+                                name     = dto.title,
+                                image    = dto.imageUrl ?: "",
+                                liked    = dto.liked
+                            )
+                        }
+
+                        if (uiList.isEmpty()) {
+                            Log.w("MyPage", "[recent] empty list -> adapter submit empty")
+                        }
+
+                        recentAdapter.submitList(uiList)
+                        Log.d("MyPage", "[recent] adapter submitList done (size=${uiList.size})")
+
+                    } else {
+                        val err = response.errorBody()?.string()
+                        Log.e("MyPage", "[recent] fail code=${response.code()} body=$err")
+                        if (response.code() == 401) {
+                            Log.e("MyPage", "[recent] 401 unauthorized -> token may be invalid")
+                        }
+                    }
+
+                }
+
+                override fun onFailure(call: Call<RecentRecipeResponse>, t: Throwable) {
+                    if (!isAdded) return
+                    Log.e("MyPage", "[recent] network error: ${t.message}", t)
+                }
+            })
+    }
+
+
+
 
     private fun loadUserProfile() {
         val loginType = TokenManager.getLoginType(requireContext()) ?: "LOCAL"
@@ -269,7 +381,7 @@ class MyPageFragment : Fragment() {
                         response: Response<UserProfileResponse>
                     ) {
                         if (response.isSuccessful) {
-                            bindProfile(response.body()?.data) // ✅ UserProfileData
+                            bindProfile(response.body()?.data)
                         } else {
                             Log.e("MyPage", "프로필 API 실패: ${response.code()}")
                         }
@@ -301,6 +413,11 @@ class MyPageFragment : Fragment() {
             else     -> R.drawable.ic_user_profile_orange
         }
         binding.imgProfile.setImageResource(profileRes)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (_binding != null) loadRecentRecipes()
     }
 
 

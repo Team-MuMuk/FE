@@ -76,4 +76,7 @@ interface AuthApiService {
 
     @GET("/api/auth/exists/login-id")
     fun checkLoginIdExists(@Query("value") loginId: String): Call<CommonResponse>
+
+
+
 }

@@ -37,6 +37,7 @@ class RecipeFragment : Fragment() {
     private var isBlogExpanded = false
     private var fullBlogList: List<SearchedBlog> = emptyList()
 
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -54,10 +55,11 @@ class RecipeFragment : Fragment() {
         setupRecyclerViews()
         observeViewModel()
 
-        val recipeId = arguments?.getLong("recipeId") ?: 4L
+        val recipeId = requireArguments().getLong("recipeId")
         currentRecipeId = recipeId
         Log.d("RecipeFragment", "onViewCreated: Starting to fetch details for recipeId: $recipeId")
         recipeViewModel.fetchRecipeDetail(recipeId)
+
     }
 
     private fun setupClickListeners() {

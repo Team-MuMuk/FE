@@ -77,4 +77,10 @@ object RetrofitClient {
     fun getCategoryRecipeApi(context: Context): CategoryRecipeApiService {
         return getRetrofit(context).create(CategoryRecipeApiService::class.java)
     }
+
+    fun getRecentRecipeApi(context: Context): RecentRecipeApiService =
+        getRetrofit(context).create(RecentRecipeApiService::class.java)
+
+
+
 }
