@@ -92,18 +92,37 @@ class SearchResultFragment : Fragment() {
                 response: Response<RecipeSearchResponse>
             ) {
                 Log.d("SearchResult", "API onResponse 호출됨")
-                Log.d("SearchResult", "response code = ${response.code()}, body = ${response.body()}")
+                Log.d("SearchResult", "response.code = ${response.code()}")
+                Log.d("SearchResult", "response.raw = ${response.raw()}")
+                Log.d("SearchResult", "response.body = ${response.body()}")
+                Log.d("SearchResult", "response.errorBody = ${response.errorBody()?.string()}")
+
                 val result = response.body()
+                Log.d("SearchResult", "result = $result")
+
+                if (result?.data == null) {
+                    Log.d("SearchResult", "result.data is null")
+                } else {
+                    Log.d("SearchResult", "result.data size = ${result.data.size}")
+                }
+
                 val recipes = result?.data?.map {
                     Recipe(
                         id = it.recipeId,
-                        img = it.imgResId,
+                        img = null,
                         title = it.name,
-                        isLiked = it.liked
+                        isLiked = it.liked,
+                        recipeImageUrl = it.imageUrl
                     )
                 } ?: emptyList()
+
                 Log.d("SearchResult", "파싱된 레시피 개수 = ${recipes.size}")
+                for (r in recipes) {
+                    Log.d("SearchResult", "Recipe: id=${r.id}, title=${r.title}, img=${r.img}, isLiked=${r.isLiked}, recipeImageUrl=${r.recipeImageUrl}")
+                }
                 adapter.updateList(recipes)
+                Log.d("SearchResult", "adapter.updateList 호출됨")
+
                 if (recipes.isEmpty()) {
                     Log.d("SearchResult", "검색 결과 없음")
                     showEmpty()

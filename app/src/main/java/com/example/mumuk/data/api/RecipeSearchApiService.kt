@@ -6,6 +6,6 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface RecipeSearchApiService {
-    @GET("/api/search/recipes")
+    @GET("/api/search/search")
     fun searchRecipes(@Query("keyword") keyword: String): Call<RecipeSearchResponse>
 }
