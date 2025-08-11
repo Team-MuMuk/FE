@@ -1,8 +1,8 @@
 package com.example.mumuk.data.model.category
 
 data class RandomRecipe(
-    val id: Long,
-    val title: String,
-    val recipeImage: String,
-    val liked: Boolean = false
+    val recipeId: Long,
+    val name: String,
+    val imageUrl: String,
+    val liked: Boolean
 )
