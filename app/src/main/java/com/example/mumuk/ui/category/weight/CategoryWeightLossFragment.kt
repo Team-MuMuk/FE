@@ -110,11 +110,11 @@ class CategoryWeightLossFragment : Fragment() {
                 if (response.isSuccessful && response.body()?.data != null) {
                     val recipes = response.body()!!.data.map { categoryRecipe ->
                         Recipe(
-                            id = categoryRecipe.id,
+                            id = categoryRecipe.recipeId,
                             img = null,
-                            title = categoryRecipe.title,
-                            isLiked = false,
-                            recipeImageUrl = categoryRecipe.recipeImage
+                            title = categoryRecipe.name,
+                            isLiked = categoryRecipe.liked,
+                            recipeImageUrl = categoryRecipe.imageUrl
                         )
                     }
                     binding.categoryRecipeRecyclerView.adapter =
