@@ -285,7 +285,7 @@ class SearchFragment : Fragment() {
             ) {
                 Log.d("SearchFragment/API", "[PopularKeywords] onResponse: code=${response.code()}, body=${response.body()}, errorBody=${response.errorBody()?.string()}")
                 val body = response.body()
-                val keywords = body?.data?.trendKeywordList
+                val keywords = body?.data?.trendRecipeTitleList
                 val timeRaw = body?.data?.localDateTime
 
                 popularKeywords = keywords ?: emptyList()

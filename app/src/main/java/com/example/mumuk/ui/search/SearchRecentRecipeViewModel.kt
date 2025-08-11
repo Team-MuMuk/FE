@@ -21,7 +21,7 @@ class SearchRecentRecipeViewModel(private val apiService: RecentRecipeApiService
                 response: Response<RecentRecipeResponse>
             ) {
                 if (response.isSuccessful) {
-                    val recipes = response.body()?.data?.recentRecipes ?: emptyList()
+                    val recipes = response.body()?.data?.recipeSummaries ?: emptyList()
                     _recentRecipes.postValue(recipes)
                 } else {
                     _recentRecipes.postValue(emptyList())
