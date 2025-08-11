@@ -5,29 +5,30 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mumuk.R
 import com.example.mumuk.data.model.Recipe
 import com.example.mumuk.data.repository.IngredientAiRecipeRepository
 import com.example.mumuk.data.repository.IngredientRepository
 import com.example.mumuk.databinding.FragmentIngredientRecommendBinding
-import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 
 class IngredientRecommendFragment : Fragment() {
     private var _binding: FragmentIngredientRecommendBinding? = null
     private val binding get() = _binding!!
 
-    private var aiRecipeList: List<Recipe> = emptyList()
-    private lateinit var aiRecipeAdapter: IngredientAiRecipeAdapter
-    private var isExpanded = false
-
     private val ingredientRepository by lazy { IngredientRepository(requireContext()) }
     private val aiRecipeRepository = IngredientAiRecipeRepository()
+
+    private lateinit var aiRecipeAdapter: IngredientAiRecipeAdapter
+    private var aiRecipeList: List<Recipe> = emptyList()
+    private var isExpanded = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -40,28 +41,8 @@ class IngredientRecommendFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            val ingredientList = ingredientRepository.getIngredients()
-            val adapter = IngredientCountAdapter(ingredientList)
-            binding.countRV.layoutManager = LinearLayoutManager(requireContext())
-            binding.countRV.adapter = adapter
-
-            aiRecipeList = aiRecipeRepository.getAiRecipes()
-            aiRecipeAdapter = IngredientAiRecipeAdapter(
-                aiRecipeList.toMutableList(),
-                onItemClick = { recipe ->
-                    Log.d("IngredientRecommend", "Recipe clicked. ID: ${recipe.id}")
-                    val bundle = bundleOf("recipeId" to recipe.id)
-                    findNavController().navigate(R.id.action_ingredientRecommendFragment_to_recipeFragment, bundle)
-                },
-                onHeartClick = { recipe, position ->
-                }
-            )
-            binding.aiRecipeRV.layoutManager = GridLayoutManager(requireContext(), 2)
-            binding.aiRecipeRV.adapter = aiRecipeAdapter
-
-            updateAiRecipeList()
-        }
+        setupRecyclerViews()
+        loadData()
 
         binding.plusBtn.setOnClickListener {
             isExpanded = true
@@ -73,15 +54,55 @@ class IngredientRecommendFragment : Fragment() {
         }
     }
 
+    private fun setupRecyclerViews() {
+        binding.aiRecipeRV.layoutManager = GridLayoutManager(requireContext(), 2)
+        aiRecipeAdapter = IngredientAiRecipeAdapter(
+            mutableListOf(),
+            onItemClick = { recipe ->
+                Log.d("IngredientRecommend", "Recipe clicked. ID: ${recipe.id}")
+                val bundle = bundleOf("recipeId" to recipe.id)
+                findNavController().navigate(R.id.action_ingredientRecommendFragment_to_recipeFragment, bundle)
+            },
+            onHeartClick = { _, _ ->
+                // TODO: 좋아요 기능 구현
+            }
+        )
+        binding.aiRecipeRV.adapter = aiRecipeAdapter
+    }
+
+    private fun loadData() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                val ingredientList = ingredientRepository.getIngredients()
+                binding.countRV.layoutManager = LinearLayoutManager(requireContext())
+                binding.countRV.adapter = IngredientCountAdapter(ingredientList)
+            } catch (e: Exception) {
+                Log.e("IngredientRecommend", "Failed to load ingredients", e)
+                Toast.makeText(requireContext(), "재료 목록을 불러오는데 실패했습니다.", Toast.LENGTH_SHORT).show()
+            }
+
+            try {
+                // TODO: 현재는 임시 데이터, 추후 AI 레시피 API 연동 필요
+                aiRecipeList = aiRecipeRepository.getAiRecipes()
+                updateAiRecipeList()
+            } catch (e: Exception) {
+                Log.e("IngredientRecommend", "Failed to load AI recipes", e)
+                Toast.makeText(requireContext(), "추천 레시피를 불러오는데 실패했습니다.", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    // AI 추천 레시피 목록 UI 업데이트
     private fun updateAiRecipeList() {
         if (!this::aiRecipeAdapter.isInitialized) return
-        if (aiRecipeList.size > 6 && !isExpanded) {
-            aiRecipeAdapter.updateList(aiRecipeList.take(6))
-            binding.plusBtn.visibility = View.VISIBLE
+
+        val itemsToShow = if (aiRecipeList.size > 6 && !isExpanded) {
+            aiRecipeList.take(6)
         } else {
-            aiRecipeAdapter.updateList(aiRecipeList)
-            binding.plusBtn.visibility = View.GONE
+            aiRecipeList
         }
+        aiRecipeAdapter.updateList(itemsToShow.toMutableList())
+        binding.plusBtn.visibility = if (aiRecipeList.size > 6 && !isExpanded) View.VISIBLE else View.GONE
     }
 
     override fun onDestroyView() {
