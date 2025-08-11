@@ -250,11 +250,11 @@ class MyPageFragment : Fragment() {
         recentAdapter = RecentRecipeAdapter(
             mutableListOf(),
             onItemClick = { item ->
-                val args = bundleOf("recipeId" to (item.recipeId ?: return@RecentRecipeAdapter))
+                val args = bundleOf("recipeId" to (item.recipeId))
                 findNavController().navigate(R.id.recipeFragment, args)
             },
             onHeartClick = { item, pos ->
-                val id = item.recipeId ?: return@RecentRecipeAdapter
+                val id = item.recipeId
                 val old = item.liked
                 recentAdapter.updateLikeAt(pos, !old)
 
@@ -310,14 +310,15 @@ class MyPageFragment : Fragment() {
                     }
 
                     if (response.isSuccessful) {
-                        val body = response.body()
+                        val body: RecentRecipeResponse? = response.body()
                         Log.d("MyPage", "[recent] body.status=${body?.status}, code=${body?.code}, msg=${body?.message}")
 
-                        val items = body?.data?.recentRecipes.orEmpty()
+                        val items: List<com.example.mumuk.data.model.search.RecentRecipe> =
+                            body?.data?.recipeSummaries ?: emptyList()
+
                         Log.d("MyPage", "[recent] items.size=${items.size}")
                         if (items.isNotEmpty()) {
                             val first = items.first()
-                            Log.d("MyPage", "[recent] first.id=${first.id}, title=${first.title}, imageUrl=${first.imageUrl}, liked=${first.liked}")
                         }
 
                         val uiList = items.map { dto ->
@@ -329,12 +330,8 @@ class MyPageFragment : Fragment() {
                             )
                         }
 
-                        // 비었을 때 UI 힌트(선택)
                         if (uiList.isEmpty()) {
                             Log.w("MyPage", "[recent] empty list -> adapter submit empty")
-                            // binding.emptyRecentGroup?.isVisible = true // 있다면
-                        } else {
-                            // binding.emptyRecentGroup?.isVisible = false
                         }
 
                         recentAdapter.submitList(uiList)
@@ -347,6 +344,7 @@ class MyPageFragment : Fragment() {
                             Log.e("MyPage", "[recent] 401 unauthorized -> token may be invalid")
                         }
                     }
+
                 }
 
                 override fun onFailure(call: Call<RecentRecipeResponse>, t: Throwable) {
