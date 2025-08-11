@@ -24,7 +24,7 @@ import com.example.mumuk.data.api.RetrofitClient
 import com.example.mumuk.data.api.TokenManager
 import com.example.mumuk.data.model.auth.CommonResponse
 import com.example.mumuk.data.model.mypage.RecentRecipe
-import com.example.mumuk.data.model.mypage.RecentRecipeListResponse
+import com.example.mumuk.data.model.search.RecentRecipeResponse
 import com.example.mumuk.data.model.mypage.UserProfileData
 import com.example.mumuk.data.model.mypage.UserProfileResponse
 import com.example.mumuk.databinding.DialogDeleteAccountBinding
@@ -293,40 +293,70 @@ class MyPageFragment : Fragment() {
 
 
     private fun loadRecentRecipes() {
-        RetrofitClient.getUserApi(requireContext())
+        Log.d("MyPage", "[recent] call start")
+
+        RetrofitClient.getRecentRecipeApi(requireContext())
             .getRecentRecipes()
-            .enqueue(object : Callback<RecentRecipeListResponse> {
+            .enqueue(object : Callback<RecentRecipeResponse> {
                 override fun onResponse(
-                    call: Call<RecentRecipeListResponse>,
-                    response: Response<RecentRecipeListResponse>
+                    call: Call<RecentRecipeResponse>,
+                    response: Response<RecentRecipeResponse>
                 ) {
-                    if (!isAdded) return
+                    Log.d("MyPage", "[recent] onResponse code=${response.code()} isSuccessful=${response.isSuccessful}")
+
+                    if (!isAdded) {
+                        Log.w("MyPage", "[recent] fragment not added, skip")
+                        return
+                    }
+
                     if (response.isSuccessful) {
-                        val items = response.body()?.data?.recentRecipes.orEmpty()
+                        val body = response.body()
+                        Log.d("MyPage", "[recent] body.status=${body?.status}, code=${body?.code}, msg=${body?.message}")
 
+                        val items = body?.data?.recentRecipes.orEmpty()
+                        Log.d("MyPage", "[recent] items.size=${items.size}")
+                        if (items.isNotEmpty()) {
+                            val first = items.first()
+                            Log.d("MyPage", "[recent] first.id=${first.id}, title=${first.title}, imageUrl=${first.imageUrl}, liked=${first.liked}")
+                        }
 
-                        val uiList = items.map {
+                        val uiList = items.map { dto ->
                             RecentRecipe(
-                                name = it.name,
-                                image = it.imageUrl,
-                                liked = it.liked,
-                                recipeId = it.recipeId
+                                recipeId = dto.id,
+                                name     = dto.title,
+                                image    = dto.imageUrl ?: "",
+                                liked    = dto.liked
                             )
                         }
 
+                        // 비었을 때 UI 힌트(선택)
+                        if (uiList.isEmpty()) {
+                            Log.w("MyPage", "[recent] empty list -> adapter submit empty")
+                            // binding.emptyRecentGroup?.isVisible = true // 있다면
+                        } else {
+                            // binding.emptyRecentGroup?.isVisible = false
+                        }
+
                         recentAdapter.submitList(uiList)
+                        Log.d("MyPage", "[recent] adapter submitList done (size=${uiList.size})")
 
                     } else {
-                        Log.e("MyPage", "최근 레시피 실패 code=${response.code()}")
+                        val err = response.errorBody()?.string()
+                        Log.e("MyPage", "[recent] fail code=${response.code()} body=$err")
+                        if (response.code() == 401) {
+                            Log.e("MyPage", "[recent] 401 unauthorized -> token may be invalid")
+                        }
                     }
                 }
 
-                override fun onFailure(call: Call<RecentRecipeListResponse>, t: Throwable) {
+                override fun onFailure(call: Call<RecentRecipeResponse>, t: Throwable) {
                     if (!isAdded) return
-                    Log.e("MyPage", "최근 레시피 네트워크 오류", t)
+                    Log.e("MyPage", "[recent] network error: ${t.message}", t)
                 }
             })
     }
+
+
 
 
     private fun loadUserProfile() {

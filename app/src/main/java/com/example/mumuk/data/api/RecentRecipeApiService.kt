@@ -5,6 +5,6 @@ import retrofit2.Call
 import retrofit2.http.GET
 
 interface RecentRecipeApiService {
-    @GET("/api/user-recipe/recent-recipe")
+    @GET("/api/user-recipe/recent")
     fun getRecentRecipes(): Call<RecentRecipeResponse>
 }
