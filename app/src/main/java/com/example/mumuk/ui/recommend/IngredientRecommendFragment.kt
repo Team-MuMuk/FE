@@ -24,7 +24,7 @@ class IngredientRecommendFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val ingredientRepository by lazy { IngredientRepository(requireContext()) }
-    private val aiRecipeRepository = IngredientAiRecipeRepository()
+    private val aiRecipeRepository by lazy { IngredientAiRecipeRepository(requireContext()) }
 
     private lateinit var aiRecipeAdapter: IngredientAiRecipeAdapter
     private var aiRecipeList: List<Recipe> = emptyList()
@@ -82,7 +82,6 @@ class IngredientRecommendFragment : Fragment() {
             }
 
             try {
-                // TODO: 현재는 임시 데이터, 추후 AI 레시피 API 연동 필요
                 aiRecipeList = aiRecipeRepository.getAiRecipes()
                 updateAiRecipeList()
             } catch (e: Exception) {
