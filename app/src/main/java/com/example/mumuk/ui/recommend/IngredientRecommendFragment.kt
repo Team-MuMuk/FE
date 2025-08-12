@@ -30,6 +30,13 @@ class IngredientRecommendFragment : Fragment() {
     private var aiRecipeList: List<Recipe> = emptyList()
     private var isExpanded = false
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        if (aiRecipeList.isEmpty()) {
+            loadAiRecipes()
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -42,7 +49,8 @@ class IngredientRecommendFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setupRecyclerViews()
-        loadData()
+        loadIngredients()
+        updateAiRecipeList()
 
         binding.plusBtn.setOnClickListener {
             isExpanded = true
@@ -70,7 +78,7 @@ class IngredientRecommendFragment : Fragment() {
         binding.aiRecipeRV.adapter = aiRecipeAdapter
     }
 
-    private fun loadData() {
+    private fun loadIngredients() {
         viewLifecycleOwner.lifecycleScope.launch {
             try {
                 val ingredientList = ingredientRepository.getIngredients()
@@ -80,18 +88,26 @@ class IngredientRecommendFragment : Fragment() {
                 Log.e("IngredientRecommend", "Failed to load ingredients", e)
                 Toast.makeText(requireContext(), "재료 목록을 불러오는데 실패했습니다.", Toast.LENGTH_SHORT).show()
             }
+        }
+    }
 
+    private fun loadAiRecipes() {
+        lifecycleScope.launch {
             try {
                 aiRecipeList = aiRecipeRepository.getAiRecipes()
-                updateAiRecipeList()
+                // 뷰가 이미 생성되었다면 UI를 업데이트합니다.
+                if (_binding != null) {
+                    updateAiRecipeList()
+                }
             } catch (e: Exception) {
                 Log.e("IngredientRecommend", "Failed to load AI recipes", e)
-                Toast.makeText(requireContext(), "추천 레시피를 불러오는데 실패했습니다.", Toast.LENGTH_SHORT).show()
+                if (context != null) {
+                    Toast.makeText(requireContext(), "추천 레시피를 불러오는데 실패했습니다.", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
 
-    // AI 추천 레시피 목록 UI 업데이트
     private fun updateAiRecipeList() {
         if (!this::aiRecipeAdapter.isInitialized) return
 
