@@ -96,19 +96,19 @@ class BookmarkRecipeFragment : Fragment() {
         fun selectCategory(cat: RecipeCategory) {
             currentCategory = cat
             when (cat) {
-                RecipeCategory.WEIGHT -> selectButton(binding.button)
-                RecipeCategory.HEALTH -> selectButton(binding.button2)
-                RecipeCategory.RANDOM -> selectButton(binding.button3)
+                RecipeCategory.ALL -> selectButton(binding.button)
+                RecipeCategory.WEIGHT -> selectButton(binding.button2)
+                RecipeCategory.HEALTH -> selectButton(binding.button3)
             }
             bookmarkViewModel.loadRecipes(cat)
         }
 
-        selectCategory(RecipeCategory.WEIGHT)
+        selectCategory(RecipeCategory.ALL)
 
 
-        binding.button.setOnClickListener { selectCategory(RecipeCategory.WEIGHT) }
-        binding.button2.setOnClickListener { selectCategory(RecipeCategory.HEALTH) }
-        binding.button3.setOnClickListener { selectCategory(RecipeCategory.RANDOM) }
+        binding.button.setOnClickListener { selectCategory(RecipeCategory.ALL) }
+        binding.button2.setOnClickListener { selectCategory(RecipeCategory.WEIGHT) }
+        binding.button3.setOnClickListener { selectCategory(RecipeCategory.HEALTH) }
     }
 
     override fun onDestroyView() {

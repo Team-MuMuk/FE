@@ -25,7 +25,7 @@ class BookmarkRecipeViewModel(
                 val recipeList = when (category) {
                     RecipeCategory.WEIGHT -> repo.getWeightRecipes()
                     RecipeCategory.HEALTH -> repo.getHealthRecipes()
-                    RecipeCategory.RANDOM -> repo.getRandomRecipes()
+                    RecipeCategory.ALL    -> repo.getAllBookmarkedRecipes()
                 }
                 _recipes.value = recipeList
             } catch (e: Exception) {

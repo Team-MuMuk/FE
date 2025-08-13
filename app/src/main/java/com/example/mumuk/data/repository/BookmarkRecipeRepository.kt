@@ -14,7 +14,7 @@ import retrofit2.Response
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-enum class RecipeCategory { WEIGHT, HEALTH, RANDOM }
+enum class RecipeCategory { WEIGHT, HEALTH, ALL }
 
 class BookmarkRecipeRepository(
     private val categoryApi: CategoryRecipeApiService,
@@ -105,16 +105,9 @@ class BookmarkRecipeRepository(
     suspend fun getHealthRecipes(): List<Recipe> =
         loadCategoryLikedOnly(CategoryKeys.HEALTH_ALL)
 
-    suspend fun getRandomRecipes(): List<Recipe> {
+    suspend fun getAllBookmarkedRecipes(): List<Recipe> {
         val liked: List<MyLiked> = try { getAllMyLiked() } catch (_: Throwable) { emptyList() }
-        if (liked.isEmpty()) return emptyList()
-
-        val weightIds = fetchCategories(CategoryKeys.WEIGHT_ALL).map { it.recipeId }.toSet()
-        val healthIds = fetchCategories(CategoryKeys.HEALTH_ALL).map { it.recipeId }.toSet()
-        val excluded = weightIds + healthIds
-
-        val randomItems = liked.filter { it.id !in excluded }
-        return randomItems.map { m ->
+        return liked.map { m ->
             Recipe(
                 id = m.id,
                 img = null,
