@@ -84,4 +84,8 @@ object RetrofitClient {
     fun getPushAlarmApi(context: Context): PushAlarmApiService {
         return getRetrofit(context).create(PushAlarmApiService::class.java)
     }
+
+    fun getPushFcmTokenApi(context: Context): PushFcmTokenApiService {
+        return getRetrofit(context).create(PushFcmTokenApiService::class.java)
+    }
 }
