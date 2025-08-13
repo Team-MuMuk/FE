@@ -126,7 +126,7 @@ class ProfileFragment : Fragment() {
         }
 
         binding.btnEditProfileImage.setOnClickListener {
-            binding.btnEditProfileImage.setImageResource(R.drawable.ic_profile_pen_blue)
+            binding.btnEditProfileImage.setImageResource(R.drawable.ic_check)
             showProfileImageDialog()
         }
 
@@ -233,7 +233,7 @@ class ProfileFragment : Fragment() {
         hintText: String
     ) {
         if (isEditing) {
-            penIcon.setImageResource(R.drawable.ic_profile_pen_blue)
+            penIcon.setImageResource(R.drawable.ic_check)
             editText.apply {
                 isEnabled = true
                 hint = hintText
