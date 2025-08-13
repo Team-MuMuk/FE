@@ -58,6 +58,21 @@
             app:exitAnim="@anim/hold"
             app:popEnterAnim="@anim/hold"
             app:popExitAnim="@anim/slide_out_right"/>
+
+        <action
+            android:id="@+id/action_navigation_home_to_alarmFragment"
+            app:destination="@id/alarmFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/hold"
+            app:popEnterAnim="@anim/hold"
+            app:popExitAnim="@anim/slide_out_right"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/alarmFragment"
+        android:name="com.example.mumuk.ui.alarm.AlarmFragment"
+        android:label="fragment_alarm"
+        tools:layout="@layout/fragment_alarm" >
     </fragment>
 
     <fragment
