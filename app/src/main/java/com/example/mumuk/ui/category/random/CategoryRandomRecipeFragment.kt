@@ -104,11 +104,11 @@ class CategoryRandomRecipeFragment : Fragment() {
                 if (response.isSuccessful && response.body()?.data != null) {
                     val items = response.body()!!.data.map {
                         Recipe(
-                            id = it.id,
+                            id = it.recipeId,
                             img = null,
-                            title = it.title ?: "알 수 없음",
-                            isLiked = false,
-                            recipeImageUrl = it.recipeImage
+                            title = it.name ?: "알 수 없음",
+                            isLiked = it.liked,
+                            recipeImageUrl = it.imageUrl
                         )
                     }.toMutableList()
                     randomRecipeList = items
