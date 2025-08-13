@@ -2,12 +2,14 @@ package com.example.mumuk.ui.recommend
 
 import android.animation.ObjectAnimator
 import android.app.Dialog
+import android.database.Cursor
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.provider.OpenableColumns
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -23,6 +25,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.example.mumuk.R
 import com.example.mumuk.data.model.Recipe
 import com.example.mumuk.data.repository.HealthAiRecipeRepository
+import com.example.mumuk.data.repository.OcrRepository
 import com.example.mumuk.databinding.FragmentHealthRecommendBinding
 import kotlinx.coroutines.launch
 
@@ -31,6 +34,7 @@ class HealthRecommendFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val healthAiRepository by lazy { HealthAiRecipeRepository(requireContext()) }
+    private val ocrRepository by lazy { OcrRepository(requireContext()) }
 
     private lateinit var aiRecipeAdapter: HealthAiAdapter
     private var aiRecipeList: List<Recipe> = emptyList()
@@ -40,6 +44,9 @@ class HealthRecommendFragment : Fragment() {
         ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri?.let {
+            val fileName = getFileName(it)
+            binding.imgText.text = fileName ?: "image.jpg"
+
             uploadImageToServer(it)
         }
     }
@@ -100,6 +107,8 @@ class HealthRecommendFragment : Fragment() {
         lifecycleScope.launch {
             try {
                 aiRecipeList = healthAiRepository.getAiRecipes()
+                // isExpanded 상태를 false로 초기화하여 '더보기' 로직이 올바르게 동작하도록 함
+                isExpanded = false
                 if (_binding != null) {
                     updateAiRecipeList()
                 }
@@ -125,17 +134,36 @@ class HealthRecommendFragment : Fragment() {
     }
 
     private fun uploadImageToServer(uri: Uri) {
-        // TODO: 서버로 이미지를 업로드하는 코드 구현
-        showAiRecommendDialog()
+        val dialog = showAiRecommendDialog()
+        lifecycleScope.launch {
+            try {
+                // 1. OCR API 호출
+                val ocrResponse = ocrRepository.uploadImageForOcr(uri)
+                Log.d("HealthRecommend", "OCR Success: ${ocrResponse.data}")
+
+                // 2. OCR 성공 후, 새로운 추천 레시피 로드
+                loadAiRecipes()
+
+                dialog.dismiss() // 모든 과정이 성공적으로 끝나면 다이얼로그 닫기
+                Toast.makeText(requireContext(), "새로운 레시피를 추천받았습니다!", Toast.LENGTH_SHORT).show()
+
+            } catch (e: Exception) {
+                dialog.dismiss() // 실패 시 다이얼로그 닫기
+                Log.e("HealthRecommend", "Failed to upload or load recipes", e)
+                if (context != null) {
+                    Toast.makeText(requireContext(), "이미지 분석 또는 레시피 로딩에 실패했습니다.", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
     }
 
-    private fun showAiRecommendDialog() {
+    private fun showAiRecommendDialog(): Dialog {
         val dialog = Dialog(requireContext())
         dialog.setContentView(R.layout.dialog_ai_recommend)
         dialog.setCancelable(false)
 
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialog.window?.setDimAmount(0f)
+        dialog.window?.setDimAmount(0.5f)
         dialog.window?.setLayout(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.MATCH_PARENT
@@ -151,12 +179,32 @@ class HealthRecommendFragment : Fragment() {
         }
 
         dialog.show()
+        return dialog
+    }
 
-        Handler(Looper.getMainLooper()).postDelayed({
-            if (dialog.isShowing) {
-                dialog.dismiss()
+    private fun getFileName(uri: Uri): String? {
+        var result: String? = null
+        if (uri.scheme == "content") {
+            val cursor: Cursor? = context?.contentResolver?.query(uri, null, null, null, null)
+            cursor.use {
+                if (it != null && it.moveToFirst()) {
+                    val nameIndex = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                    if (nameIndex != -1) {
+                        result = it.getString(nameIndex)
+                    }
+                }
             }
-        }, 3000)
+        }
+        if (result == null) {
+            result = uri.path
+            val cut = result?.lastIndexOf('/')
+            if (cut != -1) {
+                if (cut != null) {
+                    result = result?.substring(cut + 1)
+                }
+            }
+        }
+        return result
     }
 
     override fun onDestroyView() {
