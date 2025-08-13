@@ -11,11 +11,10 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginTop="8dp"
-        android:backgroundTint="@color/beige_300"
+        android:backgroundTint="@color/green_100"
         app:cardCornerRadius="100dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:strokeColor="@color/black_300"
         app:strokeWidth="0dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -32,7 +31,7 @@
                 android:layout_marginBottom="5dp"
                 android:fontFamily="@font/pretendard_semibold"
                 android:text="아보카도"
-                android:textColor="@color/beige_800"
+                android:textColor="@color/green_500"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

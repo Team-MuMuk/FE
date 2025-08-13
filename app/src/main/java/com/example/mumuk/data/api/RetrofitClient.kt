@@ -4,6 +4,7 @@ import android.content.Context
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 
 object RetrofitClient {
     private const val BASE_URL = "https://api.mumuk.site"
@@ -12,6 +13,9 @@ object RetrofitClient {
     private fun getRetrofit(context: Context): Retrofit {
         if (retrofit == null) {
             val client = OkHttpClient.Builder()
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS)
+                .writeTimeout(30, TimeUnit.SECONDS) 
                 .addInterceptor(AuthInterceptor(context))
                 .build()
 
@@ -81,6 +85,11 @@ object RetrofitClient {
     fun getRecentRecipeApi(context: Context): RecentRecipeApiService =
         getRetrofit(context).create(RecentRecipeApiService::class.java)
 
-
-
+    fun getRecipeApiService(context: Context): RecipeApiService {
+        return getRetrofit(context).create(RecipeApiService::class.java)
+    }
+    
+    fun getPushAlarmApi(context: Context): PushAlarmApiService {
+        return getRetrofit(context).create(PushAlarmApiService::class.java)
+    }
 }
