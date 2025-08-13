@@ -148,10 +148,6 @@ class FindAccountFragment : Fragment() {
         }
 
 
-
-
-
-
     }
 
     private fun showFindIdLayout() {

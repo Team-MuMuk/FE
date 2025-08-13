@@ -102,13 +102,14 @@ class TermsPrivacyFragment : Fragment() {
         }
 
 
-
         binding.btnAgree.setOnClickListener {
             showSimpleConfirmDialog("동의하시겠습니까?", "확인") {
-                parentFragmentManager.beginTransaction()
-                    .replace(R.id.signup_container, SignupCompleteFragment())
-                    .addToBackStack(null)
-                    .commit()
+                showSimpleConfirmDialog("정상처리되었습니다.", "확인") {
+                    parentFragmentManager.beginTransaction()
+                        .replace(R.id.signup_container, SignupCompleteFragment())
+                        .addToBackStack(null)
+                        .commit()
+                }
             }
         }
 
