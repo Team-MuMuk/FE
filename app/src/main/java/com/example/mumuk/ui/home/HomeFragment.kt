@@ -85,6 +85,9 @@ class HomeFragment : Fragment() {
         binding.personalBtn.setOnClickListener {
             findNavController().navigate(R.id.action_navigation_home_to_healthRecommendFragment)
         }
+        binding.imageView12.setOnClickListener {
+            findNavController().navigate(R.id.action_navigation_home_to_alarmFragment)
+        }
 
         fetchRandomRecipes()
 
