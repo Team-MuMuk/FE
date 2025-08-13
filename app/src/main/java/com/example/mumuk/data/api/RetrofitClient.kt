@@ -81,6 +81,7 @@ object RetrofitClient {
     fun getRecentRecipeApi(context: Context): RecentRecipeApiService =
         getRetrofit(context).create(RecentRecipeApiService::class.java)
 
-
-
+    fun getPushAlarmApi(context: Context): PushAlarmApiService {
+        return getRetrofit(context).create(PushAlarmApiService::class.java)
+    }
 }
