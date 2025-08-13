@@ -153,7 +153,6 @@ class IngredientDetailFragment : Fragment() {
         })
     }
 
-    // userId 없이 fcmToken만 저장하는 방식으로 변경 + 로그 강화
     private fun getFcmTokenAndSave(onComplete: (Boolean) -> Unit) {
         Log.d(TAG, "getFcmTokenAndSave() 호출됨")
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
@@ -170,11 +169,10 @@ class IngredientDetailFragment : Fragment() {
         }
     }
 
-    // userId 파라미터 제거, 요청 body에 fcmToken만 포함 + 로그 강화
     private fun saveFcmToken(fcmToken: String, onComplete: () -> Unit) {
         Log.d(TAG, "FCM 토큰 저장 API 호출 시작, 저장할 fcmToken: $fcmToken")
         val pushFcmTokenApi = RetrofitClient.getPushFcmTokenApi(requireContext())
-        val request = PushFcmTokenRequest(fcmToken = fcmToken) // userId 제거
+        val request = PushFcmTokenRequest(fcmToken = fcmToken)
         Log.d(TAG, "saveFcmToken() - Request Body: $request")
         pushFcmTokenApi.saveFcmToken(request).enqueue(object : Callback<PushFcmTokenResponse> {
             override fun onResponse(
