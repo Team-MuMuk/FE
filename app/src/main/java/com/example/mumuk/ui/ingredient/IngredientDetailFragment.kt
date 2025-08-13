@@ -159,13 +159,11 @@ class IngredientDetailFragment : Fragment() {
             if (task.isSuccessful) {
                 val token = task.result
                 Log.d(TAG, "FCM 토큰 획득 성공: $token")
-                Toast.makeText(requireContext(), "FCM 토큰: $token", Toast.LENGTH_LONG).show()
                 saveFcmToken(token) {
                     onComplete(true)
                 }
             } else {
                 Log.e(TAG, "FCM 토큰 획득 실패: ${task.exception}")
-                Toast.makeText(requireContext(), "FCM 토큰 획득에 실패했습니다. 네트워크를 확인해주세요.", Toast.LENGTH_SHORT).show()
                 onComplete(false)
             }
         }
