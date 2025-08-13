@@ -18,9 +18,12 @@ import android.widget.Toast
 import com.example.mumuk.data.api.RetrofitClient
 import com.example.mumuk.data.model.ingredient.PushAgreeResponse
 import com.example.mumuk.data.model.ingredient.PushAgreeRequest
+import com.example.mumuk.data.model.ingredient.PushFcmTokenRequest
+import com.example.mumuk.data.model.ingredient.PushFcmTokenResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import com.google.firebase.messaging.FirebaseMessaging
 
 class IngredientDetailFragment : Fragment() {
     private var _binding: FragmentIngredientDetailBinding? = null
@@ -43,7 +46,7 @@ class IngredientDetailFragment : Fragment() {
         val ingredient = arguments?.getSerializable("ingredient") as? Ingredient
         ingredient?.let {
             binding.name.text = it.name
-            val expiryDate = it.expiryDate // 예: "2025-10-10"
+            val expiryDate = it.expiryDate
             expiryDate?.let { dateStr ->
                 val parts = dateStr.split("-")
                 if (parts.size == 3) {
@@ -111,8 +114,14 @@ class IngredientDetailFragment : Fragment() {
         btnOk.setOnClickListener {
             Log.d(TAG, "푸시 알림 동의 다이얼로그 확인 버튼 클릭됨")
             pushAgreeApi {
-                Toast.makeText(requireContext(), "푸시 알림 동의가 완료되었습니다.", Toast.LENGTH_SHORT).show()
-                dialog.dismiss()
+                getFcmTokenAndSave { fcmTokenSaved ->
+                    if (fcmTokenSaved) {
+                        Toast.makeText(requireContext(), "푸시 알림 동의 및 토큰 저장 완료!", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(requireContext(), "FCM 토큰 저장에 실패했습니다.", Toast.LENGTH_SHORT).show()
+                    }
+                    dialog.dismiss()
+                }
             }
         }
 
@@ -139,6 +148,48 @@ class IngredientDetailFragment : Fragment() {
             override fun onFailure(call: Call<PushAgreeResponse>, t: Throwable) {
                 Log.e(TAG, "푸시 알림 동의 API 네트워크 오류", t)
                 Toast.makeText(requireContext(), "알림 동의 요청에 실패했습니다.", Toast.LENGTH_SHORT).show()
+                onComplete()
+            }
+        })
+    }
+
+    private fun getFcmTokenAndSave(onComplete: (Boolean) -> Unit) {
+        Log.d(TAG, "getFcmTokenAndSave() 호출됨")
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val token = task.result
+                Log.d(TAG, "FCM 토큰 획득 성공: $token")
+                saveFcmToken(token) {
+                    onComplete(true)
+                }
+            } else {
+                Log.e(TAG, "FCM 토큰 획득 실패: ${task.exception}")
+                onComplete(false)
+            }
+        }
+    }
+
+    private fun saveFcmToken(fcmToken: String, onComplete: () -> Unit) {
+        Log.d(TAG, "FCM 토큰 저장 API 호출 시작, 저장할 fcmToken: $fcmToken")
+        val pushFcmTokenApi = RetrofitClient.getPushFcmTokenApi(requireContext())
+        val request = PushFcmTokenRequest(fcmToken = fcmToken)
+        Log.d(TAG, "saveFcmToken() - Request Body: $request")
+        pushFcmTokenApi.saveFcmToken(request).enqueue(object : Callback<PushFcmTokenResponse> {
+            override fun onResponse(
+                call: Call<PushFcmTokenResponse>,
+                response: Response<PushFcmTokenResponse>
+            ) {
+                Log.d(TAG, "saveFcmToken - API 응답 isSuccessful: ${response.isSuccessful}")
+                if (response.isSuccessful) {
+                    Log.d(TAG, "FCM 토큰 저장 API 성공: ${response.body()}")
+                } else {
+                    Log.e(TAG, "FCM 토큰 저장 API 응답 실패: ${response.code()} ${response.errorBody()?.string()}")
+                }
+                onComplete()
+            }
+
+            override fun onFailure(call: Call<PushFcmTokenResponse>, t: Throwable) {
+                Log.e(TAG, "FCM 토큰 저장 API 네트워크 오류", t)
                 onComplete()
             }
         })
