@@ -137,7 +137,7 @@
             android:id="@+id/line_3"
             android:layout_width="0dp"
             android:layout_height="5dp"
-            android:layout_marginTop="23dp"
+            android:layout_marginTop="8dp"
             android:background="#F3F3F3"
             app:layout_constraintTop_toBottomOf="@id/rv_recent_recipes"
             app:layout_constraintStart_toStartOf="parent"
