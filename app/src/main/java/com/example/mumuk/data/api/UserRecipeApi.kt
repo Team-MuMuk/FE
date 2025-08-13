@@ -1,8 +1,6 @@
 package com.example.mumuk.data.api
 
-import com.example.mumuk.data.model.auth.CommonResponse
-import com.example.mumuk.data.model.bookmark.LikedRecipesPageDto
-import com.example.mumuk.data.model.bookmark.LikedRecipesResponse
+import com.example.mumuk.data.model.bookmark.LikedRecipeResponse
 import com.example.mumuk.data.model.recipe.ClickLikeRequest
 import com.example.mumuk.data.model.recipe.ClickLikeResponse
 import retrofit2.Call
@@ -20,5 +18,5 @@ interface UserRecipeApi {
     suspend fun getLikedRecipes(
         @Query("page") page: Int = 0,
         @Query("size") size: Int = 20
-    ): Response<LikedRecipesResponse>
+    ): Response<LikedRecipeResponse>
 }

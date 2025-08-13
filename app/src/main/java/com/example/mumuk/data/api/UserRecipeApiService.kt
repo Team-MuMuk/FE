@@ -1,5 +1,6 @@
 package com.example.mumuk.data.api
 
+import com.example.mumuk.data.model.bookmark.LikedRecipeResponse
 import com.example.mumuk.data.model.recipe.BlogResponse
 import com.example.mumuk.data.model.recipe.ClickLikeRequest
 import com.example.mumuk.data.model.recipe.ClickLikeResponse
@@ -25,4 +26,11 @@ interface UserRecipeApiService {
     suspend fun searchBlogs(
         @Query("keyword") keyword: String
     ): Response<BlogResponse>
+
+    @GET("/api/user-recipe/liked-recipe")
+    fun getLikedRecipes(
+        @Query("page") page: Int,
+        @Query("size") size: Int
+    ): Call<LikedRecipeResponse>
+
 }

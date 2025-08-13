@@ -9,9 +9,14 @@ import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.mumuk.R
+import com.example.mumuk.data.api.RetrofitClient
+import com.example.mumuk.data.repository.BookmarkRecipeRepository
+import com.example.mumuk.data.repository.RecipeCategory
 import com.example.mumuk.databinding.FragmentBookmarkRecipeBinding
 import com.google.android.material.button.MaterialButton
 
@@ -19,7 +24,21 @@ class BookmarkRecipeFragment : Fragment() {
 
     private var _binding: FragmentBookmarkRecipeBinding? = null
     private val binding get() = _binding!!
-    private val bookmarkViewModel: BookmarkRecipeViewModel by viewModels()
+
+    private val bookmarkViewModel: BookmarkRecipeViewModel by viewModels {
+        object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                val repo = BookmarkRecipeRepository(
+                    categoryApi = RetrofitClient.getCategoryRecipeApi(requireContext()),
+                    userRecipeApiService = RetrofitClient.getUserRecipeApi(requireContext())
+                )
+                @Suppress("UNCHECKED_CAST")
+                return BookmarkRecipeViewModel(repo) as T
+            }
+        }
+    }
+
+    private var currentCategory = RecipeCategory.WEIGHT
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -32,32 +51,30 @@ class BookmarkRecipeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.backBtn.setOnClickListener {
-            findNavController().navigateUp()
-        }
+        binding.backBtn.setOnClickListener { findNavController().navigateUp() }
 
-        val recipeAdapter = BookmarkRecipeAdapter()
-
-        recipeAdapter.onItemClick = { recipe ->
-            Log.d("BookmarkFragment", "Recipe clicked. ID: ${recipe.id}")
-            val bundle = bundleOf("recipeId" to recipe.id)
-            findNavController().navigate(R.id.action_bookmarkRecipeFragment_to_recipeFragment, bundle)
-        }
-
-        recipeAdapter.onHeartClick = { recipe, position ->
-            // 좋아요 버튼 클릭 로직
+        val recipeAdapter = BookmarkRecipeAdapter().apply {
+            onItemClick = { recipe ->
+                Log.d("BookmarkFragment", "Recipe clicked. ID: ${recipe.id}")
+                val bundle = bundleOf("recipeId" to recipe.id)
+                findNavController().navigate(
+                    R.id.action_bookmarkRecipeFragment_to_recipeFragment, bundle
+                )
+            }
+            onHeartClick = { recipe, position ->
+                bookmarkViewModel.onHeartClick(recipe, position)
+            }
         }
 
         binding.recipeRV.apply {
-            adapter = recipeAdapter
             layoutManager = GridLayoutManager(context, 2)
+            adapter = recipeAdapter
         }
 
         bookmarkViewModel.recipes.observe(viewLifecycleOwner) { recipes ->
             recipeAdapter.submitList(recipes)
         }
 
-        // 버튼 색상 리소스
         val buttons = listOf(binding.button, binding.button2, binding.button3)
         val selectedBg = ContextCompat.getColor(requireContext(), R.color.green_100)
         val selectedText = ContextCompat.getColor(requireContext(), R.color.green_800)
@@ -65,33 +82,33 @@ class BookmarkRecipeFragment : Fragment() {
         val unselectedText = ContextCompat.getColor(requireContext(), R.color.black)
 
         fun selectButton(selected: MaterialButton) {
-            buttons.forEach { button ->
-                if (button == selected) {
-                    button.setBackgroundColor(selectedBg)
-                    button.setTextColor(selectedText)
+            buttons.forEach { btn ->
+                if (btn == selected) {
+                    btn.setBackgroundColor(selectedBg)
+                    btn.setTextColor(selectedText)
                 } else {
-                    button.setBackgroundColor(unselectedBg)
-                    button.setTextColor(unselectedText)
+                    btn.setBackgroundColor(unselectedBg)
+                    btn.setTextColor(unselectedText)
                 }
             }
         }
 
-        selectButton(binding.button)
-        bookmarkViewModel.loadRecipes(RecipeCategory.WEIGHT)
+        fun selectCategory(cat: RecipeCategory) {
+            currentCategory = cat
+            when (cat) {
+                RecipeCategory.ALL -> selectButton(binding.button)
+                RecipeCategory.WEIGHT -> selectButton(binding.button2)
+                RecipeCategory.HEALTH -> selectButton(binding.button3)
+            }
+            bookmarkViewModel.loadRecipes(cat)
+        }
+
+        selectCategory(RecipeCategory.ALL)
 
 
-        binding.button.setOnClickListener {
-            selectButton(binding.button)
-            bookmarkViewModel.loadRecipes(RecipeCategory.WEIGHT)
-        }
-        binding.button2.setOnClickListener {
-            selectButton(binding.button2)
-            bookmarkViewModel.loadRecipes(RecipeCategory.HEALTH)
-        }
-        binding.button3.setOnClickListener {
-            selectButton(binding.button3)
-            bookmarkViewModel.loadRecipes(RecipeCategory.RANDOM)
-        }
+        binding.button.setOnClickListener { selectCategory(RecipeCategory.ALL) }
+        binding.button2.setOnClickListener { selectCategory(RecipeCategory.WEIGHT) }
+        binding.button3.setOnClickListener { selectCategory(RecipeCategory.HEALTH) }
     }
 
     override fun onDestroyView() {
