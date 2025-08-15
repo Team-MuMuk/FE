@@ -10,6 +10,7 @@ import android.widget.PopupWindow
 import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -20,9 +21,10 @@ import com.example.mumuk.data.api.TokenManager
 import com.example.mumuk.data.model.Recipe
 import com.example.mumuk.data.model.category.RandomRecipeResponse
 import com.example.mumuk.data.model.mypage.UserProfileResponse
-import com.example.mumuk.data.repository.RecipeRankRepository
+import com.example.mumuk.data.repository.RecipeTrendRepository
 import com.example.mumuk.databinding.FragmentHomeBinding
 import com.google.android.material.card.MaterialCardView
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -36,7 +38,7 @@ class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
-    private val recipeRankRepository = RecipeRankRepository()
+    private val recipeTrendRepository = RecipeTrendRepository()
     private lateinit var recipeRankAdapter: RecipeRankAdapter
 
     private var randomRecipeList: MutableList<Recipe>? = null
@@ -171,17 +173,20 @@ class HomeFragment : Fragment() {
 
     private fun setupRankRecyclerView() {
         recipeRankAdapter = RecipeRankAdapter(
-            onItemClick = {
-                findNavController().navigate(R.id.action_navigation_home_to_recipeFragment)
+            onItemClick = { recipeRank ->
+                val bundle = bundleOf("recipeId" to recipeRank.recipeId?.toLong())
+                findNavController().navigate(R.id.action_navigation_home_to_recipeFragment, bundle)
             },
-            onHeartClick = { recipeRank, position ->
-            }
+            onHeartClick = { recipeRank, position -> }
         )
         binding.rankRV.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = recipeRankAdapter
         }
-        recipeRankAdapter.submitList(recipeRankRepository.getHealthRankRecipes())
+        viewLifecycleOwner.lifecycleScope.launch {
+            val rankList = recipeTrendRepository.getRecipeTrendRank(requireContext())
+            recipeRankAdapter.submitList(rankList)
+        }
     }
 
     private fun loadUserNicknameForHome() {
