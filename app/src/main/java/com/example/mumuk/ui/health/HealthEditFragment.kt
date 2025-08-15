@@ -85,7 +85,7 @@ class HealthEditFragment : Fragment() {
                     ) {
                         android.util.Log.d("HealthEditFragment", "toggleAllergies API 응답: isSuccessful=${response.isSuccessful}, code=${response.code()}, body=${response.body()}")
                         if (response.isSuccessful) {
-                            val latestAllergies = response.body()?.data?.results?.map { it.allergyType } ?: emptyList()
+                            val latestAllergies = response.body()?.data?.allergyOptions?.map { it.allergyType } ?: emptyList()
                             android.util.Log.d("HealthEditFragment", "서버 반영된 allergyType: $latestAllergies")
                             allergyButtonMap.forEach { (type, btn) ->
                                 btn.isChecked = latestAllergies.contains(type)
@@ -202,7 +202,7 @@ class HealthEditFragment : Fragment() {
             btn.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
         } else {
             btn.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
-            btn.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+            btn.setTextColor(ContextCompat.getColor(requireContext(), R.color.beige_500))
         }
     }
 
@@ -212,7 +212,7 @@ class HealthEditFragment : Fragment() {
             btn.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
         } else {
             btn.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
-            btn.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+            btn.setTextColor(ContextCompat.getColor(requireContext(), R.color.beige_500))
         }
     }
 
