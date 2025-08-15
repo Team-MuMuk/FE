@@ -6,7 +6,7 @@ data class ToggleAllergyResult(
 )
 
 data class ToggleAllergyResponseData(
-    val results: List<ToggleAllergyResult>
+    val allergyOptions: List<AllergyOption>
 )
 
 data class ToggleAllergyResponse(

@@ -96,4 +96,12 @@ object RetrofitClient {
     fun getPushFcmTokenApi(context: Context): PushFcmTokenApiService {
         return getRetrofit(context).create(PushFcmTokenApiService::class.java)
     }
+
+    fun getHealthApi(context: Context): HealthApiService {
+        return getRetrofit(context).create(HealthApiService::class.java)
+    }
+
+    fun getUserInfoApi(context: Context): UserInfoApiService {
+        return getRetrofit(context).create(UserInfoApiService::class.java)
+    }
 }

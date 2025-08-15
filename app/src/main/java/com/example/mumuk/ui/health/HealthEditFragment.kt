@@ -10,11 +10,15 @@ import androidx.navigation.fragment.findNavController
 import com.example.mumuk.databinding.FragmentHealthEditBinding
 import com.example.mumuk.R
 import com.example.mumuk.data.api.AllergyApiService
+import com.example.mumuk.data.api.HealthApiService
 import com.example.mumuk.data.api.RetrofitClient
 import com.example.mumuk.data.api.TokenManager
 import com.example.mumuk.data.model.allergy.AllergyOptionsResponse
 import com.example.mumuk.data.model.allergy.ToggleAllergyRequest
 import com.example.mumuk.data.model.allergy.ToggleAllergyResponse
+import com.example.mumuk.data.model.health.HealthGoalsResponse
+import com.example.mumuk.data.model.health.ToggleHealthGoalRequest
+import com.example.mumuk.data.model.health.ToggleHealthGoalResponse
 import com.google.android.material.button.MaterialButton
 import retrofit2.Call
 import retrofit2.Callback
@@ -30,6 +34,10 @@ class HealthEditFragment : Fragment() {
     private lateinit var allergyButtonMap: Map<String, MaterialButton>
     private lateinit var allergyTypeByButton: Map<MaterialButton, String>
     private lateinit var allergyApi: AllergyApiService
+
+    private lateinit var goalButtonMap: Map<String, MaterialButton>
+    private lateinit var goalTypeByButton: Map<MaterialButton, String>
+    private lateinit var healthApi: HealthApiService
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -85,7 +93,7 @@ class HealthEditFragment : Fragment() {
                     ) {
                         android.util.Log.d("HealthEditFragment", "toggleAllergies API 응답: isSuccessful=${response.isSuccessful}, code=${response.code()}, body=${response.body()}")
                         if (response.isSuccessful) {
-                            val latestAllergies = response.body()?.data?.results?.map { it.allergyType } ?: emptyList()
+                            val latestAllergies = response.body()?.data?.allergyOptions?.map { it.allergyType } ?: emptyList()
                             android.util.Log.d("HealthEditFragment", "서버 반영된 allergyType: $latestAllergies")
                             allergyButtonMap.forEach { (type, btn) ->
                                 btn.isChecked = latestAllergies.contains(type)
@@ -136,7 +144,7 @@ class HealthEditFragment : Fragment() {
         )
         goalButtons.forEach { btn ->
             btn.setOnClickListener {
-                if (isGoalEditSelected) {
+                if (!isGoalEditSelected) {
                     btn.isChecked = !btn.isChecked
                 }
                 updateGoalButtonColor(btn)
@@ -162,6 +170,83 @@ class HealthEditFragment : Fragment() {
                     }
                 }
                 override fun onFailure(call: Call<AllergyOptionsResponse>, t: Throwable) {
+                    // TODO: 에러 처리
+                }
+            })
+
+        healthApi = RetrofitClient.getHealthApi(requireContext())
+
+        binding.cardViewGoalEdit.setOnClickListener {
+            val wasSelected = isGoalEditSelected
+            isGoalEditSelected = !isGoalEditSelected
+            toggleCard(
+                selected = isGoalEditSelected,
+                card = binding.cardViewGoalEdit,
+                layout = binding.layoutGoalEdit,
+                textView = binding.tvGoalEdit,
+                imageView = binding.ivGoalEdit,
+                defaultText = "수정"
+            )
+
+            // "완료"에서 "수정" 전환 시 서버에 변경 반영
+            if (!isGoalEditSelected && wasSelected) {
+                val selectedTypes = goalTypeByButton.filter { it.key.isChecked }.values.toList()
+                android.util.Log.d("HealthEditFragment", "선택된 healthGoalType: $selectedTypes")
+                val request = ToggleHealthGoalRequest(healthGoalTypeList = selectedTypes)
+                healthApi.toggleHealthGoals(request).enqueue(object : Callback<ToggleHealthGoalResponse> {
+                    override fun onResponse(
+                        call: Call<ToggleHealthGoalResponse>,
+                        response: Response<ToggleHealthGoalResponse>
+                    ) {
+                        android.util.Log.d("HealthEditFragment", "toggleHealthGoals API 응답: isSuccessful=${response.isSuccessful}, code=${response.code()}, body=${response.body()}")
+                        if (response.isSuccessful) {
+                            val latestGoals = response.body()?.data?.healthGoalList?.map { it.healthGoalType } ?: emptyList()
+                            android.util.Log.d("HealthEditFragment", "서버 반영된 healthGoalType: $latestGoals")
+                            goalButtonMap.forEach { (type, btn) ->
+                                btn.isChecked = latestGoals.contains(type)
+                                updateGoalButtonColor(btn)
+                            }
+                        } else {
+                            android.util.Log.e("HealthEditFragment", "toggleHealthGoals 실패: code=${response.code()}, errorBody=${response.errorBody()?.string()}")
+                        }
+                    }
+                    override fun onFailure(call: Call<ToggleHealthGoalResponse>, t: Throwable) {
+                        android.util.Log.e("HealthEditFragment", "toggleHealthGoals API 호출 실패", t)
+                        // TODO: 에러 처리
+                    }
+                })
+            }
+        }
+
+        // ... 버튼 초기화, 서버 조회 등 기존 코드 유지
+        goalButtonMap = mapOf(
+            "WEIGHT_LOSS" to binding.btnWeightLoss,
+            "MUSCLE_GAIN" to binding.btnMuscleGain,
+            "SUGAR_REDUCTION" to binding.btnSugarReduction,
+            "BLOOD_PRESSURE" to binding.btnBloodPressure,
+            "CHOLESTEROL" to binding.btnCholesterol,
+            "DIGESTIVE_HEALTH" to binding.btnDigestiveHealth,
+            "NONE" to binding.btnNoneGoal
+        )
+        goalTypeByButton = goalButtonMap.entries.associate { (type, btn) -> btn to type }
+
+        healthApi.getHealthGoals()
+            .enqueue(object : Callback<HealthGoalsResponse> {
+                override fun onResponse(
+                    call: Call<HealthGoalsResponse>,
+                    response: Response<HealthGoalsResponse>
+                ) {
+                    if (response.isSuccessful) {
+                        val goals = response.body()?.data?.healthGoalList ?: emptyList()
+                        goals.forEach { goal ->
+                            goalButtonMap[goal.healthGoalType]?.let { btn ->
+                                btn.isChecked = true
+                                updateGoalButtonColor(btn)
+                            }
+                        }
+                    }
+                }
+                override fun onFailure(call: Call<HealthGoalsResponse>, t: Throwable) {
                     // TODO: 에러 처리
                 }
             })
@@ -202,7 +287,7 @@ class HealthEditFragment : Fragment() {
             btn.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
         } else {
             btn.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
-            btn.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+            btn.setTextColor(ContextCompat.getColor(requireContext(), R.color.beige_500))
         }
     }
 
@@ -212,7 +297,7 @@ class HealthEditFragment : Fragment() {
             btn.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
         } else {
             btn.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
-            btn.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+            btn.setTextColor(ContextCompat.getColor(requireContext(), R.color.beige_500))
         }
     }
 

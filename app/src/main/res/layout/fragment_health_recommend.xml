@@ -146,73 +146,21 @@
                 app:layout_constraintStart_toEndOf="@+id/textView53"
                 app:layout_constraintTop_toTopOf="@+id/textView53" />
 
-            <androidx.cardview.widget.CardView
-                android:id="@+id/filter1"
-                android:layout_width="wrap_content"
+            <HorizontalScrollView
+                android:id="@+id/filterScrollView"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:backgroundTint="@color/beige_200"
-                app:cardCornerRadius="5dp"
-                app:cardElevation="0dp"
+                android:scrollbars="none"
                 app:layout_constraintStart_toStartOf="@+id/textView53"
                 app:layout_constraintTop_toBottomOf="@+id/textView53">
 
-                <TextView
-                    android:id="@+id/filter1Text"
+                <LinearLayout
+                    android:id="@+id/filterContainer"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingLeft="8dp"
-                    android:paddingTop="4dp"
-                    android:paddingRight="8dp"
-                    android:paddingBottom="4dp"
-                    android:text="견과류 알레르기" />
-            </androidx.cardview.widget.CardView>
-
-            <androidx.cardview.widget.CardView
-                android:id="@+id/filter2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:backgroundTint="@color/beige_200"
-                app:cardCornerRadius="5dp"
-                app:cardElevation="0dp"
-                app:layout_constraintStart_toEndOf="@+id/filter1"
-                app:layout_constraintTop_toBottomOf="@+id/textView53">
-
-                <TextView
-                    android:id="@+id/filter2Text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingLeft="8dp"
-                    android:paddingTop="4dp"
-                    android:paddingRight="8dp"
-                    android:paddingBottom="4dp"
-                    android:text="갑각류 알레르기" />
-            </androidx.cardview.widget.CardView>
-
-            <androidx.cardview.widget.CardView
-                android:id="@+id/filter3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:backgroundTint="@color/beige_200"
-                app:cardCornerRadius="5dp"
-                app:cardElevation="0dp"
-                app:layout_constraintStart_toEndOf="@+id/filter2"
-                app:layout_constraintTop_toBottomOf="@+id/textView53">
-
-                <TextView
-                    android:id="@+id/filter3Text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingLeft="8dp"
-                    android:paddingTop="4dp"
-                    android:paddingRight="8dp"
-                    android:paddingBottom="4dp"
-                    android:text="체중감량" />
-            </androidx.cardview.widget.CardView>
+                    android:orientation="horizontal"/>
+            </HorizontalScrollView>
 
             <TextView
                 android:id="@+id/textView55"
@@ -222,7 +170,7 @@
                 android:layout_marginTop="20dp"
                 android:text="사진첨부"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/filter1"
+                app:layout_constraintTop_toBottomOf="@+id/filterScrollView"
                 android:fontFamily="@font/pretendard_regular"
                 android:textSize="12sp"/>
 
@@ -281,7 +229,7 @@
                 app:cardElevation="0dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/filter1"
+                app:layout_constraintTop_toBottomOf="@+id/filterScrollView"
                 app:strokeColor="@color/red_inbody"
                 app:strokeWidth="2dp">
 
