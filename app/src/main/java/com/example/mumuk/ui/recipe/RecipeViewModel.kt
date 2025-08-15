@@ -3,9 +3,9 @@ package com.example.mumuk.ui.recipe
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.*
-import com.example.mumuk.data.model.ShopItem
 import com.example.mumuk.data.model.Recipe
 import com.example.mumuk.data.model.RecipeIngredient
+import com.example.mumuk.data.model.recipe.NaverShoppingItem
 import com.example.mumuk.data.model.recipe.SearchedBlog
 import com.example.mumuk.data.model.search.UserRecipeDetailData
 import com.example.mumuk.data.repository.OgImageRepository
@@ -16,14 +16,14 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 
-class RecipeViewModel(private val userRecipeRepository: UserRecipeRepository) : ViewModel() {
+class RecipeViewModel(private val userRecipeRepository: UserRecipeRepository, private val context: Context) : ViewModel() {
 
-    private val shopRepository = ShopRepository()
+    private val shopRepository = ShopRepository(context)
     private val ingredientRepository = RecipeIngredientRepository()
     private val ogImageRepository = OgImageRepository
 
-    private val _shopItemList = MutableLiveData<List<ShopItem>>()
-    val shopItemList: LiveData<List<ShopItem>> = _shopItemList
+    private val _shopItemList = MutableLiveData<List<NaverShoppingItem>>()
+    val shopItemList: LiveData<List<NaverShoppingItem>> = _shopItemList
 
     private val _selectedRecipe = MutableLiveData<Recipe>()
     val selectedRecipe: LiveData<Recipe> = _selectedRecipe
@@ -38,13 +38,18 @@ class RecipeViewModel(private val userRecipeRepository: UserRecipeRepository) : 
     val blogList: LiveData<List<SearchedBlog>> = _blogList
 
     init {
-        loadShopItems()
         loadIngredients()
     }
 
-    private fun loadShopItems() {
+    fun fetchShopItems(recipeId: Long) {
         viewModelScope.launch {
-            _shopItemList.value = shopRepository.getShopItems()
+            try {
+                val items = shopRepository.getNaverShoppingItems(recipeId)
+                _shopItemList.value = items
+            } catch (e: Exception) {
+                Log.e("RecipeViewModel", "Exception in fetchShopItems: ${e.localizedMessage}", e)
+                _shopItemList.value = emptyList()
+            }
         }
     }
 
@@ -73,6 +78,7 @@ class RecipeViewModel(private val userRecipeRepository: UserRecipeRepository) : 
                         Log.d("RecipeViewModel", "Parsed detail data: $it")
                         _userRecipeDetail.postValue(it)
                         fetchBlogs(it.title)
+                        fetchShopItems(recipeId) // 네이버 쇼핑 불러오기 추가!
                     }
                 } else {
                     val errorBody = response.errorBody()?.string() ?: "No error body"
@@ -118,7 +124,7 @@ class RecipeViewModel(private val userRecipeRepository: UserRecipeRepository) : 
             if (modelClass.isAssignableFrom(RecipeViewModel::class.java)) {
                 val repo = UserRecipeRepository(context)
                 @Suppress("UNCHECKED_CAST")
-                return RecipeViewModel(repo) as T
+                return RecipeViewModel(repo, context) as T
             }
             throw IllegalArgumentException("Unknown ViewModel class")
         }

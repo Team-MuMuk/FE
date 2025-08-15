@@ -59,6 +59,7 @@ class RecipeFragment : Fragment() {
         currentRecipeId = recipeId
         Log.d("RecipeFragment", "onViewCreated: Starting to fetch details for recipeId: $recipeId")
         recipeViewModel.fetchRecipeDetail(recipeId)
+        recipeViewModel.fetchShopItems(recipeId)
 
     }
 
@@ -155,6 +156,12 @@ class RecipeFragment : Fragment() {
 
                 // 재료 목록 RecyclerView 업데이트
                 (ingredientRV.adapter as? IngredientAdapter)?.updateData(detail.recipeIngredients)
+
+                recipeTitle2.text = "#${detail.title}"
+
+                recipeViewModel.shopItemList.observe(viewLifecycleOwner) { shopList ->
+                    (binding.shopRV.adapter as? ShopAdapter)?.submitList(shopList)
+                }
             }
         }
 
