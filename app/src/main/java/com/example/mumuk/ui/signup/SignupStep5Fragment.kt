@@ -29,6 +29,8 @@ class SignupStep5Fragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.btnNext.setImageResource(R.drawable.btn_next_gray)
+
         binding.etPw.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun afterTextChanged(s: Editable?) {}
@@ -96,6 +98,8 @@ class SignupStep5Fragment : Fragment() {
                     binding.ivPwErrorIcon1.setImageResource(R.drawable.ic_check)
                     binding.tvPwErrorMsg1.text = "정상적으로 확인되었습니다"
                     binding.tvPwErrorMsg1.setTextColor(Color.parseColor("#306AF2"))
+
+                    binding.btnNext.setImageResource(R.drawable.btn_next)
                 } else {
                     messageList.forEachIndexed { index, pair ->
                         containers[index].visibility = View.VISIBLE
@@ -108,6 +112,8 @@ class SignupStep5Fragment : Fragment() {
                                 Color.parseColor("#306AF2")
                         )
                     }
+
+                    binding.btnNext.setImageResource(R.drawable.btn_next_gray) 
                 }
             }
         })
@@ -138,6 +144,7 @@ class SignupStep5Fragment : Fragment() {
                 .commit()
         }
     }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

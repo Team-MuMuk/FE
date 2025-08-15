@@ -29,6 +29,7 @@ class SignupStep6Fragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.btnNext.setImageResource(R.drawable.btn_next_gray)
 
         val activity = requireActivity() as SignupActivity
         val originalPassword = activity.password
@@ -47,6 +48,7 @@ class SignupStep6Fragment : Fragment() {
                         binding.tvPwStatus.text = "비밀번호를 입력해주세요."
                         binding.tvPwStatus.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
                         binding.layoutPw.error = null
+                        binding.btnNext.setImageResource(R.drawable.btn_next_gray)
                     }
                     input != originalPassword -> {
                         binding.ivPwStatusIcon.setImageResource(R.drawable.ic_error)
@@ -54,6 +56,7 @@ class SignupStep6Fragment : Fragment() {
                         binding.tvPwStatus.text = "비밀번호가 일치하지 않습니다."
                         binding.tvPwStatus.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
                         binding.layoutPw.error = null
+                        binding.btnNext.setImageResource(R.drawable.btn_next_gray)
                     }
                     else -> {
                         binding.ivPwStatusIcon.setImageResource(R.drawable.ic_check)
@@ -61,6 +64,7 @@ class SignupStep6Fragment : Fragment() {
                         binding.tvPwStatus.text = "비밀번호가 일치합니다."
                         binding.tvPwStatus.setTextColor(Color.parseColor("#306AF2"))
                         binding.layoutPw.error = null
+                        binding.btnNext.setImageResource(R.drawable.btn_next)
                     }
                 }
             }

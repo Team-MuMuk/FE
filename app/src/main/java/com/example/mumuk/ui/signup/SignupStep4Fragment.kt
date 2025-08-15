@@ -23,13 +23,11 @@ class SignupStep4Fragment : Fragment() {
 
     private var isLoginIdUnique = false
 
-    // 디바운스/요청 추적/상태 가드
     private val handler = android.os.Handler(android.os.Looper.getMainLooper())
     private var debounceRunnable: Runnable? = null
     private var ongoingCall: Call<CommonResponse>? = null
     private var lastRequestedId: String? = null
 
-    // UI 상태
     private var inFinalStatus = false        // 최종(사용가능/중복/오류) 메시지 모드
     private var lastFinalId: String? = null  // 마지막으로 최종 메시지 표시했던 문자열
     private var stickySuccess = false        // ‘사용 가능’ 상태 고정 여부
@@ -45,6 +43,8 @@ class SignupStep4Fragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.btnNext.setImageResource(R.drawable.btn_next_gray)
+
         resetConditionViews()
 
         binding.etId.addTextChangedListener(object : TextWatcher {
@@ -59,9 +59,7 @@ class SignupStep4Fragment : Fragment() {
                 val lengthOk  = idInput.length in 8..15
                 val formatOk  = hasLetter && hasDigit && lengthOk
 
-                // ✅ STICKY 성공 유지 로직
                 if (stickySuccess) {
-                    // 1) 길이 초과는 즉시 깨짐 → 에러 한 줄
                     if (idInput.length > 15) {
                         stickySuccess = false
                         inFinalStatus = true
@@ -74,7 +72,6 @@ class SignupStep4Fragment : Fragment() {
                         return
                     }
 
-                    // 2) 형식이 깨졌으면(영문/숫자 빠짐 or 길이<8) → sticky 해제하고 조건 3줄로 전환
                     if (!formatOk) {
                         stickySuccess = false
                         inFinalStatus = false
@@ -92,7 +89,6 @@ class SignupStep4Fragment : Fragment() {
                         return
                     }
 
-                    // 3) 형식은 만족 → 화면은 계속 '사용 가능' 유지, 백그라운드 재검사만 수행
                     inFinalStatus = true
                     lastFinalId = idInput
                     showFinalStatus(true, "사용 가능한 아이디입니다")
@@ -105,7 +101,6 @@ class SignupStep4Fragment : Fragment() {
                     return
                 }
 
-                // --- 아직 sticky가 아닌 상태 ---
                 inFinalStatus = false
                 isLoginIdUnique = false
                 debounceRunnable?.let { handler.removeCallbacks(it) }
@@ -113,27 +108,26 @@ class SignupStep4Fragment : Fragment() {
 
                 if (idInput.isBlank()) {
                     showFinalStatus(false, "아이디를 입력해주세요.")
-                    binding.btnNext.isEnabled = false
+                    binding.btnNext.setImageResource(R.drawable.btn_next_gray)
                     return
                 }
 
                 if (!formatOk) {
-                    // 형식 불만족 → 조건 3줄 보여줌
                     showCondition(1, hasLetter, "영문자 포함", "영문자를 포함해주세요.")
                     showCondition(2, hasDigit,  "숫자 포함",   "숫자를 포함해주세요.")
                     showCondition(
                         3, lengthOk, "8~15자 입력",
                         if (idInput.length < 8) "글자 수가 미달되었습니다." else "글자 수가 초과되었습니다."
                     )
-                    binding.btnNext.isEnabled = false
+                    binding.btnNext.setImageResource(R.drawable.btn_next_gray)
                     return
                 }
 
-                // 형식 만족 → 조건 숨기고 조용히 중복검사
                 hideConditions()
                 binding.btnNext.isEnabled = false
                 debounceRunnable = Runnable { checkLoginIdDuplicate(idInput) }
                 handler.postDelayed(debounceRunnable!!, 300)
+
             }
         })
 
@@ -185,7 +179,6 @@ class SignupStep4Fragment : Fragment() {
                 if (response.isSuccessful) {
                     when {
                         message.contains("사용 가능") -> {
-                            // 성공 → sticky 활성화
                             isLoginIdUnique = true
                             inFinalStatus = true
                             stickySuccess = true
@@ -196,18 +189,17 @@ class SignupStep4Fragment : Fragment() {
                             val hasDigit  = current.any { it.isDigit() }
                             val lengthOk  = current.length in 8..15
                             binding.btnNext.isEnabled = hasLetter && hasDigit && lengthOk && isLoginIdUnique
+                            binding.btnNext.setImageResource(R.drawable.btn_next)
                         }
                         message.contains("이미 사용") -> {
-                            // 중복 → sticky 해제 + 에러 표시
                             isLoginIdUnique = false
                             inFinalStatus = true
                             stickySuccess = false
                             lastFinalId = current
                             showFinalStatus(false, "중복된 아이디입니다")
-                            binding.btnNext.isEnabled = false
+                            binding.btnNext.setImageResource(R.drawable.btn_next_gray)
                         }
                         else -> {
-                            // 기타 응답: sticky가 아니면 에러 표시, sticky면 화면 유지(여긴 sticky=false 케이스)
                             isLoginIdUnique = false
                             inFinalStatus = true
                             lastFinalId = current
@@ -216,7 +208,6 @@ class SignupStep4Fragment : Fragment() {
                         }
                     }
                 } else {
-                    // 서버 오류: sticky가 아니면 에러 표시, sticky면 화면 유지(여긴 sticky=false 케이스)
                     isLoginIdUnique = false
                     inFinalStatus = true
                     lastFinalId = current
@@ -230,7 +221,6 @@ class SignupStep4Fragment : Fragment() {
                 val current = binding.etId.text?.toString() ?: ""
                 if (current != lastRequestedId) return
 
-                // sticky=false일 때만 에러 표시
                 if (!stickySuccess) {
                     isLoginIdUnique = false
                     inFinalStatus = true
@@ -241,7 +231,6 @@ class SignupStep4Fragment : Fragment() {
         })
     }
 
-    // --- UI helpers ---
     private fun resetConditionViews() {
         binding.idErrorContainer1.visibility = View.GONE
         binding.idErrorContainer2.visibility = View.GONE
@@ -254,7 +243,6 @@ class SignupStep4Fragment : Fragment() {
         binding.idErrorContainer3.visibility = View.GONE
     }
 
-    // 최종 결과 모드: 1만 노출, 2/3 숨김
     private fun showFinalStatus(ok: Boolean, message: String) {
         binding.idErrorContainer1.visibility = View.VISIBLE
         binding.idErrorContainer2.visibility = View.GONE
@@ -276,9 +264,7 @@ class SignupStep4Fragment : Fragment() {
         }
     }
 
-    // 조건 모드 표시
     private fun showCondition(containerIndex: Int, ok: Boolean, okText: String, failText: String) {
-        // 최종모드면 조건 안 보임
         if (inFinalStatus) return
 
         val iconRes = if (ok) R.drawable.ic_check else R.drawable.ic_error
