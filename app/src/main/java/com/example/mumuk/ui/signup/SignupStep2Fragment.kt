@@ -34,6 +34,7 @@ class SignupStep2Fragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.btnNext.setImageResource(R.drawable.btn_next_gray)
 
         binding.etNickname.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -43,10 +44,16 @@ class SignupStep2Fragment : Fragment() {
                 val nickname = s.toString()
 
                 if (nickname.isBlank()) {
+                    binding.btnNext.isEnabled = true
+                    binding.btnNext.setImageResource(R.drawable.btn_next_gray)
                     setErrorStatus("닉네임을 입력해주세요.")
                 } else if (nickname.length >= 10) {
+                    binding.btnNext.isEnabled = true
+                    binding.btnNext.setImageResource(R.drawable.btn_next_gray)
                     setErrorStatus("글자 수가 초과되었습니다. 10자 이내로 입력해주세요.")
                 } else {
+                    binding.btnNext.isEnabled = true
+                    binding.btnNext.setImageResource(R.drawable.btn_next)
                     checkNicknameDuplicate(nickname)
                 }
             }
@@ -85,6 +92,7 @@ class SignupStep2Fragment : Fragment() {
         binding.tvNicknameStatus.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
         binding.ivNicknameStatusIcon.setImageResource(R.drawable.ic_error)
         binding.ivNicknameStatusIcon.visibility = View.VISIBLE
+        binding.btnNext.setImageResource(R.drawable.btn_next_gray)
         binding.btnNext.isEnabled = false
     }
 
@@ -93,6 +101,7 @@ class SignupStep2Fragment : Fragment() {
         binding.tvNicknameStatus.setTextColor(Color.parseColor("#306AF2"))
         binding.ivNicknameStatusIcon.setImageResource(R.drawable.ic_check)
         binding.ivNicknameStatusIcon.visibility = View.VISIBLE
+        binding.btnNext.setImageResource(R.drawable.btn_next)
         binding.btnNext.isEnabled = true
     }
 

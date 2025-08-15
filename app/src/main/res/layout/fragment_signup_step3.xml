@@ -134,55 +134,7 @@
                 </LinearLayout>
             </FrameLayout>
 
-            <!-- Caps Lock 경고 -->
-            <LinearLayout
-                android:id="@+id/layout_caps_lock_warning"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="4dp"
-                android:gravity="center_vertical"
-                android:visibility="gone">
 
-                <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:layout_marginEnd="6dp"
-                    android:src="@drawable/ic_notice_signup" />
-
-                <TextView
-                    android:id="@+id/tv_caps_lock_warning"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Caps Lock is on"
-                    android:textColor="@android:color/holo_red_dark"
-                    android:textSize="12sp" />
-            </LinearLayout>
-
-            <!-- Num Lock 경고 -->
-            <LinearLayout
-                android:id="@+id/layout_num_lock_warning"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="2dp"
-                android:gravity="center_vertical"
-                android:visibility="gone">
-
-                <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:layout_marginEnd="6dp"
-                    android:src="@drawable/ic_notice_signup" />
-
-                <TextView
-                    android:id="@+id/tv_num_lock_warning"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Num Lock is on"
-                    android:textColor="@android:color/holo_red_dark"
-                    android:textSize="12sp" />
-            </LinearLayout>
         </LinearLayout>
     </com.google.android.material.textfield.TextInputLayout>
 

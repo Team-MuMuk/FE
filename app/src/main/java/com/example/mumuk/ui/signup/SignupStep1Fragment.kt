@@ -26,6 +26,8 @@ class SignupStep1Fragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.btnNext.setImageResource(R.drawable.btn_next_gray)
+
 
         binding.etName.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -33,9 +35,21 @@ class SignupStep1Fragment : Fragment() {
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 val nickname = s.toString()
+
+                if (nickname.isBlank() || nickname.length >= 10) {
+                    binding.btnNext.isEnabled = true
+                    binding.btnNext.setImageResource(R.drawable.btn_next_gray)
+                } else {
+                    binding.btnNext.isEnabled = true
+                    binding.btnNext.setImageResource(R.drawable.btn_next)
+                }
+
                 updateNameStatus(nickname)
             }
         })
+
+
+
 
         binding.btnNext.setOnClickListener {
             val nickname = binding.etName.text.toString()
