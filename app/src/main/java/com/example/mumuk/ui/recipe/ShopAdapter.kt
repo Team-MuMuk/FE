@@ -1,22 +1,29 @@
 package com.example.mumuk.ui.recipe
 
+import android.content.Intent
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.mumuk.data.model.ShopItem
 import com.example.mumuk.databinding.ItemShopBinding
+import com.bumptech.glide.Glide
+import com.example.mumuk.data.model.recipe.NaverShoppingItem
 
-class ShopAdapter : ListAdapter<ShopItem, ShopAdapter.ShopViewHolder>(ShopDiffCallback()) {
+class ShopAdapter : ListAdapter<NaverShoppingItem, ShopAdapter.ShopViewHolder>(ShopDiffCallback()) {
 
     inner class ShopViewHolder(private val binding: ItemShopBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: ShopItem) {
-            binding.shopImg.setImageResource(item.img)
+        fun bind(item: NaverShoppingItem) {
+            Glide.with(binding.shopImg.context).load(item.imageUrl).into(binding.shopImg)
             binding.shopTitle.text = item.title
-            binding.textView8.text = "가격: ${item.price}"
+            binding.textView8.text = "가격: ${item.price}원"
+            binding.root.setOnClickListener {
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(item.link))
+                binding.root.context.startActivity(intent)
+            }
         }
     }
 
@@ -30,12 +37,12 @@ class ShopAdapter : ListAdapter<ShopItem, ShopAdapter.ShopViewHolder>(ShopDiffCa
         holder.bind(getItem(position))
     }
 
-    class ShopDiffCallback : DiffUtil.ItemCallback<ShopItem>() {
-        override fun areItemsTheSame(oldItem: ShopItem, newItem: ShopItem): Boolean {
-            return oldItem.title == newItem.title
+    class ShopDiffCallback : DiffUtil.ItemCallback<NaverShoppingItem>() {
+        override fun areItemsTheSame(oldItem: NaverShoppingItem, newItem: NaverShoppingItem): Boolean {
+            return oldItem.link == newItem.link // 링크가 고유하다고 가정
         }
 
-        override fun areContentsTheSame(oldItem: ShopItem, newItem: ShopItem): Boolean {
+        override fun areContentsTheSame(oldItem: NaverShoppingItem, newItem: NaverShoppingItem): Boolean {
             return oldItem == newItem
         }
     }
