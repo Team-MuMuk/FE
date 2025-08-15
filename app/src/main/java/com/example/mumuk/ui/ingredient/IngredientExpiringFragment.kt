@@ -12,89 +12,46 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import androidx.navigation.fragment.findNavController
-import com.example.mumuk.R
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.launch
 import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
+import com.example.mumuk.R
+import com.example.mumuk.databinding.FragmentIngredientExpiringBinding
+import kotlinx.coroutines.launch
 
-class IngredientListFragment : Fragment() {
-    private var _binding: FragmentIngredientListBinding? = null
+class IngredientExpiringFragment : Fragment() {
+    private var _binding: FragmentIngredientExpiringBinding? = null
     private val binding get() = _binding!!
 
     private val ingredientRepository by lazy { IngredientRepository(requireContext()) }
+
+    private var expiringAdapter: ExpiringIngredientAdapter? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentIngredientListBinding.inflate(inflater, container, false)
+        _binding = FragmentIngredientExpiringBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        setupIngredientRV()
-
+        setupExpiringRV()
         binding.backBtn.setOnClickListener {
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
-
-        binding.plusBtn.setOnClickListener {
-            findNavController().navigate(R.id.ingredientExpiringFragment)
-        }
     }
 
-    private fun setupIngredientRV() {
+    private fun setupExpiringRV() {
         viewLifecycleOwner.lifecycleScope.launch {
             val ingredientList = ingredientRepository.getIngredients()
-
-            lateinit var ingredientAdapter: IngredientAdapter
-            lateinit var expiringAdapter: ExpiringIngredientAdapter
-            
-            ingredientAdapter = IngredientAdapter(
-                ingredientList,
-                onItemClick = { ingredient ->
-                    val bundle = Bundle().apply {
-                        putSerializable("ingredient", ingredient)
-                    }
-                    findNavController().navigate(
-                        R.id.action_ingredientListFragment_to_ingredientDetailFragment,
-                        bundle
-                    )
-                },
-                onDeleteClick = { ingredient ->
-                    viewLifecycleOwner.lifecycleScope.launch {
-                        try {
-                            val response = ingredientRepository.deleteIngredient(ingredient.id)
-                            if (response.isSuccessful && response.body()?.code == "INGREDIENT_200") {
-                                val newList = ingredientRepository.getIngredients()
-                                ingredientAdapter.submitList(newList)
-                                val newExpiringList = newList.filter {
-                                    val today = LocalDate.now()
-                                    val expiry = LocalDate.parse(it.expiryDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-                                    ChronoUnit.DAYS.between(today, expiry) in 0..3
-                                }.toMutableList()
-                                expiringAdapter.submitList(newExpiringList)
-                            } else {
-                                Toast.makeText(requireContext(), "삭제 실패: ${response.body()?.message ?: response.message()}", Toast.LENGTH_SHORT).show()
-                            }
-                        } catch (e: Exception) {
-                            Toast.makeText(requireContext(), "네트워크 오류: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                }
-            )
-
-            binding.ingredientRV.layoutManager = LinearLayoutManager(requireContext())
-            binding.ingredientRV.adapter = ingredientAdapter
-
             val expiringList = ingredientList.filter {
                 val today = LocalDate.now()
                 val expiry = LocalDate.parse(it.expiryDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
                 ChronoUnit.DAYS.between(today, expiry) in 0..7
             }.toMutableList()
-            expiringAdapter = ExpiringIngredientAdapter(
+
+            val expiringAdapter = ExpiringIngredientAdapter(
                 expiringList,
                 onItemClick = { ingredient ->
                     val bundle = Bundle().apply {
@@ -114,10 +71,9 @@ class IngredientListFragment : Fragment() {
                                 val newExpiringList = newList.filter {
                                     val today = LocalDate.now()
                                     val expiry = LocalDate.parse(it.expiryDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-                                    ChronoUnit.DAYS.between(today, expiry) in 0..3
+                                    ChronoUnit.DAYS.between(today, expiry) in 0..7
                                 }.toMutableList()
-                                expiringAdapter.submitList(newExpiringList)
-                                ingredientAdapter.submitList(newList)
+                                expiringAdapter?.submitList(newExpiringList)
                             } else {
                                 Toast.makeText(requireContext(), "삭제 실패: ${response.body()?.message ?: response.message()}", Toast.LENGTH_SHORT).show()
                             }
