@@ -66,6 +66,14 @@
             app:exitAnim="@anim/hold"
             app:popEnterAnim="@anim/hold"
             app:popExitAnim="@anim/slide_out_right"/>
+
+        <action
+            android:id="@+id/action_navigation_home_to_ingredientExpiringFragment"
+            app:destination="@id/ingredientExpiringFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/hold"
+            app:popEnterAnim="@anim/hold"
+            app:popExitAnim="@anim/slide_out_right"/>
     </fragment>
 
     <fragment
@@ -294,6 +302,14 @@
             app:exitAnim="@anim/hold"
             app:popEnterAnim="@anim/hold"
             app:popExitAnim="@anim/slide_out_right"/>
+
+        <action
+            android:id="@+id/action_ingredientListFragment_to_ingredientExpiringFragment"
+            app:destination="@id/ingredientExpiringFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/hold"
+            app:popEnterAnim="@anim/hold"
+            app:popExitAnim="@anim/slide_out_right"/>
     </fragment>
 
     <fragment
@@ -347,5 +363,12 @@
             app:exitAnim="@android:anim/fade_out"
             app:popEnterAnim="@android:anim/fade_in"
             app:popExitAnim="@android:anim/fade_out" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/ingredientExpiringFragment"
+        android:name="com.example.mumuk.ui.ingredient.IngredientExpiringFragment"
+        android:label="fragment_ingredient_expiring"
+        tools:layout="@layout/fragment_ingredient_expiring" >
     </fragment>
 </navigation>

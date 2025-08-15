@@ -91,6 +91,10 @@ class HomeFragment : Fragment() {
             findNavController().navigate(R.id.action_navigation_home_to_alarmFragment)
         }
 
+        binding.dateBtn.setOnClickListener {
+            findNavController().navigate(R.id.action_navigation_home_to_ingredientExpiringFragment)
+        }
+
         fetchRandomRecipes()
 
         setupRankRecyclerView()
