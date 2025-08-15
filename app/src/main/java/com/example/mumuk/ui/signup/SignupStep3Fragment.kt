@@ -103,8 +103,6 @@ class SignupStep3Fragment : Fragment() {
                 val capsOn = event.metaState and KeyEvent.META_CAPS_LOCK_ON != 0
                 val numOn = event.metaState and KeyEvent.META_NUM_LOCK_ON != 0
 
-                binding.layoutCapsLockWarning.visibility = if (capsOn) View.VISIBLE else View.GONE
-                binding.layoutNumLockWarning.visibility = if (numOn) View.VISIBLE else View.GONE
             }
             false
         }

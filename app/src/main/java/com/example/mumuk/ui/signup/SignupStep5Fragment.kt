@@ -113,7 +113,7 @@ class SignupStep5Fragment : Fragment() {
                         )
                     }
 
-                    binding.btnNext.setImageResource(R.drawable.btn_next_gray) 
+                    binding.btnNext.setImageResource(R.drawable.btn_next_gray)
                 }
             }
         })
