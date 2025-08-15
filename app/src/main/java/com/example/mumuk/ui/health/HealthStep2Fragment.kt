@@ -21,13 +21,13 @@ class HealthStep2Fragment : Fragment() {
 
     private val goalButtonsMap by lazy {
         mapOf(
-            binding.btnWeightLoss to "체중감량",
-            binding.btnMuscleGain to "근육량 증가",
-            binding.btnSugarReduction to "당 줄이기",
-            binding.btnBloodPressure to "혈압관리",
-            binding.btnCholesterol to "콜레스테롤 관리",
-            binding.btnDigestiveHealth to "소화 및 장 건강",
-            binding.btnNone to "없음"
+            binding.btnWeightLoss to "WEIGHT_LOSS",
+            binding.btnMuscleGain to "MUSCLE_GAIN",
+            binding.btnSugarReduction to "SUGAR_REDUCTION",
+            binding.btnBloodPressure to "BLOOD_PRESSURE",
+            binding.btnCholesterol to "CHOLESTEROL",
+            binding.btnDigestiveHealth to "DIGESTIVE_HEALTH",
+            binding.btnNone to "NONE"
         )
     }
 

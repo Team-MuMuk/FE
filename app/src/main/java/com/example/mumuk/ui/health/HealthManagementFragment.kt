@@ -14,10 +14,13 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import com.example.mumuk.R
+import com.example.mumuk.data.api.HealthApiService
 import com.example.mumuk.databinding.FragmentHealthManagementBinding
 import com.example.mumuk.data.api.RetrofitClient
 import com.example.mumuk.data.model.allergy.ToggleAllergyRequest
 import com.example.mumuk.data.model.allergy.ToggleAllergyResponse
+import com.example.mumuk.data.model.health.ToggleHealthGoalRequest
+import com.example.mumuk.data.model.health.ToggleHealthGoalResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -64,8 +67,7 @@ class HealthManagementFragment : Fragment() {
             if (viewPager.currentItem < numPages - 1) {
                 viewPager.currentItem += 1
             } else {
-                // 온보딩 마지막 단계에서 알러지 정보 서버로 전송
-                sendAllergiesToServerAndNavigate()
+                sendAllergiesAndGoalsToServerAndNavigate()
             }
         }
     }
@@ -200,29 +202,41 @@ class HealthManagementFragment : Fragment() {
     }
 
     // 알러지 정보 서버로 전송 후 온보딩 완료 네비게이션
-    private fun sendAllergiesToServerAndNavigate() {
+    private fun sendAllergiesAndGoalsToServerAndNavigate() {
         val allergies = healthViewModel.allergies.value ?: emptySet()
         val customAllergy = healthViewModel.customAllergy.value?.takeIf { !it.isNullOrBlank() }
         val allergyTypeList = allergies.toMutableList().apply {
             customAllergy?.let { add(it) }
         }
 
+        val goals = healthViewModel.goals.value ?: emptySet()
+        val customGoal = healthViewModel.customGoal.value?.takeIf { !it.isNullOrBlank() }
+        val healthGoalTypeList = goals.toMutableList().apply {
+            customGoal?.let { add(it) }
+        }
+
         val allergyApi = RetrofitClient.getAllergyApi(requireContext())
-        val request = ToggleAllergyRequest(allergyTypeList = allergyTypeList)
+        val healthApi = RetrofitClient.getHealthApi(requireContext())
 
-        allergyApi.toggleAllergies(request).enqueue(object : Callback<ToggleAllergyResponse> {
+        // 1. 알러지 정보 전송
+        allergyApi.toggleAllergies(ToggleAllergyRequest(allergyTypeList)).enqueue(object : Callback<ToggleAllergyResponse> {
             override fun onResponse(call: Call<ToggleAllergyResponse>, response: Response<ToggleAllergyResponse>) {
-                if (response.isSuccessful) {
-                    // 성공시 온보딩 완료 화면 이동
-                    findNavController().navigate(R.id.action_healthManagement_to_healthComplete)
-                } else {
-                    // 실패시에도 일단 이동(원하면 에러처리)
-                    findNavController().navigate(R.id.action_healthManagement_to_healthComplete)
-                }
+                // 알러지 성공/실패 무관하게 목표 정보도 전송
+                sendGoalsAndNavigate(healthGoalTypeList, healthApi)
             }
-
             override fun onFailure(call: Call<ToggleAllergyResponse>, t: Throwable) {
-                // 네트워크 에러 처리(원하면 사용자 알림)
+                // 알러지 실패해도 목표 전송 시도 (원하면 에러처리 추가)
+                sendGoalsAndNavigate(healthGoalTypeList, healthApi)
+            }
+        })
+    }
+
+    private fun sendGoalsAndNavigate(healthGoalTypeList: List<String>, healthApi: HealthApiService) {
+        healthApi.toggleHealthGoals(ToggleHealthGoalRequest(healthGoalTypeList)).enqueue(object : Callback<ToggleHealthGoalResponse> {
+            override fun onResponse(call: Call<ToggleHealthGoalResponse>, response: Response<ToggleHealthGoalResponse>) {
+                findNavController().navigate(R.id.action_healthManagement_to_healthComplete)
+            }
+            override fun onFailure(call: Call<ToggleHealthGoalResponse>, t: Throwable) {
                 findNavController().navigate(R.id.action_healthManagement_to_healthComplete)
             }
         })
