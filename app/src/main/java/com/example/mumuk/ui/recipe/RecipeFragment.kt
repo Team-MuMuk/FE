@@ -155,6 +155,8 @@ class RecipeFragment : Fragment() {
 
                 // 재료 목록 RecyclerView 업데이트
                 (ingredientRV.adapter as? IngredientAdapter)?.updateData(detail.recipeIngredients)
+
+                recipeTitle2.text = "#${detail.title}"
             }
         }
 
