@@ -108,4 +108,8 @@ object RetrofitClient {
     fun getNaverShoppingApi(context: Context): NaverShoppingApiService {
         return getRetrofit(context).create(NaverShoppingApiService::class.java)
     }
+
+    fun getRecipeTrendsApi(context: Context): RecipeTrendsApiService {
+        return getRetrofit(context).create(RecipeTrendsApiService::class.java)
+    }
 }
