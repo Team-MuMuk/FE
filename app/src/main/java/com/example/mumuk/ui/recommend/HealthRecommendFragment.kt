@@ -7,27 +7,36 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.provider.OpenableColumns
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.cardview.widget.CardView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.mumuk.R
+import com.example.mumuk.data.api.AllergyApiService
+import com.example.mumuk.data.api.HealthApiService
+import com.example.mumuk.data.api.RetrofitClient
 import com.example.mumuk.data.model.Recipe
+import com.example.mumuk.data.model.allergy.AllergyOptionsResponse
+import com.example.mumuk.data.model.health.HealthGoalsResponse
 import com.example.mumuk.data.repository.HealthAiRecipeRepository
 import com.example.mumuk.data.repository.OcrRepository
 import com.example.mumuk.databinding.FragmentHealthRecommendBinding
 import kotlinx.coroutines.launch
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class HealthRecommendFragment : Fragment() {
     private var _binding: FragmentHealthRecommendBinding? = null
@@ -40,6 +49,11 @@ class HealthRecommendFragment : Fragment() {
     private var aiRecipeList: List<Recipe> = emptyList()
     private var isExpanded = false
 
+    private lateinit var filterContainer: LinearLayout
+
+    private lateinit var allergyApi: AllergyApiService
+    private lateinit var healthApi: HealthApiService
+
     private val pickImageLauncher = registerForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
@@ -50,6 +64,26 @@ class HealthRecommendFragment : Fragment() {
             uploadImageToServer(it)
         }
     }
+
+    private val allergyTypeKorMap = mapOf(
+        "SHELLFISH" to "갑각류 알레르기",
+        "NUTS" to "견과류 알레르기",
+        "DAIRY" to "유제품 알레르기",
+        "WHEAT" to "밀 알레르기",
+        "EGG" to "계란 알레르기",
+        "FISH" to "생선 알레르기",
+        "SOY" to "콩 알레르기",
+        "NONE" to "알레르기 없음"
+    )
+    private val healthGoalKorMap = mapOf(
+        "WEIGHT_LOSS" to "체중감량",
+        "MUSCLE_GAIN" to "근육증가",
+        "SUGAR_REDUCTION" to "저당식",
+        "BLOOD_PRESSURE" to "혈압관리",
+        "CHOLESTEROL" to "콜레스테롤관리",
+        "DIGESTIVE_HEALTH" to "소화건강",
+        "NONE" to "목표없음"
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84,6 +118,73 @@ class HealthRecommendFragment : Fragment() {
         binding.addImg.setOnClickListener {
             pickImageLauncher.launch("image/*")
         }
+
+        allergyApi = RetrofitClient.getAllergyApi(requireContext())
+        healthApi = RetrofitClient.getHealthApi(requireContext())
+
+        // filterContainer 초기화
+        filterContainer = binding.root.findViewById(R.id.filterContainer)
+        fetchAndDisplayFilters()
+    }
+
+    private fun fetchAndDisplayFilters() {
+        allergyApi.getAllergyOptions().enqueue(object : Callback<AllergyOptionsResponse> {
+            override fun onResponse(
+                call: Call<AllergyOptionsResponse>,
+                response: Response<AllergyOptionsResponse>
+            ) {
+                val allergyList = response.body()?.data?.allergyOptions?.map {
+                    allergyTypeKorMap[it.allergyType] ?: it.allergyType
+                } ?: emptyList()
+                healthApi.getHealthGoals().enqueue(object : Callback<HealthGoalsResponse> {
+                    override fun onResponse(
+                        call: Call<HealthGoalsResponse>,
+                        response: Response<HealthGoalsResponse>
+                    ) {
+                        val goalList = response.body()?.data?.healthGoalList?.map {
+                            healthGoalKorMap[it.healthGoalType] ?: it.healthGoalType
+                        } ?: emptyList()
+                        val filterList = allergyList + goalList
+                        displayFilters(filterList)
+                    }
+                    override fun onFailure(call: Call<HealthGoalsResponse>, t: Throwable) {
+                        displayFilters(allergyList)
+                    }
+                })
+            }
+            override fun onFailure(call: Call<AllergyOptionsResponse>, t: Throwable) {
+                // TODO: 에러처리
+            }
+        })
+    }
+
+    private fun displayFilters(filters: List<String>) {
+        binding.filterContainer.removeAllViews()
+        val inflater = LayoutInflater.from(requireContext())
+        filters.forEachIndexed { index, filterText ->
+            val cardBinding = com.example.mumuk.databinding.ItemFilterCardBinding.inflate(inflater)
+            cardBinding.filterText.text = filterText
+
+            // 첫 번째 카드에만 marginStart 20dp 적용
+            val params = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            if (index == 0) {
+                params.marginStart = dpToPx(20)
+            } else {
+                params.marginStart = 0
+            }
+            params.marginEnd = dpToPx(8) // 기존 marginEnd 8dp도 적용
+
+            cardBinding.root.layoutParams = params
+
+            binding.filterContainer.addView(cardBinding.root)
+        }
+    }
+
+    private fun dpToPx(dp: Int): Int {
+        return (dp * requireContext().resources.displayMetrics.density).toInt()
     }
 
     private fun setupRecyclerView() {
@@ -107,7 +208,6 @@ class HealthRecommendFragment : Fragment() {
         lifecycleScope.launch {
             try {
                 aiRecipeList = healthAiRepository.getAiRecipes()
-                // isExpanded 상태를 false로 초기화하여 '더보기' 로직이 올바르게 동작하도록 함
                 isExpanded = false
                 if (_binding != null) {
                     updateAiRecipeList()
@@ -137,18 +237,16 @@ class HealthRecommendFragment : Fragment() {
         val dialog = showAiRecommendDialog()
         lifecycleScope.launch {
             try {
-                // 1. OCR API 호출
                 val ocrResponse = ocrRepository.uploadImageForOcr(uri)
                 Log.d("HealthRecommend", "OCR Success: ${ocrResponse.data}")
 
-                // 2. OCR 성공 후, 새로운 추천 레시피 로드
                 loadAiRecipes()
 
-                dialog.dismiss() // 모든 과정이 성공적으로 끝나면 다이얼로그 닫기
+                dialog.dismiss()
                 Toast.makeText(requireContext(), "새로운 레시피를 추천받았습니다!", Toast.LENGTH_SHORT).show()
 
             } catch (e: Exception) {
-                dialog.dismiss() // 실패 시 다이얼로그 닫기
+                dialog.dismiss()
                 Log.e("HealthRecommend", "Failed to upload or load recipes", e)
                 if (context != null) {
                     Toast.makeText(requireContext(), "이미지 분석 또는 레시피 로딩에 실패했습니다.", Toast.LENGTH_SHORT).show()
