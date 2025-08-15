@@ -2,6 +2,7 @@ package com.example.mumuk.ui.health
 
 import android.animation.ObjectAnimator
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,6 +22,8 @@ import com.example.mumuk.data.model.allergy.ToggleAllergyRequest
 import com.example.mumuk.data.model.allergy.ToggleAllergyResponse
 import com.example.mumuk.data.model.health.ToggleHealthGoalRequest
 import com.example.mumuk.data.model.health.ToggleHealthGoalResponse
+import com.example.mumuk.data.model.userinfo.PatchUserInfoRequest
+import com.example.mumuk.data.model.userinfo.PatchUserInfoResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -35,6 +38,8 @@ class HealthManagementFragment : Fragment() {
     private lateinit var viewPager: ViewPager2
     private lateinit var adapter: HealthOnboardingAdapter
     private val numPages = 3
+
+    private val TAG = "HealthManagement"
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -67,7 +72,7 @@ class HealthManagementFragment : Fragment() {
             if (viewPager.currentItem < numPages - 1) {
                 viewPager.currentItem += 1
             } else {
-                sendAllergiesAndGoalsToServerAndNavigate()
+                sendUserInfo()
             }
         }
     }
@@ -201,55 +206,78 @@ class HealthManagementFragment : Fragment() {
         animator.start()
     }
 
-    // 알러지 정보 서버로 전송 후 온보딩 완료 네비게이션
-    private fun sendAllergiesAndGoalsToServerAndNavigate() {
+    private fun sendUserInfo() {
+        val gender = healthViewModel.gender.value
+        val heightText = healthViewModel.height.value
+        val weightText = healthViewModel.weight.value
+
+        val height = heightText?.toIntOrNull()
+        val weight = weightText?.toIntOrNull()
+
+        val userInfoApi = RetrofitClient.getUserInfoApi(requireContext())
+        val patchRequest = PatchUserInfoRequest(gender = gender, height = height, weight = weight)
+
+        Log.d(TAG, "Sending UserInfo: gender=$gender, height=$height, weight=$weight")
+        userInfoApi.patchUserInfo(patchRequest).enqueue(object : Callback<PatchUserInfoResponse> {
+            override fun onResponse(call: Call<PatchUserInfoResponse>, response: Response<PatchUserInfoResponse>) {
+                Log.d(TAG, "UserInfo response: success=${response.isSuccessful}, code=${response.code()}, body=${response.body()}")
+                sendAllergy()
+            }
+            override fun onFailure(call: Call<PatchUserInfoResponse>, t: Throwable) {
+                Log.e(TAG, "UserInfo failed: ${t.message}", t)
+                sendAllergy()
+            }
+        })
+    }
+
+    private fun sendAllergy() {
         val allergies = healthViewModel.allergies.value ?: emptySet()
         val customAllergy = healthViewModel.customAllergy.value?.takeIf { !it.isNullOrBlank() }
         val allergyTypeList = allergies.toMutableList().apply {
             customAllergy?.let { add(it) }
         }
 
+        val allergyApi = RetrofitClient.getAllergyApi(requireContext())
+
+        Log.d(TAG, "Sending Allergies: $allergyTypeList")
+        allergyApi.toggleAllergies(ToggleAllergyRequest(allergyTypeList)).enqueue(object : Callback<ToggleAllergyResponse> {
+            override fun onResponse(call: Call<ToggleAllergyResponse>, response: Response<ToggleAllergyResponse>) {
+                Log.d(TAG, "Allergy response: success=${response.isSuccessful}, code=${response.code()}, body=${response.body()}")
+                sendGoal()
+            }
+            override fun onFailure(call: Call<ToggleAllergyResponse>, t: Throwable) {
+                Log.e(TAG, "Allergy failed: ${t.message}", t)
+                sendGoal()
+            }
+        })
+    }
+
+    private fun sendGoal() {
         val goals = healthViewModel.goals.value ?: emptySet()
         val customGoal = healthViewModel.customGoal.value?.takeIf { !it.isNullOrBlank() }
         val healthGoalTypeList = goals.toMutableList().apply {
             customGoal?.let { add(it) }
         }
 
-        val allergyApi = RetrofitClient.getAllergyApi(requireContext())
         val healthApi = RetrofitClient.getHealthApi(requireContext())
 
-        // 1. 알러지 정보 전송
-        allergyApi.toggleAllergies(ToggleAllergyRequest(allergyTypeList)).enqueue(object : Callback<ToggleAllergyResponse> {
-            override fun onResponse(call: Call<ToggleAllergyResponse>, response: Response<ToggleAllergyResponse>) {
-                // 알러지 성공/실패 무관하게 목표 정보도 전송
-                sendGoalsAndNavigate(healthGoalTypeList, healthApi)
-            }
-            override fun onFailure(call: Call<ToggleAllergyResponse>, t: Throwable) {
-                // 알러지 실패해도 목표 전송 시도 (원하면 에러처리 추가)
-                sendGoalsAndNavigate(healthGoalTypeList, healthApi)
-            }
-        })
-    }
-
-    private fun sendGoalsAndNavigate(healthGoalTypeList: List<String>, healthApi: HealthApiService) {
+        Log.d(TAG, "Sending HealthGoals: $healthGoalTypeList")
         healthApi.toggleHealthGoals(ToggleHealthGoalRequest(healthGoalTypeList)).enqueue(object : Callback<ToggleHealthGoalResponse> {
             override fun onResponse(call: Call<ToggleHealthGoalResponse>, response: Response<ToggleHealthGoalResponse>) {
-                findNavController().navigate(R.id.action_healthManagement_to_healthComplete)
+                Log.d(TAG, "HealthGoal response: success=${response.isSuccessful}, code=${response.code()}, body=${response.body()}")
+                navigateToComplete()
             }
             override fun onFailure(call: Call<ToggleHealthGoalResponse>, t: Throwable) {
-                findNavController().navigate(R.id.action_healthManagement_to_healthComplete)
+                Log.e(TAG, "HealthGoal failed: ${t.message}", t)
+                navigateToComplete()
             }
         })
     }
 
-    // 더 이상 사용하지 않음: navigateToComplete()
-    // private fun navigateToComplete() {
-    //     val currentFragment = adapter.getFragmentAt(viewPager.currentItem)
-    //     if (currentFragment is HealthStep2Fragment) {
-    //         currentFragment.saveHealthData()
-    //     }
-    //     findNavController().navigate(R.id.action_healthManagement_to_healthComplete)
-    // }
+    private fun navigateToComplete() {
+        Log.d(TAG, "Navigating to HealthComplete")
+        findNavController().navigate(R.id.action_healthManagement_to_healthComplete)
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()

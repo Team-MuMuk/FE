@@ -100,4 +100,8 @@ object RetrofitClient {
     fun getHealthApi(context: Context): HealthApiService {
         return getRetrofit(context).create(HealthApiService::class.java)
     }
+
+    fun getUserInfoApi(context: Context): UserInfoApiService {
+        return getRetrofit(context).create(UserInfoApiService::class.java)
+    }
 }
