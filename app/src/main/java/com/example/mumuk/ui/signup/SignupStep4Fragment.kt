@@ -113,11 +113,11 @@ class SignupStep4Fragment : Fragment() {
                 }
 
                 if (!formatOk) {
-                    showCondition(1, hasLetter, "영문자 포함", "영문자를 포함해주세요.")
-                    showCondition(2, hasDigit,  "숫자 포함",   "숫자를 포함해주세요.")
-                    showCondition(
-                        3, lengthOk, "8~15자 입력",
-                        if (idInput.length < 8) "글자 수가 미달되었습니다." else "글자 수가 초과되었습니다."
+                    renderConditionsDynamic(
+                        hasLetter = hasLetter,
+                        hasDigit = hasDigit,
+                        lengthOk = lengthOk,
+                        lengthFailText = if (idInput.length < 8) "글자 수가 미달되었습니다." else "글자 수가 초과되었습니다."
                     )
                     binding.btnNext.setImageResource(R.drawable.btn_next_gray)
                     return
@@ -314,6 +314,89 @@ class SignupStep4Fragment : Fragment() {
             }
         }
     }
+
+    // 조건 한 줄을 컨테이너에 채워 넣는 헬퍼
+    private fun bindConditionRow(
+        containerIndex: Int,
+        ok: Boolean,
+        okText: String,
+        failText: String
+    ) {
+        val iconRes = if (ok) R.drawable.ic_check else R.drawable.ic_error
+        val color = if (ok) Color.parseColor("#306AF2")
+        else ContextCompat.getColor(requireContext(), R.color.red)
+        val text = if (ok) okText else failText
+
+        when (containerIndex) {
+            1 -> {
+                binding.idErrorContainer1.visibility = View.VISIBLE
+                if (binding.ivIdErrorIcon1.tag != iconRes) {
+                    binding.ivIdErrorIcon1.setImageResource(iconRes)
+                    binding.ivIdErrorIcon1.tag = iconRes
+                }
+                if (binding.tvIdErrorMsg1.text.toString() != text) {
+                    binding.tvIdErrorMsg1.text = text
+                }
+                if (binding.tvIdErrorMsg1.currentTextColor != color) {
+                    binding.tvIdErrorMsg1.setTextColor(color)
+                }
+            }
+            2 -> {
+                binding.idErrorContainer2.visibility = View.VISIBLE
+                if (binding.ivIdErrorIcon2.tag != iconRes) {
+                    binding.ivIdErrorIcon2.setImageResource(iconRes)
+                    binding.ivIdErrorIcon2.tag = iconRes
+                }
+                if (binding.tvIdErrorMsg2.text.toString() != text) {
+                    binding.tvIdErrorMsg2.text = text
+                }
+                if (binding.tvIdErrorMsg2.currentTextColor != color) {
+                    binding.tvIdErrorMsg2.setTextColor(color)
+                }
+            }
+            3 -> {
+                binding.idErrorContainer3.visibility = View.VISIBLE
+                if (binding.ivIdErrorIcon3.tag != iconRes) {
+                    binding.ivIdErrorIcon3.setImageResource(iconRes)
+                    binding.ivIdErrorIcon3.tag = iconRes
+                }
+                if (binding.tvIdErrorMsg3.text.toString() != text) {
+                    binding.tvIdErrorMsg3.text = text
+                }
+                if (binding.tvIdErrorMsg3.currentTextColor != color) {
+                    binding.tvIdErrorMsg3.setTextColor(color)
+                }
+            }
+        }
+    }
+
+
+    private fun renderConditionsDynamic(
+        hasLetter: Boolean,
+        hasDigit: Boolean,
+        lengthOk: Boolean,
+        lengthFailText: String // "글자 수가 미달되었습니다." 또는 "초과되었습니다."
+    ) {
+        if (inFinalStatus) return
+
+        hideConditions()
+
+        data class Cond(val ok: Boolean, val okText: String, val failText: String)
+
+        val conds = listOf(
+            Cond(hasLetter, "영문자 포함", "영문자를 포함해주세요."),
+            Cond(hasDigit,  "숫자 포함",   "숫자를 포함해주세요."),
+            Cond(lengthOk,  "8~15자 입력", lengthFailText)
+        )
+
+        val ordered = conds.sortedByDescending { it.ok }
+
+        ordered.forEachIndexed { idx, c ->
+            val containerIndex = idx + 1
+            bindConditionRow(containerIndex, c.ok, c.okText, c.failText)
+        }
+    }
+
 
     override fun onDestroyView() {
         debounceRunnable?.let { handler.removeCallbacks(it) }
