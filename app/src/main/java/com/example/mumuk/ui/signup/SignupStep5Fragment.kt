@@ -38,6 +38,21 @@ class SignupStep5Fragment : Fragment() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 val pw = s.toString()
 
+                if (pw.isBlank()) {
+                    hidePwConditions()
+                    binding.pwSuccessContainer.visibility = View.GONE
+
+                    binding.pwErrorContainer1.visibility = View.VISIBLE
+                    binding.ivPwErrorIcon1.setImageResource(R.drawable.ic_error)
+                    binding.tvPwErrorMsg1.text = "비밀번호를 입력해주세요"
+                    binding.tvPwErrorMsg1.setTextColor(
+                        ContextCompat.getColor(requireContext(), R.color.red)
+                    )
+
+                    binding.btnNext.setImageResource(R.drawable.btn_next_gray)
+                    return
+                }
+
                 val hasLetter = pw.any { it.isLetter() }
                 val hasDigit = pw.any { it.isDigit() }
                 val hasSpecial = pw.any { !it.isLetterOrDigit() }
@@ -45,52 +60,7 @@ class SignupStep5Fragment : Fragment() {
 
                 val allValid = hasLetter && hasDigit && hasSpecial && lengthValid
 
-                val containers = listOf(
-                    binding.pwErrorContainer1,
-                    binding.pwErrorContainer2,
-                    binding.pwErrorContainer3,
-                    binding.pwErrorContainer4
-                )
-                val icons = listOf(
-                    binding.ivPwErrorIcon1,
-                    binding.ivPwErrorIcon2,
-                    binding.ivPwErrorIcon3,
-                    binding.ivPwErrorIcon4
-                )
-                val messages = listOf(
-                    binding.tvPwErrorMsg1,
-                    binding.tvPwErrorMsg2,
-                    binding.tvPwErrorMsg3,
-                    binding.tvPwErrorMsg4
-                )
-                val messageList = mutableListOf<Pair<Int, String>>()
-
-                messageList.add(
-                    if (hasLetter)
-                        Pair(R.drawable.ic_check, "영문자 사용")
-                    else
-                        Pair(R.drawable.ic_error, "영문자를 포함해주세요.")
-                )
-                messageList.add(
-                    if (hasDigit)
-                        Pair(R.drawable.ic_check, "숫자 사용")
-                    else
-                        Pair(R.drawable.ic_error, "숫자를 포함해주세요.")
-                )
-                messageList.add(
-                    if (hasSpecial)
-                        Pair(R.drawable.ic_check, "특수문자 사용")
-                    else
-                        Pair(R.drawable.ic_error, "특수문자를 포함해주세요.")
-                )
-                messageList.add(
-                    if (lengthValid)
-                        Pair(R.drawable.ic_check, "글자수 충족")
-                    else
-                        Pair(R.drawable.ic_error, "8자 이상 15자 이내로 입력해주세요.")
-                )
-
-                containers.forEach { it.visibility = View.GONE }
+                hidePwConditions()
                 binding.pwSuccessContainer.visibility = View.GONE
 
                 if (allValid) {
@@ -101,27 +71,33 @@ class SignupStep5Fragment : Fragment() {
 
                     binding.btnNext.setImageResource(R.drawable.btn_next)
                 } else {
-                    messageList.forEachIndexed { index, pair ->
-                        containers[index].visibility = View.VISIBLE
-                        icons[index].setImageResource(pair.first)
-                        messages[index].text = pair.second
-                        messages[index].setTextColor(
-                            if (pair.first == R.drawable.ic_error)
-                                ContextCompat.getColor(requireContext(), R.color.red)
-                            else
-                                Color.parseColor("#306AF2")
-                        )
-                    }
-
+                    renderPwConditionsDynamic(hasLetter, hasDigit, hasSpecial, lengthValid)
                     binding.btnNext.setImageResource(R.drawable.btn_next_gray)
                 }
             }
+
         })
 
         binding.btnNext.setOnClickListener {
             val input = binding.etPw.text.toString()
             (requireActivity() as SignupActivity).password = input
             val allConditionsMet = binding.tvPwErrorMsg1.text.toString() == "정상적으로 확인되었습니다"
+
+            if (input.isBlank()) {
+                hidePwConditions()
+                binding.pwSuccessContainer.visibility = View.GONE
+
+                binding.pwErrorContainer1.visibility = View.VISIBLE
+                binding.ivPwErrorIcon1.setImageResource(R.drawable.ic_error)
+                binding.tvPwErrorMsg1.text = "비밀번호를 입력해주세요"
+                binding.tvPwErrorMsg1.setTextColor(
+                    ContextCompat.getColor(requireContext(), R.color.red)
+                )
+
+                binding.btnNext.setImageResource(R.drawable.btn_next_gray)
+                binding.etPw.requestFocus()
+                return@setOnClickListener
+            }
 
             if (allConditionsMet) {
                 val step5Fragment = SignupStep5Fragment()
@@ -144,6 +120,74 @@ class SignupStep5Fragment : Fragment() {
                 .commit()
         }
     }
+
+    private fun hidePwConditions() {
+        binding.pwErrorContainer1.visibility = View.GONE
+        binding.pwErrorContainer2.visibility = View.GONE
+        binding.pwErrorContainer3.visibility = View.GONE
+        binding.pwErrorContainer4.visibility = View.GONE
+    }
+
+    private fun bindPwRow(
+        containerIndex: Int,
+        ok: Boolean,
+        okText: String,
+        failText: String
+    ) {
+        val iconRes = if (ok) R.drawable.ic_check else R.drawable.ic_error
+        val color = if (ok) Color.parseColor("#306AF2")
+        else ContextCompat.getColor(requireContext(), R.color.red)
+        val text = if (ok) okText else failText
+
+        when (containerIndex) {
+            1 -> {
+                binding.pwErrorContainer1.visibility = View.VISIBLE
+                binding.ivPwErrorIcon1.setImageResource(iconRes)
+                binding.tvPwErrorMsg1.text = text
+                binding.tvPwErrorMsg1.setTextColor(color)
+            }
+            2 -> {
+                binding.pwErrorContainer2.visibility = View.VISIBLE
+                binding.ivPwErrorIcon2.setImageResource(iconRes)
+                binding.tvPwErrorMsg2.text = text
+                binding.tvPwErrorMsg2.setTextColor(color)
+            }
+            3 -> {
+                binding.pwErrorContainer3.visibility = View.VISIBLE
+                binding.ivPwErrorIcon3.setImageResource(iconRes)
+                binding.tvPwErrorMsg3.text = text
+                binding.tvPwErrorMsg3.setTextColor(color)
+            }
+            4 -> {
+                binding.pwErrorContainer4.visibility = View.VISIBLE
+                binding.ivPwErrorIcon4.setImageResource(iconRes)
+                binding.tvPwErrorMsg4.text = text
+                binding.tvPwErrorMsg4.setTextColor(color)
+            }
+        }
+    }
+
+    private fun renderPwConditionsDynamic(
+        hasLetter: Boolean,
+        hasDigit: Boolean,
+        hasSpecial: Boolean,
+        lengthValid: Boolean
+    ) {
+        hidePwConditions()
+
+        data class Cond(val ok: Boolean, val okText: String, val failText: String)
+
+        val conds = listOf(
+            Cond(hasLetter, "영문자 사용", "영문자를 포함해주세요."),
+            Cond(hasDigit,  "숫자 사용",   "숫자를 포함해주세요."),
+            Cond(hasSpecial,"특수문자 사용", "특수문자를 포함해주세요."),
+            Cond(lengthValid,"글자수 충족", "8자 이상 15자 이내로 입력해주세요.")
+        )
+
+        val ordered = conds.sortedByDescending { it.ok }   // true 먼저
+        ordered.forEachIndexed { idx, c -> bindPwRow(idx + 1, c.ok, c.okText, c.failText) }
+    }
+
 
 
     override fun onDestroyView() {
