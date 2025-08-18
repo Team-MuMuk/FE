@@ -16,18 +16,28 @@ class BookmarkRecipeAdapter
     var onItemClick: ((Recipe) -> Unit)? = null
     var onHeartClick: ((Recipe, Int) -> Unit)? = null
 
-    inner class RecipeViewHolder(private val binding: ItemRecipeBinding)
+    inner class RecipeViewHolder(val binding: ItemRecipeBinding)
         : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(recipe: Recipe, position: Int) {
-            if (!recipe.recipeImageUrl.isNullOrBlank()) {
-                Glide.with(binding.recipeImg.context)
-                    .load(recipe.recipeImageUrl)
-                    .into(binding.recipeImg)
-            } else if (recipe.img != null) {
-                binding.recipeImg.setImageResource(recipe.img)
-            } else {
-                binding.recipeImg.setImageResource(R.drawable.bg_mosaic)
+            val url = recipe.recipeImageUrl
+
+            when {
+                !url.isNullOrEmpty() -> {
+                    Glide.with(binding.recipeImg.context)
+                        .load(url)
+                        .placeholder(R.drawable.bg_mosaic)
+                        .error(R.drawable.bg_mosaic)
+                        .into(binding.recipeImg)
+                }
+                recipe.img != null -> {
+                    Glide.with(binding.recipeImg.context).clear(binding.recipeImg)
+                    binding.recipeImg.setImageResource(recipe.img)
+                }
+                else -> {
+                    Glide.with(binding.recipeImg.context).clear(binding.recipeImg)
+                    binding.recipeImg.setImageResource(R.drawable.bg_mosaic)
+                }
             }
 
             binding.recipeTitle.text = recipe.title
