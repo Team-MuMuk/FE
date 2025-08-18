@@ -6,7 +6,7 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 
 interface CategoryRecipeApiService {
-    @GET("/api/v1/recipe/recommend/categories/{categories}")
+    @GET("/api/recipe/recommend/categories/{categories}")
     fun getRecommendedRecipes(
         @Path("categories") categories: String
     ): Call<CategoryRecipeResponse>

@@ -38,12 +38,10 @@ import com.example.mumuk.data.model.mypage.RecentRecipeAdapter
 import com.example.mumuk.data.model.recipe.ClickLikeRequest
 import com.example.mumuk.data.model.recipe.ClickLikeResponse
 
-
 class MyPageFragment : Fragment() {
     private var _binding: FragmentMyPageBinding? = null
     private val binding get() = _binding!!
     private lateinit var recentAdapter: RecentRecipeAdapter
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -207,7 +205,6 @@ class MyPageFragment : Fragment() {
             }
         }
 
-
         return binding.root
     }
 
@@ -281,16 +278,9 @@ class MyPageFragment : Fragment() {
                         }
                     })
             }
-
-
-
         )
-
-
-
         binding.rvRecentRecipes.adapter = recentAdapter
     }
-
 
     private fun loadRecentRecipes() {
         Log.d("MyPage", "[recent] call start")
@@ -354,9 +344,6 @@ class MyPageFragment : Fragment() {
             })
     }
 
-
-
-
     private fun loadUserProfile() {
         val loginType = TokenManager.getLoginType(requireContext()) ?: "LOCAL"
 
@@ -364,15 +351,17 @@ class MyPageFragment : Fragment() {
             val savedNickname = TokenManager.getNickName(requireContext())
             val nicknameText = if (!savedNickname.isNullOrBlank()) "${savedNickname}님!" else "사용자님!"
             val profileImageUrl = TokenManager.getProfileImage(requireContext())
-            binding.tvNickname.text = nicknameText
-            binding.recipeText.text = "${nicknameText.replace("님!", "")}님이 최근 본 레시피"
-            binding.tvSubtitle.text = ""
-            Glide.with(this)
-                .load(profileImageUrl)
-                .placeholder(R.drawable.ic_user_profile_orange)
-                .error(R.drawable.ic_user_profile_orange)
-                .circleCrop()
-                .into(binding.imgProfile)
+            if (_binding != null) {
+                binding.tvNickname.text = nicknameText
+                binding.recipeText.text = "${nicknameText.replace("님!", "")}님이 최근 본 레시피"
+                binding.tvSubtitle.text = ""
+                Glide.with(this)
+                    .load(profileImageUrl)
+                    .placeholder(R.drawable.ic_user_profile_orange)
+                    .error(R.drawable.ic_user_profile_orange)
+                    .circleCrop()
+                    .into(binding.imgProfile)
+            }
         } else {
             RetrofitClient.getUserApi(requireContext()).getUserProfile()
                 .enqueue(object : Callback<UserProfileResponse> {
@@ -402,27 +391,23 @@ class MyPageFragment : Fragment() {
         val imageKey = profile.profileImage?.takeIf { it.isNotBlank() } ?: "orange"
 
         val nicknameText = "${nickname}님!"
-        binding.tvNickname.text = nicknameText
-        binding.recipeText.text = "${nickname}님이 최근 본 레시피"
-        binding.tvSubtitle.text = status
+        if (_binding != null) {
+            binding.tvNickname.text = nicknameText
+            binding.recipeText.text = "${nickname}님이 최근 본 레시피"
+            binding.tvSubtitle.text = status
 
-        val profileRes = when (imageKey) {
-            "orange" -> R.drawable.ic_user_profile_orange
-            "white"  -> R.drawable.ic_user_profile_white
-            "green"  -> R.drawable.ic_user_profile_green
-            else     -> R.drawable.ic_user_profile_orange
+            val profileRes = when (imageKey) {
+                "orange" -> R.drawable.ic_user_profile_orange
+                "white"  -> R.drawable.ic_user_profile_white
+                "green"  -> R.drawable.ic_user_profile_green
+                else     -> R.drawable.ic_user_profile_orange
+            }
+            binding.imgProfile.setImageResource(profileRes)
         }
-        binding.imgProfile.setImageResource(profileRes)
     }
 
     override fun onResume() {
         super.onResume()
         if (_binding != null) loadRecentRecipes()
     }
-
-
-
-
-
-
 }
