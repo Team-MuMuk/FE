@@ -83,7 +83,17 @@ class IngredientRecommendFragment : Fragment() {
             try {
                 val ingredientList = ingredientRepository.getIngredients()
                 binding.countRV.layoutManager = LinearLayoutManager(requireContext())
-                binding.countRV.adapter = IngredientCountAdapter(ingredientList)
+                binding.countRV.adapter = IngredientCountAdapter(
+                    ingredientList,
+                    onQuantityChanged = { ingredientId, newCount ->
+                        viewLifecycleOwner.lifecycleScope.launch {
+                            val success = ingredientRepository.updateIngredientQuantity(ingredientId, newCount)
+                            if (!success) {
+                                Toast.makeText(requireContext(), "수량 변경 실패", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+                )
             } catch (e: Exception) {
                 Log.e("IngredientRecommend", "Failed to load ingredients", e)
                 Toast.makeText(requireContext(), "재료 목록을 불러오는데 실패했습니다.", Toast.LENGTH_SHORT).show()

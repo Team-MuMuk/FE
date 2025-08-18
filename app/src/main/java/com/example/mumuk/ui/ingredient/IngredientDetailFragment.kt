@@ -15,15 +15,18 @@ import android.app.Dialog
 import android.view.Window
 import android.widget.TextView
 import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
 import com.example.mumuk.data.api.RetrofitClient
 import com.example.mumuk.data.model.ingredient.PushAgreeResponse
 import com.example.mumuk.data.model.ingredient.PushAgreeRequest
 import com.example.mumuk.data.model.ingredient.PushFcmTokenRequest
 import com.example.mumuk.data.model.ingredient.PushFcmTokenResponse
+import com.example.mumuk.data.repository.IngredientRepository
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import com.google.firebase.messaging.FirebaseMessaging
+import kotlinx.coroutines.launch
 
 class IngredientDetailFragment : Fragment() {
     private var _binding: FragmentIngredientDetailBinding? = null
@@ -100,6 +103,28 @@ class IngredientDetailFragment : Fragment() {
 
         binding.notiBtn.setOnClickListener {
             showPushAgreeDialog()
+        }
+
+        binding.refreshBtn.setOnClickListener {
+            val ingredient = arguments?.getSerializable("ingredient") as? Ingredient
+            if (ingredient != null) {
+                val year = binding.year.text.toString()
+                val month = binding.month.text.toString().padStart(2, '0')
+                val day = binding.day.text.toString().padStart(2, '0')
+                val expireDate = "$year-$month-$day"
+
+                lifecycleScope.launch {
+                    val repository = IngredientRepository(requireContext())
+                    val success = repository.updateIngredientExpireDate(ingredient.id, expireDate)
+                    if (success) {
+                        Toast.makeText(requireContext(), "유통기한이 수정되었습니다.", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(requireContext(), "유통기한 수정에 실패했습니다.", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } else {
+                Toast.makeText(requireContext(), "재료 정보를 찾을 수 없습니다.", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 

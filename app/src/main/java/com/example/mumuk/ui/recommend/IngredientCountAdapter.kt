@@ -7,7 +7,8 @@ import com.example.mumuk.data.model.Ingredient
 import com.example.mumuk.databinding.ItemIngredientCountBinding
 
 class IngredientCountAdapter(
-    private val items: List<Ingredient>
+    private val items: List<Ingredient>,
+    private val onQuantityChanged: (ingredientId: Int, newCount: Int) -> Unit
 ) : RecyclerView.Adapter<IngredientCountAdapter.ViewHolder>() {
 
     inner class ViewHolder(val binding: ItemIngredientCountBinding) : RecyclerView.ViewHolder(binding.root)
@@ -30,11 +31,13 @@ class IngredientCountAdapter(
                 if (ingredient.count > 1) {
                     ingredient.count--
                     count.text = ingredient.count.toString()
+                    onQuantityChanged(ingredient.id, ingredient.count)
                 }
             }
             btnPlus.setOnClickListener {
                 ingredient.count++
                 count.text = ingredient.count.toString()
+                onQuantityChanged(ingredient.id, ingredient.count)
             }
         }
     }
