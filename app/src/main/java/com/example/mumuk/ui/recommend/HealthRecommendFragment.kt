@@ -194,9 +194,6 @@ class HealthRecommendFragment : Fragment() {
                 Log.d("HealthRecommend", "Recipe clicked. ID: ${recipe.id}")
                 val bundle = bundleOf("recipeId" to recipe.id)
                 findNavController().navigate(R.id.action_healthRecommendFragment_to_recipeFragment, bundle)
-            },
-            onHeartClick = { _, _ ->
-                // TODO: 좋아요 기능 구현
             }
         )
 

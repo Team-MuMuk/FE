@@ -70,9 +70,6 @@ class IngredientRecommendFragment : Fragment() {
                 Log.d("IngredientRecommend", "Recipe clicked. ID: ${recipe.id}")
                 val bundle = bundleOf("recipeId" to recipe.id)
                 findNavController().navigate(R.id.action_ingredientRecommendFragment_to_recipeFragment, bundle)
-            },
-            onHeartClick = { _, _ ->
-                // TODO: 좋아요 기능 구현
             }
         )
         binding.aiRecipeRV.adapter = aiRecipeAdapter
