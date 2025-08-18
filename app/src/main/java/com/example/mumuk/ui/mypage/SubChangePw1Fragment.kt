@@ -94,6 +94,12 @@ class SubChangePw1Fragment : Fragment() {
         dialog.setContentView(R.layout.dialog_confirm)
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
+        dialog.window?.setDimAmount(0f)
+        dialog.window?.setLayout(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
+
         val tvMessage = dialog.findViewById<TextView>(R.id.tv_dialog_message)
         val btnOk = dialog.findViewById<TextView>(R.id.btn_dialog_ok)
 

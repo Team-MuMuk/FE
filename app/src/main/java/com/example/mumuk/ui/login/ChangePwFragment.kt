@@ -102,10 +102,13 @@ class ChangePwFragment : Fragment() {
         dialog.setContentView(R.layout.dialog_pw_changed)
 
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+        dialog.window?.setDimAmount(0f)
         dialog.window?.setLayout(
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
         )
+
         dialog.window?.setGravity(Gravity.CENTER)
 
         val btnOk = dialog.findViewById<TextView>(R.id.btn_dialog_ok)
