@@ -25,7 +25,9 @@
             android:textStyle="bold" />
     </FrameLayout>
 
+    <!-- 여기에 ID를 추가합니다 -->
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/frontLayout"
         android:layout_width="match_parent"
         android:layout_height="75dp"
         android:background="@color/white">

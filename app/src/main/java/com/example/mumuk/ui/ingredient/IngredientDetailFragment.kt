@@ -12,18 +12,22 @@ import com.example.mumuk.R
 import com.example.mumuk.databinding.FragmentIngredientDetailBinding
 import com.example.mumuk.data.model.Ingredient
 import android.app.Dialog
+import android.graphics.drawable.ColorDrawable
 import android.view.Window
 import android.widget.TextView
 import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
 import com.example.mumuk.data.api.RetrofitClient
 import com.example.mumuk.data.model.ingredient.PushAgreeResponse
 import com.example.mumuk.data.model.ingredient.PushAgreeRequest
 import com.example.mumuk.data.model.ingredient.PushFcmTokenRequest
 import com.example.mumuk.data.model.ingredient.PushFcmTokenResponse
+import com.example.mumuk.data.repository.IngredientRepository
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import com.google.firebase.messaging.FirebaseMessaging
+import kotlinx.coroutines.launch
 
 class IngredientDetailFragment : Fragment() {
     private var _binding: FragmentIngredientDetailBinding? = null
@@ -100,6 +104,34 @@ class IngredientDetailFragment : Fragment() {
 
         binding.notiBtn.setOnClickListener {
             showPushAgreeDialog()
+        }
+
+        binding.refreshBtn.setOnClickListener {
+            val ingredient = arguments?.getSerializable("ingredient") as? Ingredient
+            if (ingredient != null) {
+                val year = binding.year.text.toString()
+                val month = binding.month.text.toString().padStart(2, '0')
+                val day = binding.day.text.toString().padStart(2, '0')
+                val expireDate = "$year-$month-$day"
+
+                lifecycleScope.launch {
+                    val repository = IngredientRepository(requireContext())
+                    val response = repository.updateIngredientExpireDateRaw(ingredient.id, expireDate) // Raw Response 반환하도록 만들기
+                    if (response.isSuccessful) {
+                        showExpireDateUpdatedDialog()
+                    } else {
+                        val errorBody = response.errorBody()?.string()
+                        val errorMsg = if (errorBody?.contains("유통기한이 유효하지 않습니다") == true) {
+                            "이전 날짜로는 재설정이 불가능합니다!"
+                        } else {
+                            "유통기한 수정에 실패했습니다."
+                        }
+                        showExpireDateErrorDialog(errorMsg)
+                    }
+                }
+            } else {
+                Toast.makeText(requireContext(), "재료 정보를 찾을 수 없습니다.", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -183,7 +215,8 @@ class IngredientDetailFragment : Fragment() {
                 if (response.isSuccessful) {
                     Log.d(TAG, "FCM 토큰 저장 API 성공: ${response.body()}")
                 } else {
-                    Log.e(TAG, "FCM 토큰 저장 API 응답 실패: ${response.code()} ${response.errorBody()?.string()}")
+                    val errorBody = response.errorBody()?.string()
+                    Log.e(TAG, "FCM 토큰 저장 API 응답 실패: ${response.code()} ${errorBody}")
                 }
                 onComplete()
             }
@@ -193,6 +226,43 @@ class IngredientDetailFragment : Fragment() {
                 onComplete()
             }
         })
+    }
+
+    private fun showExpireDateUpdatedDialog() {
+        val dialog = Dialog(requireContext())
+        dialog.setContentView(R.layout.dialog_ingredient_refresh)
+        dialog.setCancelable(false)
+
+        dialog.window?.setBackgroundDrawable(ColorDrawable(android.graphics.Color.TRANSPARENT))
+        dialog.window?.setDimAmount(0f)
+        dialog.window?.setLayout(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
+
+        val btnOk = dialog.findViewById<TextView>(R.id.btnOk)
+        btnOk.setOnClickListener { dialog.dismiss() }
+        dialog.show()
+    }
+
+    private fun showExpireDateErrorDialog(message: String) {
+        val dialog = Dialog(requireContext())
+        dialog.setContentView(R.layout.dialog_ingredient_refresh)
+        dialog.setCancelable(false)
+
+        dialog.window?.setBackgroundDrawable(ColorDrawable(android.graphics.Color.TRANSPARENT))
+        dialog.window?.setDimAmount(0f)
+        dialog.window?.setLayout(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
+
+        val msgTextView = dialog.findViewById<TextView>(R.id.textView)
+        msgTextView.text = message
+
+        val btnOk = dialog.findViewById<TextView>(R.id.btnOk)
+        btnOk.setOnClickListener { dialog.dismiss() }
+        dialog.show()
     }
 
     override fun onDestroyView() {

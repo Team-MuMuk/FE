@@ -13,7 +13,8 @@ data class IngredientDto(
     val ingredient_id: Int,
     val name: String,
     val expireDate: String,
-    val createdAt: String
+    val createdAt: String,
+    val quantity: Int
 ) : Serializable
 
 data class IngredientDeleteResponse(

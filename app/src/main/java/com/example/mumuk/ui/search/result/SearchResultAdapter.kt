@@ -11,6 +11,7 @@ import com.example.mumuk.databinding.ItemRecipeBinding
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import com.bumptech.glide.Glide
 
 class SearchResultAdapter(
     private val items: MutableList<Recipe>,
@@ -21,7 +22,15 @@ class SearchResultAdapter(
         RecyclerView.ViewHolder(binding.root) {
         fun bind(item: Recipe) {
             binding.recipeTitle.text = item.title
-            item.img?.let { binding.recipeImg.setImageResource(it) } ?: binding.recipeImg.setImageDrawable(null)
+
+            item.img?.let {
+                binding.recipeImg.setImageResource(it)
+            } ?: item.recipeImageUrl?.let { url ->
+                Glide.with(binding.recipeImg.context)
+                    .load(url)
+                    .into(binding.recipeImg)
+            } ?: binding.recipeImg.setImageDrawable(null)
+
             binding.imageView6.setImageResource(
                 if (item.isLiked) com.example.mumuk.R.drawable.btn_heart_fill
                 else com.example.mumuk.R.drawable.btn_heart_blank

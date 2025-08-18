@@ -58,7 +58,7 @@ class IngredientExpiringFragment : Fragment() {
                         putSerializable("ingredient", ingredient)
                     }
                     findNavController().navigate(
-                        R.id.action_ingredientListFragment_to_ingredientDetailFragment,
+                        R.id.action_ingredientExpiringFragment_to_ingredientDetailFragment,
                         bundle
                     )
                 },
