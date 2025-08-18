@@ -90,13 +90,25 @@
         tools:layout="@layout/fragment_category" >
         <action
             android:id="@+id/action_categoryFragment_to_categoryWeightLossFragment"
-            app:destination="@id/categoryWeightLossFragment" />
+            app:destination="@id/categoryWeightLossFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/hold"
+            app:popEnterAnim="@anim/hold"
+            app:popExitAnim="@anim/slide_out_right"/>
         <action
             android:id="@+id/action_categoryFragment_to_categoryLowSugarFragment"
-            app:destination="@id/categoryLowSugarFragment" />
+            app:destination="@id/categoryLowSugarFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/hold"
+            app:popEnterAnim="@anim/hold"
+            app:popExitAnim="@anim/slide_out_right"/>
         <action
             android:id="@+id/action_categoryFragment_to_categoryRandomRecipeFragment"
-            app:destination="@id/categoryRandomRecipeFragment" />
+            app:destination="@id/categoryRandomRecipeFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/hold"
+            app:popEnterAnim="@anim/hold"
+            app:popExitAnim="@anim/slide_out_right"/>
     </fragment>
 
     <fragment
@@ -106,7 +118,11 @@
         tools:layout="@layout/fragment_category_weight_loss">
         <action
             android:id="@+id/action_categoryWeightLossFragment_to_recipeFragment"
-            app:destination="@id/recipeFragment"/>
+            app:destination="@id/recipeFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/hold"
+            app:popEnterAnim="@anim/hold"
+            app:popExitAnim="@anim/slide_out_right"/>
     </fragment>
 
     <fragment
@@ -116,7 +132,11 @@
         tools:layout="@layout/fragment_category_low_sugar">
         <action
             android:id="@+id/action_categoryLowSugarFragment_to_recipeFragment"
-            app:destination="@id/recipeFragment"/>
+            app:destination="@id/recipeFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/hold"
+            app:popEnterAnim="@anim/hold"
+            app:popExitAnim="@anim/slide_out_right"/>
     </fragment>
 
     <fragment
@@ -126,7 +146,11 @@
         tools:layout="@layout/fragment_category_random_recipe" >
         <action
             android:id="@+id/action_categoryRandomRecipeFragment_to_recipeFragment"
-            app:destination="@id/recipeFragment"/>
+            app:destination="@id/recipeFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/hold"
+            app:popEnterAnim="@anim/hold"
+            app:popExitAnim="@anim/slide_out_right"/>
     </fragment>
 
     <fragment
@@ -146,10 +170,14 @@
         tools:layout="@layout/fragment_search">
         <action
             android:id="@+id/action_searchFragment_to_searchAutocompleteFragment"
-            app:destination="@id/searchAutocompleteFragment"/>
+            app:destination="@id/searchAutocompleteFragment" />
         <action
             android:id="@+id/action_searchFragment_to_recipeFragment"
-            app:destination="@id/recipeFragment" />
+            app:destination="@id/recipeFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/hold"
+            app:popEnterAnim="@anim/hold"
+            app:popExitAnim="@anim/slide_out_right"/>
         <action
             android:id="@+id/action_searchFragment_to_searchResultFragment"
             app:destination="@id/searchResultFragment" />
@@ -201,7 +229,11 @@
             app:destination="@id/navigation_search" />
         <action
             android:id="@+id/action_searchResultFragment_to_recipeFragment"
-            app:destination="@id/recipeFragment" />
+            app:destination="@id/recipeFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/hold"
+            app:popEnterAnim="@anim/hold"
+            app:popExitAnim="@anim/slide_out_right"/>
     </fragment>
 
     <fragment
@@ -210,10 +242,18 @@
         tools:layout="@layout/fragment_search">
         <action
             android:id="@+id/action_searchFragment_to_recipeFragment"
-            app:destination="@id/recipeFragment" />
+            app:destination="@id/recipeFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/hold"
+            app:popEnterAnim="@anim/hold"
+            app:popExitAnim="@anim/slide_out_right"/>
         <action
             android:id="@+id/action_searchResultFragment_to_recipeFragment"
-            app:destination="@id/recipeFragment" />
+            app:destination="@id/recipeFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/hold"
+            app:popEnterAnim="@anim/hold"
+            app:popExitAnim="@anim/slide_out_right"/>
     </fragment>
 
     <fragment

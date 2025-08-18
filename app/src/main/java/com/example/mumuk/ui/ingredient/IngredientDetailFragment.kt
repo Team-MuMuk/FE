@@ -116,7 +116,7 @@ class IngredientDetailFragment : Fragment() {
 
                 lifecycleScope.launch {
                     val repository = IngredientRepository(requireContext())
-                    val response = repository.updateIngredientExpireDateRaw(ingredient.id, expireDate) // Raw Response 반환하도록 만들기
+                    val response = repository.updateIngredientExpireDateRaw(ingredient.id, expireDate)
                     if (response.isSuccessful) {
                         showExpireDateUpdatedDialog()
                     } else {
