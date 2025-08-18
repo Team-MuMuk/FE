@@ -134,9 +134,10 @@ class SearchFragment : Fragment() {
                             }
                             else -> emptyList()
                         }
-                        recentKeywords.addAll(keywordList)
+                        val distinctKeywordList = keywordList.distinctBy { it.title }
+                        recentKeywords.addAll(distinctKeywordList)
                         recentKeywordAdapter.notifyDataSetChanged()
-                        setRecentKeywordEmptyView(keywordList.isEmpty())
+                        setRecentKeywordEmptyView(distinctKeywordList.isEmpty())
                     } else if (body?.code == "SEARCH_404") {
                         recentKeywords.clear()
                         recentKeywordAdapter.notifyDataSetChanged()
@@ -182,6 +183,12 @@ class SearchFragment : Fragment() {
 
     fun saveRecentKeyword(keyword: String) {
         val context = context ?: return
+
+        if (recentKeywords.any { it.title == keyword }) {
+            Log.d("SearchFragment/API", "[RecentKeywords] saveRecentKeyword - keyword=$keyword, 이미 존재함, 저장하지 않음")
+            return
+        }
+
         val api = RetrofitClient.getRecentSearchApi(context)
         Log.d("SearchFragment/API", "[RecentKeywords] saveRecentKeyword - keyword=$keyword, 요청 시작")
         api.saveRecentSearch(keyword).enqueue(object : Callback<RecentSearchResponse> {
@@ -288,6 +295,8 @@ class SearchFragment : Fragment() {
                 val keywords = body?.data?.trendRecipeTitleList
                 val timeRaw = body?.data?.localDateTime
 
+                Log.d("SearchFragment/API", "PopularKeyword localDateTime: $timeRaw")
+
                 popularKeywords = keywords ?: emptyList()
                 setupPopularKeywordList()
 
@@ -308,15 +317,33 @@ class SearchFragment : Fragment() {
     }
 
     private fun formatPopularTime(localDateTime: String): String {
-        return try {
-            val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
-            inputFormat.timeZone = TimeZone.getTimeZone("UTC")
-            val date = inputFormat.parse(localDateTime)
-            val outputFormat = SimpleDateFormat("yyyy.MM.dd HH:mm", Locale.getDefault())
-            outputFormat.format(date!!)
-        } catch (e: Exception) {
-            ""
+        val normalized = localDateTime
+            .replace(Regex("\\.(\\d{3})\\d+"), ".$1")
+            .replace("Z", "")
+
+        val inputFormats = listOf(
+            "yyyy-MM-dd'T'HH:mm:ss.SSS",
+            "yyyy-MM-dd'T'HH:mm:ss"
+        )
+        for (format in inputFormats) {
+            try {
+                val sdf = SimpleDateFormat(format, Locale.getDefault())
+                sdf.timeZone = TimeZone.getTimeZone("Asia/Seoul")
+                val date = sdf.parse(normalized)
+                if (date != null) {
+                    val cal = Calendar.getInstance()
+                    cal.time = date
+                    cal.set(Calendar.MINUTE, 0)
+                    cal.set(Calendar.SECOND, 0)
+                    cal.set(Calendar.MILLISECOND, 0)
+                    val outputFormat = SimpleDateFormat("yyyy.MM.dd HH:mm", Locale.getDefault())
+                    outputFormat.timeZone = TimeZone.getTimeZone("Asia/Seoul")
+                    return outputFormat.format(cal.time)
+                }
+            } catch (_: Exception) {}
         }
+        Log.e("SearchFragment/API", "formatPopularTime error: $localDateTime -> $normalized")
+        return ""
     }
 
     private fun setupPopularKeywordList() {

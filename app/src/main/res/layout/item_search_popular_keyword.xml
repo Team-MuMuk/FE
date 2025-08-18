@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="32dp"
+    android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:gravity="center_vertical">
+    android:gravity="center_vertical"
+    android:layout_marginTop="8dp"
+    android:layout_marginBottom="8dp">
 
     <TextView
         android:id="@+id/search_popular_rank_tv"
@@ -23,5 +25,8 @@
         android:text="연어 포케"
         android:fontFamily="@font/pretendard_medium"
         android:textSize="16sp"
-        android:textColor="@color/black" />
+        android:textColor="@color/black"
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:singleLine="false" />
 </LinearLayout>
