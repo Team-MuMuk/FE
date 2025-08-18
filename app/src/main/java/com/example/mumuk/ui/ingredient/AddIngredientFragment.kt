@@ -61,7 +61,14 @@ class AddIngredientFragment : Fragment() {
             binding.ingredientRV.adapter = IngredientAdapter(
                 ingredientList,
                 onItemClick = { ingredient ->
-                    // 상세보기 처리
+                    // 상세보기: IngredientDetailFragment로 이동
+                    val bundle = Bundle().apply {
+                        putSerializable("ingredient", ingredient)
+                    }
+                    findNavController().navigate(
+                        R.id.action_addIngredientFragment_to_ingredientDetailFragment,
+                        bundle
+                    )
                 },
                 onDeleteClick = { ingredient ->
                     // 삭제 API 호출 & RecyclerView 갱신

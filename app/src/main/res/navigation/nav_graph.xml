@@ -370,5 +370,13 @@
         android:name="com.example.mumuk.ui.ingredient.IngredientExpiringFragment"
         android:label="fragment_ingredient_expiring"
         tools:layout="@layout/fragment_ingredient_expiring" >
+
+        <action
+            android:id="@+id/action_ingredientExpiringFragment_to_ingredientDetailFragment"
+            app:destination="@id/ingredientDetailFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/hold"
+            app:popEnterAnim="@anim/hold"
+            app:popExitAnim="@anim/slide_out_right"/>
     </fragment>
 </navigation>

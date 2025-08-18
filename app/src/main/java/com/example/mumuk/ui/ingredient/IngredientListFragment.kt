@@ -41,7 +41,7 @@ class IngredientListFragment : Fragment() {
         }
 
         binding.plusBtn.setOnClickListener {
-            findNavController().navigate(R.id.ingredientExpiringFragment)
+            findNavController().navigate(R.id.action_ingredientListFragment_to_ingredientExpiringFragment)
         }
     }
 
