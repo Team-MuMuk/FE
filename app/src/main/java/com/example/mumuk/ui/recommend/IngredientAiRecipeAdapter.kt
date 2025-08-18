@@ -5,11 +5,16 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mumuk.data.model.Recipe
 import com.example.mumuk.databinding.ItemRecipeBinding
+import com.example.mumuk.data.api.RetrofitClient
+import com.example.mumuk.data.model.recipe.ClickLikeRequest
+import com.example.mumuk.data.model.recipe.ClickLikeResponse
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class IngredientAiRecipeAdapter(
     private var items: MutableList<Recipe>,
-    private val onItemClick: (Recipe) -> Unit,
-    private val onHeartClick: ((Recipe, Int) -> Unit)? = null
+    private val onItemClick: (Recipe) -> Unit
 ) : RecyclerView.Adapter<IngredientAiRecipeAdapter.ViewHolder>() {
 
     inner class ViewHolder(val binding: ItemRecipeBinding) : RecyclerView.ViewHolder(binding.root) {
@@ -23,9 +28,19 @@ class IngredientAiRecipeAdapter(
                 else com.example.mumuk.R.drawable.btn_heart_blank
             )
             binding.imageView6.setOnClickListener {
+                val context = binding.root.context
                 recipe.isLiked = !recipe.isLiked
                 notifyItemChanged(position)
-                onHeartClick?.invoke(recipe, position)
+
+                val api = RetrofitClient.getUserRecipeApi(context)
+                val request = ClickLikeRequest(recipeId = recipe.id)
+                api.clickLike(request).enqueue(object : Callback<ClickLikeResponse> {
+                    override fun onResponse(
+                        call: Call<ClickLikeResponse>,
+                        response: Response<ClickLikeResponse>
+                    ) {}
+                    override fun onFailure(call: Call<ClickLikeResponse>, t: Throwable) {}
+                })
             }
             binding.root.setOnClickListener {
                 onItemClick(recipe)
