@@ -187,6 +187,12 @@ class FindAccountFragment : Fragment() {
         dialog.setContentView(layoutResId)
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
+        dialog.window?.setDimAmount(0f)
+        dialog.window?.setLayout(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
+
         val tvMessage = dialog.findViewById<TextView>(R.id.tv_dialog_message)
         tvMessage.text = message
 
@@ -204,6 +210,12 @@ class FindAccountFragment : Fragment() {
         val dialog = Dialog(requireContext())
         dialog.setContentView(R.layout.dialog_show_id)
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        dialog.window?.setDimAmount(0f)
+        dialog.window?.setLayout(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
 
         val tvMessage = dialog.findViewById<TextView>(R.id.tv_dialog_message)
         tvMessage.text = "아이디는\n$userId 입니다."

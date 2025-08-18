@@ -9,6 +9,7 @@ import android.text.InputType
 import android.text.TextWatcher
 import android.util.Log
 import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -364,7 +365,12 @@ class LoginIntroActivity : AppCompatActivity() {
         val dialog = Dialog(this)
         dialog.setContentView(R.layout.dialog_confirm)
         dialog.window?.setBackgroundDrawable(ColorDrawable(android.graphics.Color.TRANSPARENT))
-        dialog.window?.setDimAmount(0.2f)
+        dialog.window?.setDimAmount(0f)
+
+        dialog.window?.setLayout(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
 
         val tvMessage = dialog.findViewById<TextView>(R.id.tv_dialog_message)
         val btnOk = dialog.findViewById<TextView>(R.id.btn_dialog_ok)

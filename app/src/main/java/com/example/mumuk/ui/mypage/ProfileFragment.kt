@@ -207,7 +207,12 @@ class ProfileFragment : Fragment() {
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
         dialog.window?.setDimAmount(0f)
+        dialog.window?.setLayout(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
 
         val params = window?.attributes
         params?.gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL

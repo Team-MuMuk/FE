@@ -67,16 +67,12 @@ class MyPageFragment : Fragment() {
         }
 
         binding.itemLogout.setOnClickListener {
-            val logoutBinding = DialogLogoutBinding.inflate(layoutInflater)
-            val dialog = Dialog(requireContext())
-            dialog.setContentView(logoutBinding.root)
-            dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            dialog.window?.setDimAmount(0.3f)
-            dialog.show()
-
-            logoutBinding.btnDialogOk.setOnClickListener {
+            showSimpleConfirmDialog(
+                message = "로그아웃되었습니다.",
+                buttonText = "확인"
+            ) {
                 val refreshToken = TokenManager.getRefreshToken(requireContext()) ?: ""
-                val loginType = "LOCAL"
+                val loginType = TokenManager.getLoginType(requireContext()) ?: "LOCAL"
 
                 RetrofitClient.getAuthApi(requireContext()).logout(refreshToken, loginType)
                     .enqueue(object : Callback<CommonResponse> {
@@ -84,16 +80,10 @@ class MyPageFragment : Fragment() {
                             call: Call<CommonResponse>,
                             response: Response<CommonResponse>
                         ) {
-                            if (response.code() == 401) {
-                                TokenManager.clearTokens(requireContext())
-                                val prefs = requireContext().getSharedPreferences("auth", Context.MODE_PRIVATE)
-                                prefs.edit().clear().apply()
-                                val intent = Intent(requireContext(), LoginIntroActivity::class.java)
-                                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                                startActivity(intent)
-                                return
-                            }
-                            if (response.isSuccessful && response.body()?.message?.contains("성공") == true) {
+                            // 401도 성공처럼 처리
+                            if (response.code() == 401 ||
+                                (response.isSuccessful && response.body()?.message?.contains("성공") == true)
+                            ) {
                                 TokenManager.clearTokens(requireContext())
                                 val prefs = requireContext().getSharedPreferences("auth", Context.MODE_PRIVATE)
                                 prefs.edit().clear().apply()
@@ -101,30 +91,38 @@ class MyPageFragment : Fragment() {
                                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                                 startActivity(intent)
                             } else {
-                                Toast.makeText(requireContext(), "로그아웃 실패: ${response.body()?.message ?: "알 수 없는 오류"}", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    requireContext(),
+                                    "로그아웃 실패: ${response.body()?.message ?: "알 수 없는 오류"}",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
                         }
+
                         override fun onFailure(call: Call<CommonResponse>, t: Throwable) {
-                            Toast.makeText(requireContext(), "네트워크 오류: ${t.message}", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                requireContext(),
+                                "네트워크 오류: ${t.message}",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     })
-                dialog.dismiss()
             }
-
-            val widthInPx = TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP,
-                220f,
-                resources.displayMetrics
-            ).toInt()
-            dialog.window?.setLayout(widthInPx, ViewGroup.LayoutParams.WRAP_CONTENT)
         }
+
 
         binding.itemDeleteAccount.setOnClickListener {
             val deleteBinding = DialogDeleteAccountBinding.inflate(layoutInflater)
             val dialog = Dialog(requireContext())
             dialog.setContentView(deleteBinding.root)
             dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            dialog.window?.setDimAmount(0.3f)
+
+            dialog.window?.setDimAmount(0f)
+            dialog.window?.setLayout(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
+
             dialog.show()
 
             deleteBinding.btnDialogCancel.setOnClickListener {
@@ -171,7 +169,6 @@ class MyPageFragment : Fragment() {
                 220f,
                 resources.displayMetrics
             ).toInt()
-            dialog.window?.setLayout(widthInPx, ViewGroup.LayoutParams.WRAP_CONTENT)
         }
 
         binding.itemVersion.setOnClickListener {
@@ -216,7 +213,13 @@ class MyPageFragment : Fragment() {
         val dialog = Dialog(requireContext())
         dialog.setContentView(R.layout.dialog_confirm)
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialog.window?.setDimAmount(0.3f)
+
+        dialog.window?.setDimAmount(0f)
+        dialog.window?.setLayout(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
+
         val tvMessage = dialog.findViewById<TextView>(R.id.tv_dialog_message)
         val btnOk = dialog.findViewById<TextView>(R.id.btn_dialog_ok)
         tvMessage.text = message

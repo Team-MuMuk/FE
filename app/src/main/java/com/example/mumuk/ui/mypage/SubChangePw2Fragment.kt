@@ -103,19 +103,24 @@ class SubChangePw2Fragment : Fragment() {
 
     }
 
+
     private fun showPasswordChangedDialog() {
         val dialog = Dialog(requireContext())
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setContentView(R.layout.dialog_pw_changed)
-
+        dialog.setContentView(R.layout.dialog_confirm)
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialog.window?.setLayout(
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-        dialog.window?.setGravity(Gravity.CENTER)
 
+        dialog.window?.setDimAmount(0f)
+        dialog.window?.setLayout(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
+
+        val tvMessage = dialog.findViewById<TextView>(R.id.tv_dialog_message)
         val btnOk = dialog.findViewById<TextView>(R.id.btn_dialog_ok)
+
+        tvMessage.text = "비밀번호가 변경되었습니다."
+        btnOk.text = "확인"
+
         btnOk?.setOnClickListener {
             dialog.dismiss()
 
@@ -129,10 +134,9 @@ class SubChangePw2Fragment : Fragment() {
             startActivity(intent)
         }
 
+
         dialog.show()
     }
-
-
 
     override fun onDestroyView() {
         super.onDestroyView()
