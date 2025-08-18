@@ -6,23 +6,27 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.mumuk.data.model.Recipe
 import com.example.mumuk.databinding.ItemRecipeBinding
+import com.example.mumuk.data.api.RetrofitClient
+import com.example.mumuk.data.model.recipe.ClickLikeRequest
+import com.example.mumuk.data.model.recipe.ClickLikeResponse
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class HealthAiAdapter(
     private var items: MutableList<Recipe>,
-    private val onItemClick: (Recipe) -> Unit,
-    private val onHeartClick: ((Recipe, Int) -> Unit)? = null // 하트 클릭 리스너 추가
+    private val onItemClick: (Recipe) -> Unit
 ) : RecyclerView.Adapter<HealthAiAdapter.ViewHolder>() {
 
     inner class ViewHolder(val binding: ItemRecipeBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(recipe: Recipe, position: Int) {
             binding.recipeTitle.text = recipe.title
 
-            // Glide를 사용하여 이미지 URL로부터 이미지를 로드합니다.
             recipe.recipeImageUrl?.let {
                 Glide.with(binding.recipeImg.context)
                     .load(it)
-                    .placeholder(com.example.mumuk.R.drawable.bg_mosaic) // 로딩 중 표시할 이미지
-                    .error(com.example.mumuk.R.drawable.bg_mosaic) // 에러 시 표시할 이미지
+                    .placeholder(com.example.mumuk.R.drawable.bg_mosaic)
+                    .error(com.example.mumuk.R.drawable.bg_mosaic)
                     .into(binding.recipeImg)
             }
 
@@ -31,9 +35,19 @@ class HealthAiAdapter(
                 else com.example.mumuk.R.drawable.btn_heart_blank
             )
             binding.imageView6.setOnClickListener {
+                val context = binding.root.context
                 recipe.isLiked = !recipe.isLiked
                 notifyItemChanged(position)
-                onHeartClick?.invoke(recipe, position)
+
+                val api = RetrofitClient.getUserRecipeApi(context)
+                val request = ClickLikeRequest(recipeId = recipe.id)
+                api.clickLike(request).enqueue(object : Callback<ClickLikeResponse> {
+                    override fun onResponse(
+                        call: Call<ClickLikeResponse>,
+                        response: Response<ClickLikeResponse>
+                    ) {}
+                    override fun onFailure(call: Call<ClickLikeResponse>, t: Throwable) {}
+                })
             }
             binding.root.setOnClickListener {
                 onItemClick(recipe)
