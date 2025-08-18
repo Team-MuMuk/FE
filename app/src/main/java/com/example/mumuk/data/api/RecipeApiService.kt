@@ -10,10 +10,10 @@ import retrofit2.http.POST
 import retrofit2.http.Part
 
 interface RecipeApiService {
-    @GET("/api/v1/recipe/recommend/ingredient")
+    @GET("/api/recipe/recommend/ingredient")
     suspend fun getRecommendIngredientRecipes(): BaseResponse<List<RecommendRecipeResponse>>
 
-    @GET("/api/v1/recipe/recommend/combined")
+    @GET("/api/recipe/recommend/combined")
     suspend fun getRecommendCombinedRecipes(): BaseResponse<List<RecommendRecipeResponse>>
 
     @Multipart

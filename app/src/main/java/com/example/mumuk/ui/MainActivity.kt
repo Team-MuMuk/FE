@@ -27,6 +27,11 @@ class MainActivity : AppCompatActivity(), HomeFragment.BottomNavSelector {
 
         binding.bottomNavView.setOnItemSelectedListener { item ->
             if (item.itemId == binding.bottomNavView.selectedItemId) {
+
+                val currentFragment = navHostFragment.childFragmentManager.fragments
+                    .find { it is HomeFragment } as? HomeFragment
+                currentFragment?.forceRefresh()
+
                 navController.popBackStack(item.itemId, inclusive = false)
                 return@setOnItemSelectedListener true
             }
