@@ -215,7 +215,8 @@ class IngredientDetailFragment : Fragment() {
                 if (response.isSuccessful) {
                     Log.d(TAG, "FCM 토큰 저장 API 성공: ${response.body()}")
                 } else {
-                    Log.e(TAG, "FCM 토큰 저장 API 응답 실패: ${response.code()} ${response.errorBody()?.string()}")
+                    val errorBody = response.errorBody()?.string()
+                    Log.e(TAG, "FCM 토큰 저장 API 응답 실패: ${response.code()} ${errorBody}")
                 }
                 onComplete()
             }
