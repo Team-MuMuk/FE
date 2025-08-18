@@ -27,7 +27,7 @@ class ExpiringIngredientAdapter(
             val dDayNum = ChronoUnit.DAYS.between(today, expiry)
             binding.dDay.text = "D - $dDayNum"
 
-            binding.root.setOnClickListener {
+            binding.frontLayout.setOnClickListener {
                 onItemClick(item)
             }
 

@@ -1,6 +1,8 @@
 package com.example.mumuk.data.api
 
 import com.example.mumuk.data.model.ingredient.IngredientDeleteResponse
+import com.example.mumuk.data.model.ingredient.IngredientExpireDateUpdateRequest
+import com.example.mumuk.data.model.ingredient.IngredientQuantityUpdateRequest
 import com.example.mumuk.data.model.ingredient.IngredientRegisterRequest
 import com.example.mumuk.data.model.ingredient.IngredientRegisterResponse
 import com.example.mumuk.data.model.ingredient.IngredientResponse
@@ -9,6 +11,7 @@ import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 
 interface IngredientApiService {
@@ -23,5 +26,17 @@ interface IngredientApiService {
     @DELETE("/api/ingredient/{ingredientId}/delete")
     suspend fun deleteIngredient(
         @Path("ingredientId") ingredientId: Int
+    ): Response<IngredientDeleteResponse>
+
+    @PUT("/api/ingredient/{ingredientId}/quantity")
+    suspend fun updateIngredientQuantity(
+        @Path("ingredientId") ingredientId: Int,
+        @Body request: IngredientQuantityUpdateRequest
+    ): Response<Unit>
+
+    @PUT("/api/ingredient/{ingredientId}/expiredate")
+    suspend fun updateIngredientExpireDate(
+        @Path("ingredientId") ingredientId: Int,
+        @Body request: IngredientExpireDateUpdateRequest
     ): Response<IngredientDeleteResponse>
 }
