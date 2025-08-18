@@ -47,11 +47,22 @@ class IngredientRepository(private val context: Context) {
         response.isSuccessful
     }
 
-    suspend fun updateIngredientExpireDate(ingredientId: Int, expireDate: String): Boolean = withContext(Dispatchers.IO) {
-        val response = ingredientApiService.updateIngredientExpireDate(
+    suspend fun updateIngredientExpireDate(ingredientId: Int, expireDate: String): Boolean =
+        withContext(Dispatchers.IO) {
+            val response = ingredientApiService.updateIngredientExpireDate(
+                ingredientId,
+                IngredientExpireDateUpdateRequest(expireDate)
+            )
+            response.isSuccessful
+        }
+
+    suspend fun updateIngredientExpireDateRaw(
+        ingredientId: Int,
+        expireDate: String
+    ): Response<IngredientDeleteResponse> = withContext(Dispatchers.IO) {
+        ingredientApiService.updateIngredientExpireDate(
             ingredientId,
             IngredientExpireDateUpdateRequest(expireDate)
         )
-        response.isSuccessful
     }
 }

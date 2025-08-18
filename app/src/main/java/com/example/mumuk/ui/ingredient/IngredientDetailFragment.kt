@@ -12,6 +12,7 @@ import com.example.mumuk.R
 import com.example.mumuk.databinding.FragmentIngredientDetailBinding
 import com.example.mumuk.data.model.Ingredient
 import android.app.Dialog
+import android.graphics.drawable.ColorDrawable
 import android.view.Window
 import android.widget.TextView
 import android.widget.Toast
@@ -115,11 +116,17 @@ class IngredientDetailFragment : Fragment() {
 
                 lifecycleScope.launch {
                     val repository = IngredientRepository(requireContext())
-                    val success = repository.updateIngredientExpireDate(ingredient.id, expireDate)
-                    if (success) {
-                        Toast.makeText(requireContext(), "유통기한이 수정되었습니다.", Toast.LENGTH_SHORT).show()
+                    val response = repository.updateIngredientExpireDateRaw(ingredient.id, expireDate) // Raw Response 반환하도록 만들기
+                    if (response.isSuccessful) {
+                        showExpireDateUpdatedDialog()
                     } else {
-                        Toast.makeText(requireContext(), "유통기한 수정에 실패했습니다.", Toast.LENGTH_SHORT).show()
+                        val errorBody = response.errorBody()?.string()
+                        val errorMsg = if (errorBody?.contains("유통기한이 유효하지 않습니다") == true) {
+                            "이전 날짜로는 재설정이 불가능합니다!"
+                        } else {
+                            "유통기한 수정에 실패했습니다."
+                        }
+                        showExpireDateErrorDialog(errorMsg)
                     }
                 }
             } else {
@@ -218,6 +225,43 @@ class IngredientDetailFragment : Fragment() {
                 onComplete()
             }
         })
+    }
+
+    private fun showExpireDateUpdatedDialog() {
+        val dialog = Dialog(requireContext())
+        dialog.setContentView(R.layout.dialog_ingredient_refresh)
+        dialog.setCancelable(false)
+
+        dialog.window?.setBackgroundDrawable(ColorDrawable(android.graphics.Color.TRANSPARENT))
+        dialog.window?.setDimAmount(0f)
+        dialog.window?.setLayout(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
+
+        val btnOk = dialog.findViewById<TextView>(R.id.btnOk)
+        btnOk.setOnClickListener { dialog.dismiss() }
+        dialog.show()
+    }
+
+    private fun showExpireDateErrorDialog(message: String) {
+        val dialog = Dialog(requireContext())
+        dialog.setContentView(R.layout.dialog_ingredient_refresh)
+        dialog.setCancelable(false)
+
+        dialog.window?.setBackgroundDrawable(ColorDrawable(android.graphics.Color.TRANSPARENT))
+        dialog.window?.setDimAmount(0f)
+        dialog.window?.setLayout(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
+
+        val msgTextView = dialog.findViewById<TextView>(R.id.textView)
+        msgTextView.text = message
+
+        val btnOk = dialog.findViewById<TextView>(R.id.btnOk)
+        btnOk.setOnClickListener { dialog.dismiss() }
+        dialog.show()
     }
 
     override fun onDestroyView() {
