@@ -190,13 +190,36 @@
         tools:layout="@layout/fragment_my_page">
         <action
             android:id="@+id/action_myPage_to_profile"
-            app:destination="@id/profileFragment"/>
+            app:destination="@id/profileFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/hold"
+            app:popEnterAnim="@anim/hold"
+            app:popExitAnim="@anim/slide_out_right"
+            />
         <action
             android:id="@+id/action_myPage_to_bookmarkRecipe"
-            app:destination="@id/bookmarkRecipeFragment" />
+            app:destination="@id/bookmarkRecipeFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/hold"
+            app:popEnterAnim="@anim/hold"
+            app:popExitAnim="@anim/slide_out_right"
+            />
         <action
             android:id="@+id/action_myPage_to_recipeFragment"
-            app:destination="@id/recipeFragment" />
+            app:destination="@id/recipeFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/hold"
+            app:popEnterAnim="@anim/hold"
+            app:popExitAnim="@anim/slide_out_right"
+            />
+        <action
+            android:id="@+id/action_myPage_to_subChangePw1"
+            app:destination="@id/subChangePw1Fragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/hold"
+            app:popEnterAnim="@anim/hold"
+            app:popExitAnim="@anim/slide_out_right" />
+
     </fragment>
 
     <fragment
@@ -206,7 +229,12 @@
         tools:layout="@layout/fragment_profile">
         <action
             android:id="@+id/action_profile_to_myPage_with_updated_profile"
-            app:destination="@id/navigation_my_page" />
+            app:destination="@id/navigation_my_page"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/hold"
+            app:popEnterAnim="@anim/hold"
+            app:popExitAnim="@anim/slide_out_right"/>
+
     </fragment>
 
     <fragment
@@ -419,4 +447,30 @@
             app:popEnterAnim="@anim/hold"
             app:popExitAnim="@anim/slide_out_right"/>
     </fragment>
+
+    <fragment
+        android:id="@+id/subChangePw1Fragment"
+        android:name="com.example.mumuk.ui.mypage.SubChangePw1Fragment"
+        android:label="비밀번호 확인">
+
+        <action
+            android:id="@+id/action_subChangePw1_to_subChangePw2"
+            app:destination="@id/subChangePw2Fragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/hold"
+            app:popEnterAnim="@anim/hold"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/subChangePw2Fragment"
+        android:name="com.example.mumuk.ui.login.SubChangePw2Fragment"
+        android:label="비밀번호 변경">
+
+        <argument
+            android:name="currentPassWord"
+            app:argType="string"
+            android:defaultValue="" />
+    </fragment>
+
 </navigation>

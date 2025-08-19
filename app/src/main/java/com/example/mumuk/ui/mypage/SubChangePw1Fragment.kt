@@ -10,13 +10,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.example.mumuk.R
 import com.example.mumuk.data.api.RetrofitClient
 import com.example.mumuk.data.model.auth.CheckCurrentPwRequest
 import com.example.mumuk.data.model.auth.CommonResponse
 import com.example.mumuk.databinding.FragmentSubChangePw1Binding
-import com.example.mumuk.ui.login.SubChangePw2Fragment
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -40,12 +41,10 @@ class SubChangePw1Fragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         Log.d("SubChangePw1", "onViewCreated 진입함")
 
-        binding.btnConfirmChangePw.setOnClickListener {
-            verifyCurrentPassword()
-        }
+        binding.btnConfirmChangePw.setOnClickListener { verifyCurrentPassword() }
 
         binding.btnBack.setOnClickListener {
-            parentFragmentManager.popBackStack()
+            findNavController().popBackStack()
         }
     }
 
@@ -53,7 +52,6 @@ class SubChangePw1Fragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
-
 
     private fun verifyCurrentPassword() {
         val currentPw = binding.etPwNew.text.toString()
@@ -68,7 +66,6 @@ class SubChangePw1Fragment : Fragment() {
             .enqueue(object : Callback<CommonResponse> {
                 override fun onResponse(call: Call<CommonResponse>, response: Response<CommonResponse>) {
                     val body = response.body()
-
                     Log.d("SubChangePw1", "응답 바디: $body")
 
                     if (response.isSuccessful && body?.status == "OK" && body.code == "USER_200") {
@@ -80,7 +77,6 @@ class SubChangePw1Fragment : Fragment() {
                     }
                 }
 
-
                 override fun onFailure(call: Call<CommonResponse>, t: Throwable) {
                     Log.e("SubChangePw1", "비밀번호 확인 API 실패", t)
                     Toast.makeText(requireContext(), "서버 연결 실패", Toast.LENGTH_SHORT).show()
@@ -88,12 +84,10 @@ class SubChangePw1Fragment : Fragment() {
             })
     }
 
-
     private fun showConfirmDialog() {
         val dialog = Dialog(requireContext())
         dialog.setContentView(R.layout.dialog_confirm)
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-
         dialog.window?.setDimAmount(0f)
         dialog.window?.setLayout(
             ViewGroup.LayoutParams.MATCH_PARENT,
@@ -109,18 +103,13 @@ class SubChangePw1Fragment : Fragment() {
         btnOk.setOnClickListener {
             dialog.dismiss()
 
-            val fragment = SubChangePw2Fragment().apply {
-                arguments = Bundle().apply {
-                    putString("currentPassWord", binding.etPwNew.text.toString())
-                }
+            val args = bundleOf(
+                "currentPassWord" to binding.etPwNew.text.toString()
+            )
+            if (isAdded) {
+                findNavController().navigate(R.id.action_subChangePw1_to_subChangePw2, args)
             }
-
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.mypage_container, fragment)
-                .addToBackStack(null)
-                .commit()
         }
-
 
         dialog.show()
     }
