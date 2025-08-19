@@ -60,6 +60,7 @@ class RecipeFragment : Fragment() {
         Log.d("RecipeFragment", "onViewCreated: Starting to fetch details for recipeId: $recipeId")
         recipeViewModel.fetchRecipeDetail(recipeId)
         recipeViewModel.fetchShopItems(recipeId)
+        recipeViewModel.fetchIngredientMatch(recipeId)
 
     }
 
@@ -154,9 +155,6 @@ class RecipeFragment : Fragment() {
                     .error(com.example.mumuk.R.drawable.bg_mosaic)
                     .into(binding.recipeImg)
 
-                // 재료 목록 RecyclerView 업데이트
-                (ingredientRV.adapter as? IngredientAdapter)?.updateData(detail.recipeIngredients)
-
                 recipeTitle2.text = "#${detail.title}"
 
                 recipeViewModel.shopItemList.observe(viewLifecycleOwner) { shopList ->
@@ -176,6 +174,25 @@ class RecipeFragment : Fragment() {
         recipeViewModel.shopItemList.observe(viewLifecycleOwner) { shopList ->
             Log.d("RecipeFragment", "shopItemList observer triggered. Item count: ${shopList.size}")
             (binding.shopRV.adapter as? ShopAdapter)?.submitList(shopList)
+        }
+
+        recipeViewModel.ingredientMatchData.observe(viewLifecycleOwner) { matchData ->
+            val ingredientItems = mutableListOf<com.example.mumuk.data.model.RecipeIngredient>()
+            matchData.match.forEach { name ->
+                ingredientItems.add(com.example.mumuk.data.model.RecipeIngredient(name = name, isAvailable = true))
+            }
+            matchData.mismatch.forEach { name ->
+                ingredientItems.add(com.example.mumuk.data.model.RecipeIngredient(name = name, isAvailable = false))
+            }
+            matchData.replaceable.forEach { item ->
+                ingredientItems.add(
+                    com.example.mumuk.data.model.RecipeIngredient(
+                        name = "${item.recipeIngredient} (대체: ${item.userIngredient})",
+                        isAvailable = false
+                    )
+                )
+            }
+            (binding.ingredientRV.adapter as? IngredientAdapter)?.updateData(ingredientItems)
         }
     }
 

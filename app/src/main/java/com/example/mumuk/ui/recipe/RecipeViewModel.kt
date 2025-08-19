@@ -3,8 +3,10 @@ package com.example.mumuk.ui.recipe
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.*
+import com.example.mumuk.data.api.RetrofitClient
 import com.example.mumuk.data.model.Recipe
 import com.example.mumuk.data.model.RecipeIngredient
+import com.example.mumuk.data.model.recipe.IngredientMatchData
 import com.example.mumuk.data.model.recipe.NaverShoppingItem
 import com.example.mumuk.data.model.recipe.SearchedBlog
 import com.example.mumuk.data.model.search.UserRecipeDetailData
@@ -36,6 +38,9 @@ class RecipeViewModel(private val userRecipeRepository: UserRecipeRepository, pr
 
     private val _blogList = MutableLiveData<List<SearchedBlog>>()
     val blogList: LiveData<List<SearchedBlog>> = _blogList
+
+    private val _ingredientMatchData = MutableLiveData<IngredientMatchData>()
+    val ingredientMatchData: LiveData<IngredientMatchData> = _ingredientMatchData
 
     init {
         loadIngredients()
@@ -86,6 +91,18 @@ class RecipeViewModel(private val userRecipeRepository: UserRecipeRepository, pr
                 }
             } catch (e: Exception) {
                 Log.e("RecipeViewModel", "Exception in fetchRecipeDetail: ${e.localizedMessage}", e)
+            }
+        }
+    }
+
+    fun fetchIngredientMatch(recipeId: Long) {
+        viewModelScope.launch {
+            try {
+                val api = RetrofitClient.getRecipeApiService(context)
+                val response = api.getIngredientMatch(recipeId)
+                _ingredientMatchData.value = response.data
+            } catch (e: Exception) {
+                Log.e("RecipeViewModel", "Exception in fetchIngredientMatch: ${e.localizedMessage}", e)
             }
         }
     }
