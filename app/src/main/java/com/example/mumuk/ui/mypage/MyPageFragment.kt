@@ -37,6 +37,8 @@ import retrofit2.Response
 import com.example.mumuk.data.model.mypage.RecentRecipeAdapter
 import com.example.mumuk.data.model.recipe.ClickLikeRequest
 import com.example.mumuk.data.model.recipe.ClickLikeResponse
+import androidx.core.view.isVisible
+import androidx.recyclerview.widget.RecyclerView
 
 class MyPageFragment : Fragment() {
     private var _binding: FragmentMyPageBinding? = null
@@ -195,10 +197,8 @@ class MyPageFragment : Fragment() {
                     buttonText = "확인"
                 )
             } else {
-                childFragmentManager.commit {
-                    findNavController().navigate(R.id.action_myPage_to_subChangePw1)
-                    addToBackStack(null)
-                }
+                findNavController().navigate(R.id.action_myPage_to_subChangePw1)
+
             }
         }
 
@@ -253,6 +253,7 @@ class MyPageFragment : Fragment() {
                 val args = bundleOf("recipeId" to item.recipeId)
                 findNavController().navigate(R.id.action_myPage_to_recipeFragment, args)
             },
+
             onHeartClick = { item, pos ->
                 val id = item.recipeId
                 val old = item.liked
@@ -266,9 +267,7 @@ class MyPageFragment : Fragment() {
                             response: Response<ClickLikeResponse>
                         ) {
                             if (response.isSuccessful && response.body()?.status == "OK") {
-                                // 성공 -> 그대로 유지
                             } else {
-                                // 실패 -> 롤백
                                 recentAdapter.updateLikeAt(pos, old)
                                 Toast.makeText(requireContext(), "찜 실패 (${response.code()})", Toast.LENGTH_SHORT).show()
                                 Log.w("MyPage", "clickLike fail code=${response.code()} body=${response.errorBody()?.string()}")
@@ -283,6 +282,14 @@ class MyPageFragment : Fragment() {
             }
         )
         binding.rvRecentRecipes.adapter = recentAdapter
+        recentAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+            override fun onChanged() = updateRecentEmptyState()
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) = updateRecentEmptyState()
+            override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) = updateRecentEmptyState()
+        })
+        updateRecentEmptyState()
+
+
     }
 
     private fun loadRecentRecipes() {
@@ -328,6 +335,8 @@ class MyPageFragment : Fragment() {
                         }
 
                         recentAdapter.submitList(uiList)
+                        updateRecentEmptyState()
+
                         Log.d("MyPage", "[recent] adapter submitList done (size=${uiList.size})")
 
                     } else {
@@ -407,6 +416,12 @@ class MyPageFragment : Fragment() {
             }
             binding.imgProfile.setImageResource(profileRes)
         }
+    }
+
+    private fun updateRecentEmptyState() {
+        val empty = recentAdapter.itemCount == 0
+        binding.rvRecentRecipes.isVisible = !empty
+        binding.tvRecentEmpty.isVisible = empty
     }
 
     override fun onResume() {
