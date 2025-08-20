@@ -6,6 +6,7 @@ import android.content.res.Resources
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.DisplayMetrics
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -22,6 +23,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.example.mumuk.R
@@ -65,6 +67,14 @@ class HomeFragment : Fragment() {
 
     private lateinit var bannerAdapter: HomeBannerAdapter
 
+    private var autoScrollHandler: Handler? = null
+    private var autoScrollRunnable: Runnable? = null
+    private val autoScrollInterval: Long = 6000 // ms
+
+    private var isBannerTouched = false
+    private var isBannerScrolling = false
+    private val bannerScrollDurationMs = 200
+
     val Int.dp: Int get() = TypedValue.applyDimension(
         TypedValue.COMPLEX_UNIT_DIP, this.toFloat(), Resources.getSystem().displayMetrics
     ).toInt()
@@ -102,6 +112,9 @@ class HomeFragment : Fragment() {
         setupRotationAnimator()
         loadUserNicknameForHome()
         setupBanner()
+        setupBannerTouchPauseResume()
+        setupBannerScrollListener()
+        startAutoScrollBanner()
 
         binding.infoBtn.setOnClickListener {
             showInfoPopup(it)
@@ -464,12 +477,101 @@ class HomeFragment : Fragment() {
         }
     }
 
+    private fun startAutoScrollBanner() {
+        if (autoScrollHandler == null) autoScrollHandler = Handler(Looper.getMainLooper())
+        if (autoScrollRunnable == null) {
+            autoScrollRunnable = object : Runnable {
+                override fun run() {
+                    val viewPager = binding.bannerViewPager
+                    val adapter = bannerAdapter
+                    if (!isBannerTouched && !isBannerScrolling) {
+                        val nextItem = viewPager.currentItem + 1
+                        if (nextItem >= adapter.itemCount) {
+                            // 점프 후 바로 다음 배너로 스크롤 예약
+                            viewPager.setCurrentItem(1, false)
+                            // 바로 다음 배너로 스크롤 (6초 기다리지 않음)
+                            autoScrollHandler?.postDelayed({
+                                smoothScrollToBanner(2) // 두 번째 배너로 이동
+                                autoScrollHandler?.postDelayed(autoScrollRunnable!!, autoScrollInterval)
+                            }, 500) // 점프 후 0.5초 뒤에 바로 스크롤
+                            return
+                        } else {
+                            smoothScrollToBanner(nextItem)
+                        }
+                    }
+                    autoScrollHandler?.postDelayed(this, autoScrollInterval)
+                }
+            }
+        }
+        autoScrollHandler?.postDelayed(autoScrollRunnable!!, autoScrollInterval)
+    }
+
+    private fun stopAutoScrollBanner() {
+        autoScrollHandler?.removeCallbacks(autoScrollRunnable!!)
+    }
+
+    private fun setupBannerTouchPauseResume() {
+        val viewPager = binding.bannerViewPager
+        viewPager.getChildAt(0)?.setOnTouchListener { _, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> {
+                    isBannerTouched = true
+                    stopAutoScrollBanner()
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    isBannerTouched = false
+                    startAutoScrollBanner()
+                }
+            }
+            false
+        }
+    }
+
+    private fun setupBannerScrollListener() {
+        binding.bannerViewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageScrollStateChanged(state: Int) {
+                if (state == ViewPager2.SCROLL_STATE_IDLE) {
+                    val position = binding.bannerViewPager.currentItem
+                    when (position) {
+                        0 -> binding.bannerViewPager.setCurrentItem(bannerAdapter.itemCount - 2, false) // 0 → 마지막
+                        bannerAdapter.itemCount - 1 -> binding.bannerViewPager.setCurrentItem(1, false) // 마지막 → 첫 번째
+                    }
+                }
+            }
+        })
+    }
+
+    private fun smoothScrollToBanner(targetItem: Int) {
+        val viewPager = binding.bannerViewPager
+        try {
+            val recyclerViewField = ViewPager2::class.java.getDeclaredField("mRecyclerView")
+            recyclerViewField.isAccessible = true
+            val recyclerView = recyclerViewField.get(viewPager) as RecyclerView
+
+            val layoutManager = recyclerView.layoutManager
+            if (layoutManager != null) {
+                val smoothScroller = object : LinearSmoothScroller(requireContext()) {
+                    override fun calculateSpeedPerPixel(displayMetrics: DisplayMetrics): Float {
+                        // 애니메이션 속도 (작을수록 느림)
+                        return bannerScrollDurationMs / displayMetrics.densityDpi.toFloat()
+                    }
+                }
+                smoothScroller.targetPosition = targetItem
+                layoutManager.startSmoothScroll(smoothScroller)
+            }
+        } catch (e: Exception) {
+            // 리플렉션 실패 시 기본 애니메이션 사용
+            viewPager.setCurrentItem(targetItem, true)
+        }
+    }
+
     override fun onDetach() {
         super.onDetach()
         bottomNavSelector = null
     }
 
     override fun onDestroyView() {
+        stopAutoScrollBanner()
         rotationAnimator?.cancel()
         rotationAnimator = null
         super.onDestroyView()
