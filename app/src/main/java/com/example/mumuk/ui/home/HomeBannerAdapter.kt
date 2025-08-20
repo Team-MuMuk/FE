@@ -9,8 +9,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.mumuk.R
 import com.example.mumuk.data.model.Banner
 
-class HomeBannerAdapter(private val items: List<Banner>) :
-    RecyclerView.Adapter<HomeBannerAdapter.BannerViewHolder>() {
+class HomeBannerAdapter(
+    private val items: List<Banner>,
+    private val onBannerClick: ((position: Int) -> Unit)? = null
+) : RecyclerView.Adapter<HomeBannerAdapter.BannerViewHolder>() {
 
     val loopItems: List<Banner> = if (items.size > 1)
         listOf(items.last()) + items + listOf(items.first())
@@ -27,6 +29,10 @@ class HomeBannerAdapter(private val items: List<Banner>) :
         val item = loopItems[position]
         holder.image.setImageResource(item.imageResId)
         holder.text.text = item.text
+
+        holder.itemView.setOnClickListener {
+            onBannerClick?.invoke(position)
+        }
     }
 
     override fun getItemCount() = loopItems.size

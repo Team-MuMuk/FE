@@ -409,7 +409,17 @@ class HomeFragment : Fragment() {
             Banner(R.drawable.img_banner_sample_2, "나만의 건강맞춤 레시피\n보러가기"),
             Banner(R.drawable.img_banner_sample_3, "재료등록 하러가기\n→")
         )
-        bannerAdapter = HomeBannerAdapter(banners)
+        bannerAdapter = HomeBannerAdapter(banners) { clickedPosition ->
+            val realPosition = when (clickedPosition) {
+                0 -> banners.size - 1
+                bannerAdapter.itemCount - 1 -> 0
+                else -> clickedPosition - 1
+            }
+            when (realPosition) {
+                1 -> findNavController().navigate(R.id.action_navigation_home_to_healthRecommendFragment)
+                2 -> findNavController().navigate(R.id.action_navigation_home_to_addIngredientFragment)
+            }
+        }
         binding.bannerViewPager.adapter = bannerAdapter
         binding.bannerViewPager.offscreenPageLimit = 1
 
