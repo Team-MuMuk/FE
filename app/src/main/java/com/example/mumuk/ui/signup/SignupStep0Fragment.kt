@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.example.mumuk.R
 
 class SignupStep0Fragment : Fragment() {
@@ -18,11 +19,9 @@ class SignupStep0Fragment : Fragment() {
 
         val btnNext = view.findViewById<ImageButton>(R.id.btn_next)
         btnNext.setOnClickListener {
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.signup_container, SignupStep1Fragment())
-                .addToBackStack(null)
-                .commit()
+            findNavController().navigate(R.id.action_step0_to_step1)
         }
+
 
         return view
     }

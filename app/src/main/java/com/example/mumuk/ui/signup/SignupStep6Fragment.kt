@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.example.mumuk.R
 import com.example.mumuk.databinding.FragmentSignupStep6Binding
 
@@ -77,20 +78,16 @@ class SignupStep6Fragment : Fragment() {
             if (statusText == "비밀번호가 일치합니다.") {
                 activity.confirmPassword = confirmPw
 
-                parentFragmentManager.beginTransaction()
-                    .replace(R.id.signup_container, TermsPrivacyFragment())
-                    .addToBackStack(null)
-                    .commit()
+                findNavController().navigate(R.id.action_step6_to_terms_privacy)
+
             }
         }
 
 
 
         binding.btnBack.setOnClickListener {
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.signup_container, SignupStep5Fragment())
-                .addToBackStack(null)
-                .commit()
+            findNavController().popBackStack()
+
         }
     }
 

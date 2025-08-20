@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_signup"
+    app:startDestination="@id/fragment_signup_step0">
+
+    <fragment
+        android:id="@+id/fragment_signup_step0"
+        android:name="com.example.mumuk.ui.signup.SignupStep0Fragment"
+        tools:layout="@layout/fragment_signup_step0">
+
+        <action
+            android:id="@+id/action_step0_to_step1"
+            app:destination="@id/fragment_signup_step1"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/hold"
+            app:popEnterAnim="@anim/hold"
+            app:popExitAnim="@anim/slide_out_right"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/fragment_signup_step1"
+        android:name="com.example.mumuk.ui.signup.SignupStep1Fragment"
+        tools:layout="@layout/fragment_signup_step1">
+
+        <action
+            android:id="@+id/action_step1_to_step2"
+            app:destination="@id/fragment_signup_step2"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/hold"
+            app:popEnterAnim="@anim/hold"
+            app:popExitAnim="@anim/slide_out_right"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/fragment_signup_step2"
+        android:name="com.example.mumuk.ui.signup.SignupStep2Fragment"
+        tools:layout="@layout/fragment_signup_step2">
+
+        <action
+            android:id="@+id/action_step2_to_step3"
+            app:destination="@id/fragment_signup_step3"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/hold"
+            app:popEnterAnim="@anim/hold"
+            app:popExitAnim="@anim/slide_out_right"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/fragment_signup_step3"
+        android:name="com.example.mumuk.ui.signup.SignupStep3Fragment"
+        tools:layout="@layout/fragment_signup_step3">
+
+        <action
+            android:id="@+id/action_step3_to_step4"
+            app:destination="@id/fragment_signup_step4"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/hold"
+            app:popEnterAnim="@anim/hold"
+            app:popExitAnim="@anim/slide_out_right"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/fragment_signup_step4"
+        android:name="com.example.mumuk.ui.signup.SignupStep4Fragment"
+        tools:layout="@layout/fragment_signup_step4">
+
+        <action
+            android:id="@+id/action_step4_to_step5"
+            app:destination="@id/fragment_signup_step5"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/hold"
+            app:popEnterAnim="@anim/hold"
+            app:popExitAnim="@anim/slide_out_right"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/fragment_signup_step5"
+        android:name="com.example.mumuk.ui.signup.SignupStep5Fragment"
+        tools:layout="@layout/fragment_signup_step5">
+
+        <action
+            android:id="@+id/action_step5_to_step6"
+            app:destination="@id/fragment_signup_step6"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/hold"
+            app:popEnterAnim="@anim/hold"
+            app:popExitAnim="@anim/slide_out_right"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/fragment_signup_step6"
+        android:name="com.example.mumuk.ui.signup.SignupStep6Fragment"
+        tools:layout="@layout/fragment_signup_step6">
+
+        <action
+            android:id="@+id/action_step6_to_terms_privacy"
+            app:destination="@id/termsPrivacyFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/hold"
+            app:popEnterAnim="@anim/hold"
+            app:popExitAnim="@anim/slide_out_right"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/termsPrivacyFragment"
+        android:name="com.example.mumuk.ui.signup.TermsPrivacyFragment"
+        tools:layout="@layout/fragment_terms_privacy">
+        <action
+            android:id="@+id/action_terms_to_complete"
+            app:destination="@id/signupCompleteFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/hold"
+            app:popEnterAnim="@anim/hold"
+            app:popExitAnim="@anim/slide_out_right"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/signupCompleteFragment"
+        android:name="com.example.mumuk.ui.signup.SignupCompleteFragment"
+        tools:layout="@layout/fragment_signup_complete" />
+</navigation>

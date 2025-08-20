@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.example.mumuk.R
 import com.example.mumuk.databinding.FragmentSignupStep5Binding
 
@@ -106,18 +107,14 @@ class SignupStep5Fragment : Fragment() {
                 }
                 step5Fragment.arguments = bundle
 
-                parentFragmentManager.beginTransaction()
-                    .replace(R.id.signup_container, SignupStep6Fragment())
-                    .addToBackStack(null)
-                    .commit()
+                findNavController().navigate(R.id.action_step5_to_step6)
+
             }
         }
 
         binding.btnBack.setOnClickListener {
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.signup_container, SignupStep4Fragment())
-                .addToBackStack(null)
-                .commit()
+            findNavController().popBackStack()
+
         }
     }
 

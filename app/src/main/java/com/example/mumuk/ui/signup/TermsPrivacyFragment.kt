@@ -14,6 +14,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.example.mumuk.R
 import com.example.mumuk.databinding.FragmentTermsPrivacyBinding
 
@@ -105,10 +106,8 @@ class TermsPrivacyFragment : Fragment() {
         binding.btnAgree.setOnClickListener {
             showSimpleConfirmDialog("동의하시겠습니까?", "확인") {
                 showSimpleConfirmDialog("정상처리되었습니다.", "확인") {
-                    parentFragmentManager.beginTransaction()
-                        .replace(R.id.signup_container, SignupCompleteFragment())
-                        .addToBackStack(null)
-                        .commit()
+                    findNavController().navigate(R.id.action_terms_to_complete)
+
                 }
             }
         }

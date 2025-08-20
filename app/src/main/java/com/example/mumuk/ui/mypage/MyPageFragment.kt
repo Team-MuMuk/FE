@@ -63,7 +63,7 @@ class MyPageFragment : Fragment() {
         }
 
         binding.btnFavorites.setOnClickListener {
-            findNavController().navigate(R.id.bookmarkRecipeFragment)
+            findNavController().navigate(R.id.action_myPage_to_bookmarkRecipe)
         }
 
         binding.itemLogout.setOnClickListener {
@@ -196,7 +196,7 @@ class MyPageFragment : Fragment() {
                 )
             } else {
                 childFragmentManager.commit {
-                    replace(R.id.mypage_container, SubChangePw1Fragment())
+                    findNavController().navigate(R.id.action_myPage_to_subChangePw1)
                     addToBackStack(null)
                 }
             }
@@ -250,8 +250,8 @@ class MyPageFragment : Fragment() {
         recentAdapter = RecentRecipeAdapter(
             mutableListOf(),
             onItemClick = { item ->
-                val args = bundleOf("recipeId" to (item.recipeId))
-                findNavController().navigate(R.id.recipeFragment, args)
+                val args = bundleOf("recipeId" to item.recipeId)
+                findNavController().navigate(R.id.action_myPage_to_recipeFragment, args)
             },
             onHeartClick = { item, pos ->
                 val id = item.recipeId

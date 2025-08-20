@@ -27,10 +27,6 @@ class SignupActivity : AppCompatActivity() {
             insets
         }
 
-        if(savedInstanceState==null){
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.signup_container, SignupStep0Fragment())
-                .commit()
-        }
+
     }
 }
