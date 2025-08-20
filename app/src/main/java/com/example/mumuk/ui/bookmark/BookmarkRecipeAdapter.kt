@@ -14,12 +14,16 @@ class BookmarkRecipeAdapter
     : ListAdapter<Recipe, BookmarkRecipeAdapter.RecipeViewHolder>(RecipeDiffCallback()) {
 
     var onItemClick: ((Recipe) -> Unit)? = null
-    var onHeartClick: ((Recipe, Int) -> Unit)? = null
+    var onHeartClick: ((Recipe) -> Unit)? = null
+
+    init { setHasStableIds(true) }
+    override fun getItemId(position: Int) = getItem(position).id
+
 
     inner class RecipeViewHolder(val binding: ItemRecipeBinding)
         : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(recipe: Recipe, position: Int) {
+        fun bind(recipe: Recipe) {
             val url = recipe.recipeImageUrl
 
             when {
@@ -45,7 +49,11 @@ class BookmarkRecipeAdapter
                 if (recipe.isLiked) R.drawable.btn_heart_fill else R.drawable.btn_heart_blank
             )
 
-            binding.imageView6.setOnClickListener { onHeartClick?.invoke(recipe, position) }
+            binding.imageView6.setImageResource(
+                if (recipe.isLiked) R.drawable.btn_heart_fill else R.drawable.btn_heart_blank
+            )
+
+            binding.imageView6.setOnClickListener { onHeartClick?.invoke(recipe) }
             binding.root.setOnClickListener { onItemClick?.invoke(recipe) }
         }
     }
@@ -56,7 +64,7 @@ class BookmarkRecipeAdapter
     }
 
     override fun onBindViewHolder(holder: RecipeViewHolder, position: Int) {
-        holder.bind(getItem(position), position)
+        holder.bind(getItem(position))
     }
 
     class RecipeDiffCallback : DiffUtil.ItemCallback<Recipe>() {
