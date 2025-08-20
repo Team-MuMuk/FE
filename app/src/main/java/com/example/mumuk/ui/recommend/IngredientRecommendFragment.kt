@@ -49,7 +49,9 @@ class IngredientRecommendFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setupRecyclerViews()
+        binding.loadingOverlay.show()
         loadIngredients()
+        loadAiRecipes()
         updateAiRecipeList()
 
         binding.plusBtn.setOnClickListener {
@@ -105,11 +107,11 @@ class IngredientRecommendFragment : Fragment() {
                 // 뷰가 이미 생성되었다면 UI를 업데이트합니다.
                 if (_binding != null) {
                     updateAiRecipeList()
+                    binding.loadingOverlay.hide()
                 }
             } catch (e: Exception) {
-                Log.e("IngredientRecommend", "Failed to load AI recipes", e)
-                if (context != null) {
-                    Toast.makeText(requireContext(), "추천 레시피를 불러오는데 실패했습니다.", Toast.LENGTH_SHORT).show()
+                if (_binding != null) {
+                    binding.loadingOverlay.hide()
                 }
             }
         }
