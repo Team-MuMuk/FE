@@ -186,9 +186,8 @@ class HomeFragment : Fragment() {
                 refreshData()
                 animateScrollTo(0f)
                 isRefreshing = false
-                Toast.makeText(context, "새로고침 완료", Toast.LENGTH_SHORT).show()
             }
-        }, 3000)
+        }, 1000)
     }
 
     private fun animateScrollTo(targetY: Float) {
