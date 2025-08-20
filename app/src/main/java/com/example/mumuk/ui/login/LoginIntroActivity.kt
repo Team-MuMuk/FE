@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -42,6 +43,8 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.io.IOException
 import java.util.UUID // UUID import
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 
 class LoginIntroActivity : AppCompatActivity() {
 
@@ -130,6 +133,7 @@ class LoginIntroActivity : AppCompatActivity() {
                             startActivity(Intent(this@LoginIntroActivity, MainActivity::class.java).apply {
                                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                             })
+                            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
                             finish() // finish() 추가
                         } else {
                             Log.e("LoginCheck", "로그인 실패 - 서버 응답은 왔지만 status가 OK가 아니거나 data가 없음")
@@ -188,8 +192,11 @@ class LoginIntroActivity : AppCompatActivity() {
         binding.btnLogin.isEnabled = true
 
         binding.btnSignup.setOnClickListener {
-            startActivity(Intent(this, SignupActivity::class.java))
-            finish()
+            val intent = Intent(this, SignupActivity::class.java)
+            startActivity(intent)
+
+            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
+
         }
 
         binding.btnLoginKakao.setOnClickListener {
@@ -207,13 +214,50 @@ class LoginIntroActivity : AppCompatActivity() {
             if (supportFragmentManager.findFragmentById(R.id.login_intro_fragment_container) == null) {
                 supportFragmentManager.commit {
                     setReorderingAllowed(true)
+
+                    setCustomAnimations(
+                        R.anim.slide_in_right,
+                        R.anim.slide_out_left,
+                        R.anim.slide_in_left,
+                        R.anim.slide_out_right
+                    )
+
                     replace(R.id.login_intro_fragment_container, FindAccountFragment())
                     addToBackStack(null)
                 }
             }
         }
+
+        val callback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                val isFragmentVisible = binding.loginIntroFragmentContainer.visibility == View.VISIBLE
+                if (isFragmentVisible && supportFragmentManager.backStackEntryCount > 0) {
+
+                    val slideOut = AnimationUtils.loadAnimation(
+                        this@LoginIntroActivity, R.anim.slide_out_right
+                    )
+                    binding.loginIntroFragmentContainer.startAnimation(slideOut)
+
+                    slideOut.setAnimationListener(object : Animation.AnimationListener {
+                        override fun onAnimationStart(animation: Animation?) {}
+                        override fun onAnimationRepeat(animation: Animation?) {}
+                        override fun onAnimationEnd(animation: Animation?) {
+                            binding.loginIntroFragmentContainer.visibility = View.GONE
+                            binding.loginIntroLayout.visibility = View.VISIBLE
+                            supportFragmentManager.popBackStack()
+                        }
+                    })
+
+
+                } else {
+                    finish()
+                }
+            }
+        }
+        onBackPressedDispatcher.addCallback(this, callback)
         printKeyHash()
     }
+
 
     private fun loginToServerWithKakaoToken(kakaoAccessToken: String) {
         val authApi = RetrofitClient.getAuthApi(this)
@@ -393,7 +437,7 @@ class LoginIntroActivity : AppCompatActivity() {
                 val md = java.security.MessageDigest.getInstance("SHA")
                 md.update(signature.toByteArray())
                 val keyHash = android.util.Base64.encodeToString(md.digest(), android.util.Base64.NO_WRAP)
-                Log.d("🔑KeyHash", keyHash)
+                Log.d("KeyHash", keyHash)
             }
         } catch (e: Exception) {
             Log.e("KeyHash", "키 해시 얻기 실패", e)

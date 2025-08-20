@@ -183,6 +183,14 @@
             app:destination="@id/searchResultFragment" />
     </fragment>
 
+
+
+    <fragment
+        android:id="@+id/findAccountFragment"
+        android:name="com.example.mumuk.ui.login.FindAccountFragment"
+        android:label="계정 찾기"
+        tools:layout="@layout/fragment_find_account" />
+
     <fragment
         android:id="@+id/navigation_my_page"
         android:name="com.example.mumuk.ui.mypage.MyPageFragment"
