@@ -16,6 +16,7 @@ import com.example.mumuk.data.api.RetrofitClient
 import com.example.mumuk.data.model.recipe.ClickLikeRequest
 import com.example.mumuk.data.model.recipe.ClickLikeResponse
 import com.example.mumuk.data.model.recipe.SearchedBlog
+import com.example.mumuk.ui.common.LoadingDialog
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
@@ -26,6 +27,9 @@ import retrofit2.Response
 class RecipeFragment : Fragment() {
     private var _binding: FragmentRecipeBinding? = null
     private val binding get() = _binding!!
+
+    private var isRecipeLoaded = false
+    private var isBlogLoaded = false
 
     private val recipeViewModel: RecipeViewModel by viewModels {
         RecipeViewModel.Factory(requireContext())
@@ -54,6 +58,10 @@ class RecipeFragment : Fragment() {
         setupClickListeners()
         setupRecyclerViews()
         observeViewModel()
+
+        binding.loadingOverlay.show()
+        isRecipeLoaded = false
+        isBlogLoaded = false
 
         val recipeId = requireArguments().getLong("recipeId")
         currentRecipeId = recipeId
@@ -163,6 +171,9 @@ class RecipeFragment : Fragment() {
                     (binding.shopRV.adapter as? ShopAdapter)?.submitList(shopList)
                 }
             }
+
+            isRecipeLoaded = true
+            dismissLoadingIfReady()
         }
 
         // 블로그 리스트 관찰
@@ -170,6 +181,9 @@ class RecipeFragment : Fragment() {
             Log.d("RecipeFragment", "blogList observer triggered. Item count: ${blogs.size}")
             this.fullBlogList = blogs
             updateBlogList()
+
+            isBlogLoaded = true
+            dismissLoadingIfReady()
         }
 
         // shopItemList 관찰
@@ -203,9 +217,15 @@ class RecipeFragment : Fragment() {
         }
     }
 
+    private fun dismissLoadingIfReady() {
+        if (isRecipeLoaded && isBlogLoaded) {
+            binding.loadingOverlay.hide()
+        }
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
-        Log.d("RecipeFragment", "onDestroyView: View is being destroyed.")
+        binding.loadingOverlay.hide()
         _binding = null
     }
 }
