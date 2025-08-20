@@ -2,6 +2,7 @@ package com.example.mumuk.ui.home
 
 import android.animation.ObjectAnimator
 import android.content.Context
+import android.content.res.Resources
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -11,6 +12,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.LinearInterpolator
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.PopupWindow
 import android.widget.Toast
@@ -21,15 +23,18 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager2.widget.ViewPager2
 import com.example.mumuk.R
 import com.example.mumuk.data.api.RetrofitClient
 import com.example.mumuk.data.api.TokenManager
+import com.example.mumuk.data.model.Banner
 import com.example.mumuk.data.model.Recipe
 import com.example.mumuk.data.model.category.RandomRecipeResponse
 import com.example.mumuk.data.model.mypage.UserProfileResponse
 import com.example.mumuk.data.repository.RecipeTrendRepository
 import com.example.mumuk.databinding.FragmentHomeBinding
 import com.google.android.material.card.MaterialCardView
+import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
@@ -57,6 +62,12 @@ class HomeFragment : Fragment() {
     private var rotationAnimator: ObjectAnimator? = null
 
     private var maxPullDistance = 0f
+
+    private lateinit var bannerAdapter: HomeBannerAdapter
+
+    val Int.dp: Int get() = TypedValue.applyDimension(
+        TypedValue.COMPLEX_UNIT_DIP, this.toFloat(), Resources.getSystem().displayMetrics
+    ).toInt()
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -90,6 +101,7 @@ class HomeFragment : Fragment() {
         setupCustomPullToRefresh()
         setupRotationAnimator()
         loadUserNicknameForHome()
+        setupBanner()
 
         binding.infoBtn.setOnClickListener {
             showInfoPopup(it)
@@ -375,6 +387,80 @@ class HomeFragment : Fragment() {
                 })
             }
             translationAnimator.start()
+        }
+    }
+
+    private fun setupBanner() {
+        val banners = listOf(
+            Banner(R.drawable.img_banner_sample, "푸들리에가 추천하는\nAI 추천 레시피 보고가세요!"),
+            Banner(R.drawable.img_banner_sample_2, "나만의 건강맞춤 레시피\n보러가기"),
+            Banner(R.drawable.img_banner_sample_3, "재료등록 하러가기\n→")
+        )
+        bannerAdapter = HomeBannerAdapter(banners)
+        binding.bannerViewPager.adapter = bannerAdapter
+        binding.bannerViewPager.offscreenPageLimit = 1
+
+        binding.bannerViewPager.setCurrentItem(1, false)
+
+        // 커스텀 인디케이터 첫 셋팅
+        binding.bannerViewPager.post {
+            setupCustomIndicator(banners.size, binding.bannerViewPager.currentItem - 1)
+        }
+
+        binding.bannerViewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                // 인디케이터는 실제 페이지(1~items.size)만 표시
+                val actualPos = when (position) {
+                    0 -> banners.size - 1
+                    bannerAdapter.itemCount - 1 -> 0
+                    else -> position - 1
+                }
+                setupCustomIndicator(banners.size, actualPos)
+            }
+
+            override fun onPageScrollStateChanged(state: Int) {
+                if (state == ViewPager2.SCROLL_STATE_IDLE) {
+                    val position = binding.bannerViewPager.currentItem
+                    when (position) {
+                        0 -> {
+                            binding.bannerViewPager.setCurrentItem(bannerAdapter.itemCount - 2, false)
+                            binding.bannerViewPager.post {
+                                setupCustomIndicator(banners.size, banners.size - 1)
+                            }
+                        }
+                        bannerAdapter.itemCount - 1 -> {
+                            binding.bannerViewPager.setCurrentItem(1, false)
+                            binding.bannerViewPager.post {
+                                setupCustomIndicator(banners.size, 0)
+                            }
+                        }
+                    }
+                }
+            }
+        })
+    }
+
+    private fun setupCustomIndicator(pageCount: Int, currentPos: Int = 0) {
+        val indicatorLayout = binding.customIndicator
+        indicatorLayout.visibility = View.VISIBLE
+
+        // 최초 생성 시 dot 개수 맞춰서 addView
+        if (indicatorLayout.childCount != pageCount) {
+            indicatorLayout.removeAllViews()
+            for (i in 0 until pageCount) {
+                val dot = ImageView(requireContext())
+                val params = LinearLayout.LayoutParams(10.dp, 10.dp)
+                params.setMargins(2.dp, 0, 2.dp, 0)
+                dot.layoutParams = params
+                dot.setImageResource(R.drawable.dot_unselected)
+                indicatorLayout.addView(dot)
+            }
+        }
+
+        // 선택상태만 갱신
+        for (i in 0 until pageCount) {
+            val dot = indicatorLayout.getChildAt(i) as ImageView
+            dot.setImageResource(if (i == currentPos) R.drawable.dot_selected else R.drawable.dot_unselected)
         }
     }
 
