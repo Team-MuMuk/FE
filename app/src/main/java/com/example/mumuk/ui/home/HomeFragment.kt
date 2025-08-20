@@ -570,6 +570,11 @@ class HomeFragment : Fragment() {
         bottomNavSelector = null
     }
 
+    override fun onResume() {
+        super.onResume()
+        binding.bannerViewPager.setCurrentItem(1, false)
+    }
+
     override fun onDestroyView() {
         stopAutoScrollBanner()
         rotationAnimator?.cancel()
