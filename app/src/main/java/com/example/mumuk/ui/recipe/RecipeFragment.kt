@@ -16,7 +16,6 @@ import com.example.mumuk.data.api.RetrofitClient
 import com.example.mumuk.data.model.recipe.ClickLikeRequest
 import com.example.mumuk.data.model.recipe.ClickLikeResponse
 import com.example.mumuk.data.model.recipe.SearchedBlog
-import com.example.mumuk.ui.common.LoadingDialog
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
@@ -92,6 +91,14 @@ class RecipeFragment : Fragment() {
                         if (response.isSuccessful) {
                             isCurrentlyLiked = newLikedState
                             Log.d("RecipeFragment", "Like API call successful. Response: ${response.body()}")
+
+                            // ++ HomeFragment로 결과를 전달하는 코드
+                            val result = Bundle().apply {
+                                putLong("recipeId", id)
+                                putBoolean("isLiked", newLikedState)
+                            }
+                            parentFragmentManager.setFragmentResult("likeResult", result)
+
                         } else {
                             updateLikeButton(isCurrentlyLiked)
                             val errorBody = response.errorBody()?.string() ?: "No error body"

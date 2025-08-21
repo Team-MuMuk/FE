@@ -39,7 +39,6 @@ import com.example.mumuk.data.model.recipe.ClickLikeResponse
 import com.example.mumuk.data.repository.RecipeTrendRepository
 import com.example.mumuk.databinding.FragmentHomeBinding
 import com.google.android.material.card.MaterialCardView
-import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
@@ -82,9 +81,10 @@ class HomeFragment : Fragment() {
 
     private var scrollPosition = 0
 
-    val Int.dp: Int get() = TypedValue.applyDimension(
-        TypedValue.COMPLEX_UNIT_DIP, this.toFloat(), Resources.getSystem().displayMetrics
-    ).toInt()
+    val Int.dp: Int
+        get() = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP, this.toFloat(), Resources.getSystem().displayMetrics
+        ).toInt()
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -115,6 +115,7 @@ class HomeFragment : Fragment() {
         )
         maxPullDistance = loadingIndicatorHeight + extraPullPx
 
+        setupFragmentResultListener() // ++ 찜 상태 업데이트 리스너 설정
         setupCustomPullToRefresh()
         setupRotationAnimator()
         loadUserNicknameForHome()
@@ -158,6 +159,35 @@ class HomeFragment : Fragment() {
         setupRankRecyclerView()
     }
 
+    // ++ RecipeFragment로부터 결과를 수신하는 리스너 설정
+    private fun setupFragmentResultListener() {
+        parentFragmentManager.setFragmentResultListener("likeResult", this) { _, bundle ->
+            val recipeId = bundle.getLong("recipeId")
+            val isLiked = bundle.getBoolean("isLiked")
+            updateLikeStatus(recipeId, isLiked)
+        }
+    }
+
+    // ++ 전달받은 정보로 찜 상태를 업데이트하는 함수
+    private fun updateLikeStatus(recipeId: Long, isLiked: Boolean) {
+        // 인기 레시피 목록 업데이트
+        val rankIndex = rankList.indexOfFirst { it.recipeId?.toLong() == recipeId }
+        if (rankIndex != -1) {
+            rankList[rankIndex] = rankList[rankIndex].copy(isLiked = isLiked)
+            recipeRankAdapter.submitList(rankList.toList())
+        }
+
+        // 오늘의 레시피 목록 업데이트
+        randomRecipeList?.let { list ->
+            val todayIndex = list.indexOfFirst { it.id.toLong() == recipeId }
+            if (todayIndex != -1) {
+                list[todayIndex] = list[todayIndex].copy(isLiked = isLiked)
+                (binding.todayRV.adapter as? HomeRecipeAdapter)?.updateLikeAt(todayIndex, isLiked)
+            }
+        }
+    }
+
+
     private fun setupRotationAnimator() {
         rotationAnimator = ObjectAnimator.ofFloat(binding.loadingIndicator, "rotation", 0f, 360f).apply {
             duration = 1000
@@ -181,7 +211,7 @@ class HomeFragment : Fragment() {
                     if (binding.homeScrollView.scrollY == 0 && event.rawY > initialTouchY) {
                         val pullDistance = event.rawY - initialTouchY
 
-                        var translationY = (pullDistance / 2).coerceAtMost(maxPullDistance)
+                        val translationY = (pullDistance / 2).coerceAtMost(maxPullDistance)
 
                         binding.homeScrollView.translationY = translationY
                         binding.loadingIndicator.alpha = (translationY / refreshThreshold).coerceAtMost(1f)
@@ -300,8 +330,6 @@ class HomeFragment : Fragment() {
     }
 
 
-
-
     private fun fetchRandomRecipes() {
         if (randomRecipeList != null) {
             setupRecyclerView(binding.todayRV, randomRecipeList!!.take(6))
@@ -385,6 +413,7 @@ class HomeFragment : Fragment() {
             )
         }
     }
+
     private val todayInFlight: MutableSet<Long> = mutableSetOf()
 
     private fun handleTodayHeartClick(item: Recipe, pos: Int) {
@@ -415,7 +444,7 @@ class HomeFragment : Fragment() {
                     val ok = response.isSuccessful && (response.body()?.status == "OK")
                     if (!ok) rollback()
                     else {
-                        val idx = rankList.indexOfFirst { it.recipeId?.toLong() == recipeIdInt }
+                        val idx = rankList.indexOfFirst { it.recipeId?.toLong() == idLong }
                         if (idx != -1) {
                             rankList[idx] = rankList[idx].copy(isLiked = newLiked)
                             recipeRankAdapter.submitList(rankList.toList())
@@ -524,6 +553,7 @@ class HomeFragment : Fragment() {
                         binding.loadingIndicator.visibility = View.VISIBLE
                         binding.loadingIndicator.alpha = 0f
                     }
+
                     override fun onAnimationEnd(animation: android.animation.Animator) {
                         // 공간 펼침이 끝나면 indicator를 자연스럽게 fade-in + 새로고침 시작
                         binding.loadingIndicator.animate()
@@ -534,6 +564,7 @@ class HomeFragment : Fragment() {
                             }
                             .start()
                     }
+
                     override fun onAnimationCancel(animation: android.animation.Animator) {}
                     override fun onAnimationRepeat(animation: android.animation.Animator) {}
                 })
@@ -641,7 +672,7 @@ class HomeFragment : Fragment() {
                             // 바로 다음 배너로 스크롤 (6초 기다리지 않음)
                             autoScrollHandler?.postDelayed({
                                 smoothScrollToBanner(2) // 두 번째 배너로 이동
-                                autoScrollHandler?.postDelayed(autoScrollRunnable!!, autoScrollInterval)
+                                autoScrollHandler?.postDelayed(this, autoScrollInterval)
                             }, 500) // 점프 후 0.5초 뒤에 바로 스크롤
                             return
                         } else {
