@@ -498,7 +498,7 @@ class HomeFragment : Fragment() {
         if (rankList.isNotEmpty()) {
             binding.rankRV.visibility = View.VISIBLE
             binding.rankEmptyTv.visibility = View.GONE
-            recipeRankAdapter.submitList(rankList.toList())
+            recipeRankAdapter.submitList(rankList.take(5)) // CHANGED
         } else {
             viewLifecycleOwner.lifecycleScope.launch {
                 val rank = recipeTrendRepository.getRecipeTrendRank(requireContext())
@@ -507,7 +507,7 @@ class HomeFragment : Fragment() {
                 if (rankList.isNotEmpty()) {
                     binding.rankRV.visibility = View.VISIBLE
                     binding.rankEmptyTv.visibility = View.GONE
-                    recipeRankAdapter.submitList(rankList.toList())
+                    recipeRankAdapter.submitList(rankList.take(5)) // CHANGED
                 } else {
                     binding.rankRV.visibility = View.GONE
                     binding.rankEmptyTv.visibility = View.VISIBLE
