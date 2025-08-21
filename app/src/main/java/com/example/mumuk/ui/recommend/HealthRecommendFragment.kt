@@ -125,6 +125,9 @@ class HealthRecommendFragment : Fragment() {
         // filterContainer 초기화
         filterContainer = binding.root.findViewById(R.id.filterContainer)
         fetchAndDisplayFilters()
+
+        binding.loadingOverlay.show()
+        loadAiRecipes()
     }
 
     private fun fetchAndDisplayFilters() {
@@ -208,11 +211,11 @@ class HealthRecommendFragment : Fragment() {
                 isExpanded = false
                 if (_binding != null) {
                     updateAiRecipeList()
+                    binding.loadingOverlay.hide()
                 }
             } catch (e: Exception) {
-                Log.e("HealthRecommend", "Failed to load AI recipes", e)
-                if (context != null) {
-                    Toast.makeText(requireContext(), "추천 레시피를 불러오는데 실패했습니다.", Toast.LENGTH_SHORT).show()
+                if (_binding != null) {
+                    binding.loadingOverlay.hide()
                 }
             }
         }
