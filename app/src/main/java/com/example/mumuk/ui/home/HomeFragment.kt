@@ -722,6 +722,8 @@ class HomeFragment : Fragment() {
     }
 
     private fun smoothScrollToBanner(targetItem: Int) {
+        if (_binding == null) return // View가 이미 파괴됐으면 아무 것도 하지 않음
+
         val viewPager = binding.bannerViewPager
         try {
             val recyclerViewField = ViewPager2::class.java.getDeclaredField("mRecyclerView")
@@ -732,7 +734,6 @@ class HomeFragment : Fragment() {
             if (layoutManager != null) {
                 val smoothScroller = object : LinearSmoothScroller(requireContext()) {
                     override fun calculateSpeedPerPixel(displayMetrics: DisplayMetrics): Float {
-                        // 애니메이션 속도 (작을수록 느림)
                         return bannerScrollDurationMs / displayMetrics.densityDpi.toFloat()
                     }
                 }
@@ -740,8 +741,9 @@ class HomeFragment : Fragment() {
                 layoutManager.startSmoothScroll(smoothScroller)
             }
         } catch (e: Exception) {
-            // 리플렉션 실패 시 기본 애니메이션 사용
-            viewPager.setCurrentItem(targetItem, true)
+            if (_binding != null) {
+                viewPager.setCurrentItem(targetItem, true)
+            }
         }
     }
 
