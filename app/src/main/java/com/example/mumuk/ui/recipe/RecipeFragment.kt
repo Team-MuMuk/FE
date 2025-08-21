@@ -11,11 +11,12 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
-import com.example.mumuk.databinding.FragmentRecipeBinding
 import com.example.mumuk.data.api.RetrofitClient
 import com.example.mumuk.data.model.recipe.ClickLikeRequest
 import com.example.mumuk.data.model.recipe.ClickLikeResponse
+import com.example.mumuk.data.model.recipe.NaverShoppingItem
 import com.example.mumuk.data.model.recipe.SearchedBlog
+import com.example.mumuk.databinding.FragmentRecipeBinding
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
@@ -39,6 +40,9 @@ class RecipeFragment : Fragment() {
 
     private var isBlogExpanded = false
     private var fullBlogList: List<SearchedBlog> = emptyList()
+
+    private var isShopExpanded = false
+    private var fullShopList: List<NaverShoppingItem> = emptyList()
 
 
     override fun onCreateView(
@@ -91,6 +95,13 @@ class RecipeFragment : Fragment() {
                         if (response.isSuccessful) {
                             isCurrentlyLiked = newLikedState
                             Log.d("RecipeFragment", "Like API call successful. Response: ${response.body()}")
+
+                            val result = Bundle().apply {
+                                putLong("recipeId", id)
+                                putBoolean("isLiked", newLikedState)
+                            }
+                            parentFragmentManager.setFragmentResult("likeResult", result)
+
                         } else {
                             updateLikeButton(isCurrentlyLiked)
                             val errorBody = response.errorBody()?.string() ?: "No error body"
@@ -109,6 +120,11 @@ class RecipeFragment : Fragment() {
         binding.plusBtn.setOnClickListener {
             isBlogExpanded = true
             updateBlogList()
+        }
+
+        binding.shopPlusBtn.setOnClickListener {
+            isShopExpanded = true
+            updateShopList()
         }
     }
 
@@ -165,10 +181,7 @@ class RecipeFragment : Fragment() {
                 (ingredientRV.adapter as? IngredientAdapter)?.updateData(detail.recipeIngredients)
 
                 recipeTitle2.text = "#${detail.title}"
-
-                recipeViewModel.shopItemList.observe(viewLifecycleOwner) { shopList ->
-                    (binding.shopRV.adapter as? ShopAdapter)?.submitList(shopList)
-                }
+                shopRecipeTitle.text = "#${detail.title}"
             }
 
             isRecipeLoaded = true
@@ -188,7 +201,8 @@ class RecipeFragment : Fragment() {
         // shopItemList 관찰
         recipeViewModel.shopItemList.observe(viewLifecycleOwner) { shopList ->
             Log.d("RecipeFragment", "shopItemList observer triggered. Item count: ${shopList.size}")
-            (binding.shopRV.adapter as? ShopAdapter)?.submitList(shopList)
+            this.fullShopList = shopList
+            updateShopList()
         }
     }
 
@@ -202,7 +216,7 @@ class RecipeFragment : Fragment() {
     private fun updateBlogList() {
         val blogAdapter = binding.blogRV.adapter as? BlogAdapter ?: return
 
-        if (fullBlogList.size < 5) {
+        if (fullBlogList.size <= 5) {
             blogAdapter.submitList(fullBlogList)
             binding.plusBtn.visibility = View.GONE
         } else {
@@ -212,6 +226,23 @@ class RecipeFragment : Fragment() {
             } else {
                 blogAdapter.submitList(fullBlogList.take(5))
                 binding.plusBtn.visibility = View.VISIBLE
+            }
+        }
+    }
+
+    private fun updateShopList() {
+        val shopAdapter = binding.shopRV.adapter as? ShopAdapter ?: return
+
+        if (fullShopList.size <= 4) {
+            shopAdapter.submitList(fullShopList)
+            binding.shopPlusBtn.visibility = View.INVISIBLE
+        } else {
+            if (isShopExpanded) {
+                shopAdapter.submitList(fullShopList)
+                binding.shopPlusBtn.visibility = View.INVISIBLE
+            } else {
+                shopAdapter.submitList(fullShopList.take(4))
+                binding.shopPlusBtn.visibility = View.VISIBLE
             }
         }
     }
