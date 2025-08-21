@@ -80,6 +80,8 @@ class HomeFragment : Fragment() {
     private var isBannerScrolling = false
     private val bannerScrollDurationMs = 200
 
+    private var scrollPosition = 0
+
     val Int.dp: Int get() = TypedValue.applyDimension(
         TypedValue.COMPLEX_UNIT_DIP, this.toFloat(), Resources.getSystem().displayMetrics
     ).toInt()
@@ -239,9 +241,10 @@ class HomeFragment : Fragment() {
         randomRecipeList = null
         fetchRandomRecipes()
 
+        rankList.clear()
         viewLifecycleOwner.lifecycleScope.launch {
             val rank = recipeTrendRepository.getRecipeTrendRank(requireContext())
-            rankList = rank.toMutableList()
+            rankList.addAll(rank)
             recipeRankAdapter.submitList(rankList.toList())
         }
 
@@ -457,10 +460,14 @@ class HomeFragment : Fragment() {
             adapter = recipeRankAdapter
         }
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            val rank = recipeTrendRepository.getRecipeTrendRank(requireContext())
-            rankList = rank.toMutableList()
+        if (rankList.isNotEmpty()) {
             recipeRankAdapter.submitList(rankList.toList())
+        } else {
+            viewLifecycleOwner.lifecycleScope.launch {
+                val rank = recipeTrendRepository.getRecipeTrendRank(requireContext())
+                rankList.addAll(rank)
+                recipeRankAdapter.submitList(rankList.toList())
+            }
         }
     }
 
@@ -714,9 +721,16 @@ class HomeFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        binding.bannerViewPager.setCurrentItem(1, false)
-        refreshData()
+        binding.homeScrollView.post {
+            binding.homeScrollView.scrollTo(0, scrollPosition)
+        }
+    }
 
+    override fun onPause() {
+        super.onPause()
+        if (_binding != null) {
+            scrollPosition = binding.homeScrollView.scrollY
+        }
     }
 
     override fun onDestroyView() {
