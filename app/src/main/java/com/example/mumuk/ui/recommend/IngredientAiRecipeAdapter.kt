@@ -1,9 +1,13 @@
 package com.example.mumuk.ui.recommend
 
+import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
 import com.example.mumuk.data.model.Recipe
 import com.example.mumuk.databinding.ItemRecipeBinding
 import com.example.mumuk.data.api.RetrofitClient
@@ -15,7 +19,8 @@ import retrofit2.Response
 
 class IngredientAiRecipeAdapter(
     private var items: MutableList<Recipe>,
-    private val onItemClick: (Recipe) -> Unit
+    private val onItemClick: (Recipe) -> Unit,
+    private val onImageLoaded: () -> Unit
 ) : RecyclerView.Adapter<IngredientAiRecipeAdapter.ViewHolder>() {
 
     inner class ViewHolder(val binding: ItemRecipeBinding) : RecyclerView.ViewHolder(binding.root) {
@@ -27,6 +32,28 @@ class IngredientAiRecipeAdapter(
                     .load(it)
                     .placeholder(com.example.mumuk.R.drawable.bg_mosaic)
                     .error(com.example.mumuk.R.drawable.bg_mosaic)
+                    .listener(object : RequestListener<Drawable> {
+                        override fun onLoadFailed(
+                            e: GlideException?,
+                            model: Any?,
+                            target: com.bumptech.glide.request.target.Target<Drawable?>,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            onImageLoaded()
+                            return false
+                        }
+
+                        override fun onResourceReady(
+                            resource: Drawable,
+                            model: Any,
+                            target: com.bumptech.glide.request.target.Target<Drawable?>?,
+                            dataSource: DataSource,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            onImageLoaded()
+                            return false
+                        }
+                    })
                     .into(binding.recipeImg)
             }
 

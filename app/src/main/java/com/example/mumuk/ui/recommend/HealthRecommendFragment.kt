@@ -37,6 +37,7 @@ import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.concurrent.atomic.AtomicInteger
 
 class HealthRecommendFragment : Fragment() {
     private var _binding: FragmentHealthRecommendBinding? = null
@@ -53,6 +54,8 @@ class HealthRecommendFragment : Fragment() {
 
     private lateinit var allergyApi: AllergyApiService
     private lateinit var healthApi: HealthApiService
+
+    private var imageLoadCounter: AtomicInteger? = null
 
     private val pickImageLauncher = registerForActivityResult(
         ActivityResultContracts.GetContent()
@@ -87,9 +90,6 @@ class HealthRecommendFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (aiRecipeList.isEmpty()) {
-            loadAiRecipes()
-        }
     }
 
     override fun onCreateView(
@@ -104,7 +104,6 @@ class HealthRecommendFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setupRecyclerView()
-        updateAiRecipeList()
 
         binding.backBtn.setOnClickListener {
             findNavController().popBackStack()
@@ -197,6 +196,11 @@ class HealthRecommendFragment : Fragment() {
                 Log.d("HealthRecommend", "Recipe clicked. ID: ${recipe.id}")
                 val bundle = bundleOf("recipeId" to recipe.id)
                 findNavController().navigate(R.id.action_healthRecommendFragment_to_recipeFragment, bundle)
+            },
+            onImageLoaded = {
+                if (imageLoadCounter?.decrementAndGet() == 0) {
+                    binding.loadingOverlay.hide()
+                }
             }
         )
 
@@ -211,7 +215,6 @@ class HealthRecommendFragment : Fragment() {
                 isExpanded = false
                 if (_binding != null) {
                     updateAiRecipeList()
-                    binding.loadingOverlay.hide()
                 }
             } catch (e: Exception) {
                 if (_binding != null) {
@@ -229,6 +232,13 @@ class HealthRecommendFragment : Fragment() {
         } else {
             aiRecipeList
         }
+
+        if (itemsToShow.isNotEmpty()) {
+            imageLoadCounter = AtomicInteger(itemsToShow.size)
+        } else {
+            binding.loadingOverlay.hide()
+        }
+
         aiRecipeAdapter.updateList(itemsToShow.toMutableList())
         binding.plusBtn.visibility = if (aiRecipeList.size > 6 && !isExpanded) View.VISIBLE else View.GONE
     }
