@@ -10,12 +10,12 @@
         android:id="@+id/tv_step2_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="STEP 2"
+        android:text=""
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginStart="36dp"
         android:layout_marginTop="150dp"
-        android:textSize="24sp"
+        android:textSize="0sp"
         android:textStyle="bold"/>
 
     <TextView
@@ -44,7 +44,7 @@
         android:id="@+id/subline"
         android:layout_width="124dp"
         android:layout_height="5dp"
-        android:background="#7CE5B4"
+        android:background="#29AB87"
         app:layout_constraintTop_toTopOf="@+id/line"
         app:layout_constraintBottom_toBottomOf="@id/line"
         app:layout_constraintStart_toStartOf="@id/line" />
