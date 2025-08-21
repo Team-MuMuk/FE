@@ -41,14 +41,12 @@ class RecipeRankAdapter(
             if (!recipeRank.imageUrl.isNullOrEmpty()) {
                 Glide.with(context)
                     .load(recipeRank.imageUrl)
-                    .apply(
-                        RequestOptions()
-                            .placeholder(defaultImgRes)
-                            .error(defaultImgRes)
-                            .diskCacheStrategy(DiskCacheStrategy.ALL)
-                            .override(Target.SIZE_ORIGINAL)
-                            .centerCrop()
-                    )
+                    .override(240, 240)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .thumbnail(0.1f)
+                    .placeholder(defaultImgRes)
+                    .error(defaultImgRes)
+                    .centerCrop()
                     .into(binding.img)
             } else if (recipeRank.img != null) {
                 binding.img.setImageResource(recipeRank.img)

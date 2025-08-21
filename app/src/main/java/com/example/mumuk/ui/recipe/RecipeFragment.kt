@@ -16,7 +16,6 @@ import com.example.mumuk.data.api.RetrofitClient
 import com.example.mumuk.data.model.recipe.ClickLikeRequest
 import com.example.mumuk.data.model.recipe.ClickLikeResponse
 import com.example.mumuk.data.model.recipe.SearchedBlog
-import com.example.mumuk.ui.common.LoadingDialog
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager

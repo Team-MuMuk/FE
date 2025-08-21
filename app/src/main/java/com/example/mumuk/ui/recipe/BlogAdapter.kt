@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.mumuk.R
 import com.example.mumuk.databinding.ItemBlogBinding
 import com.example.mumuk.data.model.recipe.SearchedBlog
@@ -28,6 +29,9 @@ class BlogAdapter(private var blogs: List<SearchedBlog>) :
 
             Glide.with(binding.img.context)
                 .load(blog.ogImageUrl)
+                .override(300, 300)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .thumbnail(0.1f)
                 .error(R.drawable.bg_mosaic)
                 .into(binding.img)
 
