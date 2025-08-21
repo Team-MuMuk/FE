@@ -71,20 +71,20 @@ class HealthStep2Fragment : Fragment() {
     private fun toggleGoal(goalType: String) {
         val currentGoals = healthViewModel.goals.value?.toMutableSet() ?: mutableSetOf()
 
-        if (goalType == "없음") {
-            if (!currentGoals.contains("없음")) {
+        if (goalType == "NONE") {
+            if (!currentGoals.contains("NONE")) {
                 currentGoals.clear()
-                currentGoals.add("없음")
+                currentGoals.add("NONE")
                 healthViewModel.customGoal.value = ""
             } else {
-                currentGoals.remove("없음")
+                currentGoals.remove("NONE")
             }
         } else {
             if (currentGoals.contains(goalType)) {
                 currentGoals.remove(goalType)
             } else {
                 currentGoals.add(goalType)
-                currentGoals.remove("없음")
+                currentGoals.remove("NONE")
             }
         }
         healthViewModel.goals.value = currentGoals
@@ -97,8 +97,8 @@ class HealthStep2Fragment : Fragment() {
 
             if (!input.isNullOrEmpty()) {
                 val currentGoals = healthViewModel.goals.value?.toMutableSet() ?: mutableSetOf()
-                if (currentGoals.contains("없음")) {
-                    currentGoals.remove("없음")
+                if (currentGoals.contains("NONE")) {
+                    currentGoals.remove("NONE")
                     healthViewModel.goals.value = currentGoals
                 }
             }

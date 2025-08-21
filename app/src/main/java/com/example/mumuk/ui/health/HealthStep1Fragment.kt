@@ -72,20 +72,20 @@ class HealthStep1Fragment : Fragment() {
     private fun toggleAllergy(allergyType: String) {
         val currentAllergies = healthViewModel.allergies.value?.toMutableSet() ?: mutableSetOf()
 
-        if (allergyType == "없음") {
-            if (!currentAllergies.contains("없음")) {
+        if (allergyType == "NONE") {
+            if (!currentAllergies.contains("NONE")) {
                 currentAllergies.clear()
-                currentAllergies.add("없음")
+                currentAllergies.add("NONE")
                 healthViewModel.customAllergy.value = "" // 커스텀 입력 초기화
             } else {
-                currentAllergies.remove("없음")
+                currentAllergies.remove("NONE")
             }
         } else {
             if (currentAllergies.contains(allergyType)) {
                 currentAllergies.remove(allergyType)
             } else {
                 currentAllergies.add(allergyType)
-                currentAllergies.remove("없음") // 다른 알러지 선택 시 '없음' 해제
+                currentAllergies.remove("NONE") // 다른 알러지 선택 시 '없음' 해제
             }
         }
         healthViewModel.allergies.value = currentAllergies
@@ -98,8 +98,8 @@ class HealthStep1Fragment : Fragment() {
 
             if (!input.isNullOrEmpty()) {
                 val currentAllergies = healthViewModel.allergies.value?.toMutableSet() ?: mutableSetOf()
-                if (currentAllergies.contains("없음")) {
-                    currentAllergies.remove("없음")
+                if (currentAllergies.contains("NONE")) {
+                    currentAllergies.remove("NONE")
                     healthViewModel.allergies.value = currentAllergies
                 }
             }

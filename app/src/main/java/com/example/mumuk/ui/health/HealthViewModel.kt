@@ -12,7 +12,7 @@ class HealthViewModel : ViewModel() {
 
     val isStep0Complete: LiveData<Boolean> = MediatorLiveData<Boolean>().apply {
         fun update() {
-            val isComplete = !gender.value.isNullOrBlank() &&
+            val isComplete =
                     !height.value.isNullOrBlank() &&
                     !weight.value.isNullOrBlank()
             if (value != isComplete) {
