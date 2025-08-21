@@ -1,5 +1,7 @@
 package com.example.mumuk.data.api
 
+import com.example.mumuk.data.model.ingredient.IngredientDdaySettingRequest
+import com.example.mumuk.data.model.ingredient.IngredientDdaySettingResponse
 import com.example.mumuk.data.model.ingredient.IngredientDeleteResponse
 import com.example.mumuk.data.model.ingredient.IngredientExpireDateUpdateRequest
 import com.example.mumuk.data.model.ingredient.IngredientQuantityUpdateRequest
@@ -39,4 +41,10 @@ interface IngredientApiService {
         @Path("ingredientId") ingredientId: Int,
         @Body request: IngredientExpireDateUpdateRequest
     ): Response<IngredientDeleteResponse>
+
+    @PUT("/api/ingredient/{ingredientId}/dday-setting")
+    suspend fun updateIngredientDdaySetting(
+        @Path("ingredientId") ingredientId: Int,
+        @Body request: IngredientDdaySettingRequest
+    ): Response<IngredientDdaySettingResponse>
 }
