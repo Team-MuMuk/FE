@@ -70,7 +70,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
-                android:hint="영문자, 숫자 조합 8자 이상 15자 이내"
+                android:hint="영문자 · 숫자 조합, 8~15자"
                 android:inputType="text|textCapSentences"
                 android:paddingStart="0dp"
                 android:paddingTop="4dp"
