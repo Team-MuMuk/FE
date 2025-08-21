@@ -31,7 +31,7 @@
         app:layout_constraintTop_toBottomOf="@+id/imageView"
         tools:visibility="visible" />
 
-    <androidx.core.widget.NestedScrollView
+    <com.example.mumuk.ui.home.InterceptingNestedScrollView
         android:id="@+id/home_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -321,7 +321,7 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </androidx.core.widget.NestedScrollView>
+    </com.example.mumuk.ui.home.InterceptingNestedScrollView>
 
     <ImageView
         android:id="@+id/imageView12"

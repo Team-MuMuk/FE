@@ -119,6 +119,10 @@ class HomeFragment : Fragment() {
         )
         maxPullDistance = loadingIndicatorHeight + extraPullPx
 
+        binding.homeScrollView.setVerticalScrollableViews(
+            listOf(binding.rankRV, binding.todayRV)
+        )
+
         setupFragmentResultListener() // ++ 찜 상태 업데이트 리스너 설정
         setupCustomPullToRefresh()
         setupRotationAnimator()
@@ -498,7 +502,7 @@ class HomeFragment : Fragment() {
         if (rankList.isNotEmpty()) {
             binding.rankRV.visibility = View.VISIBLE
             binding.rankEmptyTv.visibility = View.GONE
-            recipeRankAdapter.submitList(rankList.toList())
+            recipeRankAdapter.submitList(rankList.take(5)) // CHANGED
         } else {
             viewLifecycleOwner.lifecycleScope.launch {
                 val rank = recipeTrendRepository.getRecipeTrendRank(requireContext())
@@ -507,7 +511,7 @@ class HomeFragment : Fragment() {
                 if (rankList.isNotEmpty()) {
                     binding.rankRV.visibility = View.VISIBLE
                     binding.rankEmptyTv.visibility = View.GONE
-                    recipeRankAdapter.submitList(rankList.toList())
+                    recipeRankAdapter.submitList(rankList.take(5)) // CHANGED
                 } else {
                     binding.rankRV.visibility = View.GONE
                     binding.rankEmptyTv.visibility = View.VISIBLE
@@ -781,6 +785,9 @@ class HomeFragment : Fragment() {
         super.onResume()
         binding.homeScrollView.post {
             binding.homeScrollView.scrollTo(0, scrollPosition)
+        }
+        if (_binding != null) {
+            binding.bannerViewPager.setCurrentItem(1, false)
         }
     }
 
