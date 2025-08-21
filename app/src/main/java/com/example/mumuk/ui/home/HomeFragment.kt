@@ -782,6 +782,9 @@ class HomeFragment : Fragment() {
         binding.homeScrollView.post {
             binding.homeScrollView.scrollTo(0, scrollPosition)
         }
+        if (_binding != null) {
+            binding.bannerViewPager.setCurrentItem(1, false)
+        }
     }
 
     override fun onPause() {
