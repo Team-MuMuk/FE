@@ -346,6 +346,21 @@ class SearchFragment : Fragment() {
         return ""
     }
 
+    private fun verticalSortPopularKeywords(list: List<String>): List<String> {
+        val rowCount = 5
+        val colCount = 2
+        val result = mutableListOf<String>()
+        for (row in 0 until rowCount) {
+            for (col in 0 until colCount) {
+                val idx = col * rowCount + row
+                if (idx < list.size) {
+                    result.add(list[idx])
+                }
+            }
+        }
+        return result
+    }
+
     private fun setupPopularKeywordList() {
         if (popularKeywords.isEmpty()) {
             binding.searchPopularKeywordsRv.visibility = View.GONE
@@ -353,7 +368,8 @@ class SearchFragment : Fragment() {
         } else {
             binding.searchPopularKeywordsRv.visibility = View.VISIBLE
             binding.popularEmptyTv.visibility = View.GONE
-            val adapter = SearchPopularAdapter(popularKeywords) { keyword ->
+            val sortedPopularKeywords = verticalSortPopularKeywords(popularKeywords)
+            val adapter = SearchPopularAdapter(sortedPopularKeywords) { keyword ->
                 goToSearchResult(keyword)
             }
             binding.searchPopularKeywordsRv.adapter = adapter
