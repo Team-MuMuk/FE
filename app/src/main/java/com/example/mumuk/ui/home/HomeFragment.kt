@@ -119,6 +119,10 @@ class HomeFragment : Fragment() {
         )
         maxPullDistance = loadingIndicatorHeight + extraPullPx
 
+        binding.homeScrollView.setVerticalScrollableViews(
+            listOf(binding.rankRV, binding.todayRV)
+        )
+
         setupFragmentResultListener() // ++ 찜 상태 업데이트 리스너 설정
         setupCustomPullToRefresh()
         setupRotationAnimator()

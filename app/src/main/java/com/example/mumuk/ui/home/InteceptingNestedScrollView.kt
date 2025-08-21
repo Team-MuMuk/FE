@@ -1,8 +1,10 @@
 package com.example.mumuk.ui.home
 
 import android.content.Context
+import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.MotionEvent
+import android.view.View
 import android.view.ViewConfiguration
 import androidx.core.widget.NestedScrollView
 import kotlin.math.abs
@@ -17,30 +19,55 @@ class InterceptingNestedScrollView @JvmOverloads constructor(
     private var initialY = 0f
     private val touchSlop = ViewConfiguration.get(context).scaledTouchSlop
 
+    // 1. 예외 처리할 뷰들의 리스트
+    private var verticalScrollableViews: List<View> = emptyList()
+
+    // 2. 프래그먼트에서 예외 뷰들을 전달받는 함수
+    fun setVerticalScrollableViews(views: List<View>) {
+        this.verticalScrollableViews = views
+    }
+
     override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
-        // 스크롤이 최상단에 있을 때만 터치 가로채기 로직을 실행합니다.
         if (scrollY == 0) {
             when (ev.action) {
                 MotionEvent.ACTION_DOWN -> {
-                    // 터치 시작 위치를 기록합니다.
                     initialX = ev.x
                     initialY = ev.y
                 }
                 MotionEvent.ACTION_MOVE -> {
-                    val dx = abs(ev.x - initialX) // x축 이동 거리
-                    val dy = abs(ev.y - initialY) // y축 이동 거리
+                    val dx = abs(ev.x - initialX)
+                    val dy = abs(ev.y - initialY)
 
-                    // y축 이동이 x축 이동보다 크고,
-                    // 시스템이 스크롤로 인식하는 최소 거리(touchSlop)를 넘었을 때
                     if (dy > touchSlop && dy > dx) {
-                        // 이 스크롤은 '당겨서 새로고침'을 위한 세로 스크롤이므로
-                        // 부모 뷰(이 뷰)가 이벤트를 가로챕니다. (true 반환)
-                        return true
+                        // 3. 터치된 위치가 예외 처리할 뷰의 내부에 있는지 확인
+                        if (isTouchInsideAnyView(ev, verticalScrollableViews)) {
+                            // 예외 뷰 위에서는 가로채지 않음 (자체 스크롤 허용)
+                            return false
+                        } else {
+                            // 그 외의 뷰들에서는 가로챔 (당겨서 새로고침)
+                            return true
+                        }
                     }
                 }
             }
         }
-        // 그 외의 모든 경우는 기본 동작에 맡깁니다.
         return super.onInterceptTouchEvent(ev)
+    }
+
+    // 4. 터치 좌표가 주어진 뷰들 중 하나의 내부에 있는지 확인하는 헬퍼 함수
+    private fun isTouchInsideAnyView(ev: MotionEvent, views: List<View>): Boolean {
+        val touchX = ev.rawX
+        val touchY = ev.rawY
+        val rect = Rect()
+
+        for (view in views) {
+            // 뷰의 화면상 절대 좌표를 얻음
+            view.getGlobalVisibleRect(rect)
+            // 터치 좌표가 뷰의 영역에 포함되는지 확인
+            if (rect.contains(touchX.toInt(), touchY.toInt())) {
+                return true
+            }
+        }
+        return false
     }
 }
