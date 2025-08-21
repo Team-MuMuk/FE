@@ -126,31 +126,72 @@ class HealthEditFragment : Fragment() {
         // 알레르기 버튼들 (다중 선택)
         val allergyButtons = listOf(
             binding.btnShellfish, binding.btnNuts, binding.btnDairy, binding.btnWheat,
-            binding.btnEgg, binding.btnFish, binding.btnSoy, binding.btnNone
+            binding.btnEgg, binding.btnFish, binding.btnSoy
         )
+        val noneAllergyButton = binding.btnNone
+
         allergyButtons.forEach { btn ->
             btn.setOnClickListener {
+                // "수정" 상태가 아닐 때만 선택 토글
                 if (!isAllergyEditSelected) {
                     btn.isChecked = !btn.isChecked
+                }
+                // "없습니다"가 체크되어 있으면 해제
+                if (noneAllergyButton.isChecked && btn.isChecked) {
+                    noneAllergyButton.isChecked = false
+                    updateAllergyButtonColor(noneAllergyButton)
                 }
                 updateAllergyButtonColor(btn)
             }
             updateAllergyButtonColor(btn)
         }
+        noneAllergyButton.setOnClickListener {
+            if (!isAllergyEditSelected) {
+                noneAllergyButton.isChecked = !noneAllergyButton.isChecked
+            }
+            if (noneAllergyButton.isChecked) {
+                allergyButtons.forEach { btn ->
+                    btn.isChecked = false
+                    updateAllergyButtonColor(btn)
+                }
+            }
+            updateAllergyButtonColor(noneAllergyButton)
+        }
+        updateAllergyButtonColor(noneAllergyButton)
 
         val goalButtons = listOf(
             binding.btnWeightLoss, binding.btnMuscleGain, binding.btnSugarReduction,
-            binding.btnBloodPressure, binding.btnCholesterol, binding.btnDigestiveHealth, binding.btnNoneGoal
+            binding.btnBloodPressure, binding.btnCholesterol, binding.btnDigestiveHealth
         )
+        val noneGoalButton = binding.btnNoneGoal
+
         goalButtons.forEach { btn ->
             btn.setOnClickListener {
                 if (!isGoalEditSelected) {
                     btn.isChecked = !btn.isChecked
                 }
+                // "없습니다"가 체크되어 있으면 해제
+                if (noneGoalButton.isChecked && btn.isChecked) {
+                    noneGoalButton.isChecked = false
+                    updateGoalButtonColor(noneGoalButton)
+                }
                 updateGoalButtonColor(btn)
             }
             updateGoalButtonColor(btn)
         }
+        noneGoalButton.setOnClickListener {
+            if (!isGoalEditSelected) {
+                noneGoalButton.isChecked = !noneGoalButton.isChecked
+            }
+            if (noneGoalButton.isChecked) {
+                goalButtons.forEach { btn ->
+                    btn.isChecked = false
+                    updateGoalButtonColor(btn)
+                }
+            }
+            updateGoalButtonColor(noneGoalButton)
+        }
+        updateGoalButtonColor(noneGoalButton)
 
         // 처음 진입 시 서버에서 알레르기 상태 조회
         allergyApi.getAllergyOptions()
