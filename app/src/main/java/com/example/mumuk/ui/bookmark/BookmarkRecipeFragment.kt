@@ -55,14 +55,12 @@ class BookmarkRecipeFragment : Fragment() {
 
         val recipeAdapter = BookmarkRecipeAdapter().apply {
             onItemClick = { recipe ->
-                Log.d("BookmarkFragment", "Recipe clicked. ID: ${recipe.id}")
                 val bundle = bundleOf("recipeId" to recipe.id)
-                findNavController().navigate(
-                    R.id.action_bookmarkRecipeFragment_to_recipeFragment, bundle
-                )
+                findNavController().navigate(R.id.action_bookmarkRecipeFragment_to_recipeFragment, bundle)
             }
-            onHeartClick = { recipe, position ->
-                bookmarkViewModel.onHeartClick(recipe, position)
+
+            onHeartClick = { recipe ->
+                bookmarkViewModel.onHeartClick(recipe)
             }
         }
 

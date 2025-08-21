@@ -36,10 +36,12 @@ class BookmarkRecipeViewModel(
     }
 
 
-    fun onHeartClick(recipe: Recipe, position: Int) {
+    fun onHeartClick(recipe: Recipe) {
         val current = _recipes.value?.toMutableList() ?: return
-        if (position !in current.indices) return
-        val removed = current.removeAt(position)
+        val idx = current.indexOfFirst { it.id == recipe.id }
+        if (idx == -1) return
+
+        val removed = current.removeAt(idx)
         _recipes.value = current.toList()
 
         viewModelScope.launch {
@@ -47,11 +49,13 @@ class BookmarkRecipeViewModel(
                 repo.toggleLike(removed.id)
             } catch (e: Exception) {
                 val rollback = _recipes.value?.toMutableList() ?: mutableListOf()
-                rollback.add(position, removed)
-                _recipes.postValue(rollback)
+                val insertIdx = idx.coerceAtMost(rollback.size)
+                rollback.add(insertIdx, removed)
+                _recipes.postValue(rollback.toList())
             }
         }
     }
+
 
     companion object {
         fun provide(context: Context): BookmarkRecipeViewModel {
