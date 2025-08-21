@@ -496,12 +496,22 @@ class HomeFragment : Fragment() {
         }
 
         if (rankList.isNotEmpty()) {
+            binding.rankRV.visibility = View.VISIBLE
+            binding.rankEmptyTv.visibility = View.GONE
             recipeRankAdapter.submitList(rankList.toList())
         } else {
             viewLifecycleOwner.lifecycleScope.launch {
                 val rank = recipeTrendRepository.getRecipeTrendRank(requireContext())
+                rankList.clear()
                 rankList.addAll(rank)
-                recipeRankAdapter.submitList(rankList.toList())
+                if (rankList.isNotEmpty()) {
+                    binding.rankRV.visibility = View.VISIBLE
+                    binding.rankEmptyTv.visibility = View.GONE
+                    recipeRankAdapter.submitList(rankList.toList())
+                } else {
+                    binding.rankRV.visibility = View.GONE
+                    binding.rankEmptyTv.visibility = View.VISIBLE
+                }
             }
         }
     }
