@@ -18,6 +18,7 @@ import com.example.mumuk.data.repository.IngredientAiRecipeRepository
 import com.example.mumuk.data.repository.IngredientRepository
 import com.example.mumuk.databinding.FragmentIngredientRecommendBinding
 import kotlinx.coroutines.launch
+import java.util.concurrent.atomic.AtomicInteger
 
 class IngredientRecommendFragment : Fragment() {
     private var _binding: FragmentIngredientRecommendBinding? = null
@@ -30,11 +31,10 @@ class IngredientRecommendFragment : Fragment() {
     private var aiRecipeList: List<Recipe> = emptyList()
     private var isExpanded = false
 
+    private var imageLoadCounter: AtomicInteger? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (aiRecipeList.isEmpty()) {
-            loadAiRecipes()
-        }
     }
 
     override fun onCreateView(
@@ -52,7 +52,6 @@ class IngredientRecommendFragment : Fragment() {
         binding.loadingOverlay.show()
         loadIngredients()
         loadAiRecipes()
-        updateAiRecipeList()
 
         binding.plusBtn.setOnClickListener {
             isExpanded = true
@@ -72,6 +71,11 @@ class IngredientRecommendFragment : Fragment() {
                 Log.d("IngredientRecommend", "Recipe clicked. ID: ${recipe.id}")
                 val bundle = bundleOf("recipeId" to recipe.id)
                 findNavController().navigate(R.id.action_ingredientRecommendFragment_to_recipeFragment, bundle)
+            },
+            onImageLoaded = {
+                if (imageLoadCounter?.decrementAndGet() == 0) {
+                    binding.loadingOverlay.hide()
+                }
             }
         )
         binding.aiRecipeRV.adapter = aiRecipeAdapter
@@ -104,10 +108,8 @@ class IngredientRecommendFragment : Fragment() {
         lifecycleScope.launch {
             try {
                 aiRecipeList = aiRecipeRepository.getAiRecipes()
-                // 뷰가 이미 생성되었다면 UI를 업데이트합니다.
                 if (_binding != null) {
                     updateAiRecipeList()
-                    binding.loadingOverlay.hide()
                 }
             } catch (e: Exception) {
                 if (_binding != null) {
@@ -125,6 +127,13 @@ class IngredientRecommendFragment : Fragment() {
         } else {
             aiRecipeList
         }
+
+        if (itemsToShow.isNotEmpty()) {
+            imageLoadCounter = AtomicInteger(itemsToShow.size)
+        } else {
+            binding.loadingOverlay.hide()
+        }
+
         aiRecipeAdapter.updateList(itemsToShow.toMutableList())
         binding.plusBtn.visibility = if (aiRecipeList.size > 6 && !isExpanded) View.VISIBLE else View.GONE
     }

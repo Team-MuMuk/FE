@@ -95,7 +95,6 @@ class RecipeFragment : Fragment() {
                         if (response.isSuccessful) {
                             isCurrentlyLiked = newLikedState
                             Log.d("RecipeFragment", "Like API call successful. Response: ${response.body()}")
-
                             val result = Bundle().apply {
                                 putLong("recipeId", id)
                                 putBoolean("isLiked", newLikedState)

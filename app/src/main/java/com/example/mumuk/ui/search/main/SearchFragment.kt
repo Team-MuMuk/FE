@@ -248,7 +248,6 @@ class SearchFragment : Fragment() {
     private fun setupSuggestKeywordChips(inflater: LayoutInflater) {
         val flexbox = binding.searchSuggestKeywordsFl
         flexbox.removeAllViews()
-        val keywordsPerRow = 3
         val keywords = suggestKeywords.take(6)
 
         if (keywords.isEmpty()) {
@@ -262,24 +261,18 @@ class SearchFragment : Fragment() {
             return
         }
 
-        for (i in keywords.indices step keywordsPerRow) {
-            val rowLayout = LinearLayout(requireContext()).apply {
-                orientation = LinearLayout.HORIZONTAL
+        for (keyword in keywords) {
+            val chipBinding = ItemSearchSuggestKeywordChipBinding.inflate(inflater, flexbox, false)
+            chipBinding.searchSuggestKeywordTv.text = keyword
+            chipBinding.searchSuggestKeywordTv.maxLines = 1
+            chipBinding.searchSuggestKeywordTv.setOnClickListener {
+                goToSearchResult(keyword)
             }
-            for (j in 0 until keywordsPerRow) {
-                val index = i + j
-                if (index < keywords.size) {
-                    val chipBinding = ItemSearchSuggestKeywordChipBinding.inflate(inflater, rowLayout, false)
-                    chipBinding.searchSuggestKeywordTv.text = keywords[index]
-                    chipBinding.searchSuggestKeywordTv.setOnClickListener {
-                        goToSearchResult(keywords[index])
-                    }
-                    rowLayout.addView(chipBinding.root)
-                }
-            }
-            flexbox.addView(rowLayout)
+            flexbox.addView(chipBinding.root)
         }
     }
+
+
 
     private fun fetchPopularKeywordsFromApi() {
         val context = context ?: return

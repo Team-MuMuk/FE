@@ -20,8 +20,10 @@ class RecipeRankAdapter(
 
     companion object {
         private val DiffCallback = object : DiffUtil.ItemCallback<RecipeRank>() {
-            override fun areItemsTheSame(oldItem: RecipeRank, newItem: RecipeRank) = oldItem.rank == newItem.rank
-            override fun areContentsTheSame(oldItem: RecipeRank, newItem: RecipeRank) = oldItem == newItem
+            override fun areItemsTheSame(oldItem: RecipeRank, newItem: RecipeRank) =
+                oldItem.recipeId == newItem.recipeId
+            override fun areContentsTheSame(oldItem: RecipeRank, newItem: RecipeRank) =
+                oldItem == newItem
         }
     }
 
@@ -62,10 +64,12 @@ class RecipeRankAdapter(
             binding.bookmarkBtn.setImageResource(heartRes)
 
             binding.bookmarkBtn.setOnClickListener {
-                recipeRank.isLiked = !recipeRank.isLiked
-                notifyItemChanged(position)
-                onHeartClick?.invoke(recipeRank, position)
+                val pos = bindingAdapterPosition
+                if (pos != RecyclerView.NO_POSITION) {
+                    onHeartClick?.invoke(recipeRank, pos)
+                }
             }
+
 
             binding.root.setOnClickListener { onItemClick(recipeRank) }
         }

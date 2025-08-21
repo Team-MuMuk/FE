@@ -14,10 +14,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.cardview.widget.CardView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -37,6 +35,7 @@ import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.concurrent.atomic.AtomicInteger
 
 class HealthRecommendFragment : Fragment() {
     private var _binding: FragmentHealthRecommendBinding? = null
@@ -54,13 +53,15 @@ class HealthRecommendFragment : Fragment() {
     private lateinit var allergyApi: AllergyApiService
     private lateinit var healthApi: HealthApiService
 
+    private var imageLoadCounter: AtomicInteger? = null
+    private var onImagesLoadedAction: (() -> Unit)? = null
+
     private val pickImageLauncher = registerForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri?.let {
             val fileName = getFileName(it)
             binding.imgText.text = fileName ?: "image.jpg"
-
             uploadImageToServer(it)
         }
     }
@@ -87,9 +88,6 @@ class HealthRecommendFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (aiRecipeList.isEmpty()) {
-            loadAiRecipes()
-        }
     }
 
     override fun onCreateView(
@@ -104,7 +102,6 @@ class HealthRecommendFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setupRecyclerView()
-        updateAiRecipeList()
 
         binding.backBtn.setOnClickListener {
             findNavController().popBackStack()
@@ -122,11 +119,13 @@ class HealthRecommendFragment : Fragment() {
         allergyApi = RetrofitClient.getAllergyApi(requireContext())
         healthApi = RetrofitClient.getHealthApi(requireContext())
 
-        // filterContainer 초기화
         filterContainer = binding.root.findViewById(R.id.filterContainer)
         fetchAndDisplayFilters()
 
         binding.loadingOverlay.show()
+        onImagesLoadedAction = {
+            binding.loadingOverlay.hide()
+        }
         loadAiRecipes()
     }
 
@@ -168,7 +167,6 @@ class HealthRecommendFragment : Fragment() {
             val cardBinding = com.example.mumuk.databinding.ItemFilterCardBinding.inflate(inflater)
             cardBinding.filterText.text = filterText
 
-            // 첫 번째 카드에만 marginStart 20dp 적용
             val params = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
@@ -178,7 +176,7 @@ class HealthRecommendFragment : Fragment() {
             } else {
                 params.marginStart = 0
             }
-            params.marginEnd = dpToPx(8) // 기존 marginEnd 8dp도 적용
+            params.marginEnd = dpToPx(8)
 
             cardBinding.root.layoutParams = params
 
@@ -197,6 +195,12 @@ class HealthRecommendFragment : Fragment() {
                 Log.d("HealthRecommend", "Recipe clicked. ID: ${recipe.id}")
                 val bundle = bundleOf("recipeId" to recipe.id)
                 findNavController().navigate(R.id.action_healthRecommendFragment_to_recipeFragment, bundle)
+            },
+            onImageLoaded = {
+                if (imageLoadCounter?.decrementAndGet() == 0) {
+                    onImagesLoadedAction?.invoke()
+                    onImagesLoadedAction = null
+                }
             }
         )
 
@@ -211,11 +215,12 @@ class HealthRecommendFragment : Fragment() {
                 isExpanded = false
                 if (_binding != null) {
                     updateAiRecipeList()
-                    binding.loadingOverlay.hide()
                 }
             } catch (e: Exception) {
                 if (_binding != null) {
                     binding.loadingOverlay.hide()
+                    onImagesLoadedAction?.invoke()
+                    onImagesLoadedAction = null
                 }
             }
         }
@@ -229,6 +234,14 @@ class HealthRecommendFragment : Fragment() {
         } else {
             aiRecipeList
         }
+
+        if (itemsToShow.isNotEmpty()) {
+            imageLoadCounter = AtomicInteger(itemsToShow.size)
+        } else {
+            onImagesLoadedAction?.invoke()
+            onImagesLoadedAction = null
+        }
+
         aiRecipeAdapter.updateList(itemsToShow.toMutableList())
         binding.plusBtn.visibility = if (aiRecipeList.size > 6 && !isExpanded) View.VISIBLE else View.GONE
     }
@@ -237,13 +250,14 @@ class HealthRecommendFragment : Fragment() {
         val dialog = showAiRecommendDialog()
         lifecycleScope.launch {
             try {
-                val ocrResponse = ocrRepository.uploadImageForOcr(uri)
-                Log.d("HealthRecommend", "OCR Success: ${ocrResponse.data}")
+                ocrRepository.uploadImageForOcr(uri)
+                Log.d("HealthRecommend", "OCR Success")
+
+                onImagesLoadedAction = {
+                    dialog.dismiss()
+                }
 
                 loadAiRecipes()
-
-                dialog.dismiss()
-                Toast.makeText(requireContext(), "새로운 레시피를 추천받았습니다!", Toast.LENGTH_SHORT).show()
 
             } catch (e: Exception) {
                 dialog.dismiss()

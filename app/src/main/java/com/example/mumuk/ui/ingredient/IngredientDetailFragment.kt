@@ -18,10 +18,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import com.example.mumuk.data.api.RetrofitClient
-import com.example.mumuk.data.model.ingredient.PushAgreeResponse
-import com.example.mumuk.data.model.ingredient.PushAgreeRequest
-import com.example.mumuk.data.model.ingredient.PushFcmTokenRequest
-import com.example.mumuk.data.model.ingredient.PushFcmTokenResponse
+import com.example.mumuk.data.model.ingredient.*
 import com.example.mumuk.data.repository.IngredientRepository
 import retrofit2.Call
 import retrofit2.Callback
@@ -32,6 +29,8 @@ import kotlinx.coroutines.launch
 class IngredientDetailFragment : Fragment() {
     private var _binding: FragmentIngredientDetailBinding? = null
     private val binding get() = _binding!!
+    private var selectedDday: String? = null
+    private var selectedIdx: Int? = null
 
     companion object {
         private const val TAG = "IngredientDetailFragment"
@@ -47,6 +46,7 @@ class IngredientDetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         val ingredient = arguments?.getSerializable("ingredient") as? Ingredient
         ingredient?.let {
             binding.name.text = it.name
@@ -68,21 +68,17 @@ class IngredientDetailFragment : Fragment() {
             binding.d31 to binding.textView47,
             binding.none to binding.textView48
         )
+        val ddayValues = listOf("D3", "D7", "D10", "D31", "NONE")
 
         val selectedCardColor = ContextCompat.getColor(requireContext(), R.color.beige_600)
         val defaultCardColor = ContextCompat.getColor(requireContext(), R.color.beige_100)
         val selectedTextColor = ContextCompat.getColor(requireContext(), R.color.white)
         val defaultTextColor = ContextCompat.getColor(requireContext(), R.color.black_400)
 
-        cardViews.forEach { (card, text) ->
-            card.setCardBackgroundColor(defaultCardColor)
-            text.setTextColor(defaultTextColor)
-        }
-
-        fun selectCard(selectedIdx: Int) {
+        fun updateCardViewUI(selectedIdx: Int?) {
             cardViews.forEachIndexed { idx, pair ->
                 val (card, text) = pair
-                if (idx == selectedIdx) {
+                if (selectedIdx != null && idx == selectedIdx) {
                     card.setCardBackgroundColor(selectedCardColor)
                     text.setTextColor(selectedTextColor)
                 } else {
@@ -91,10 +87,16 @@ class IngredientDetailFragment : Fragment() {
                 }
             }
         }
+        
+        updateCardViewUI(null)
+        binding.notiBtn.isEnabled = false
 
         cardViews.forEachIndexed { idx, pair ->
             pair.first.setOnClickListener {
-                selectCard(idx)
+                selectedIdx = idx
+                selectedDday = ddayValues[idx]
+                updateCardViewUI(selectedIdx)
+                binding.notiBtn.isEnabled = true
             }
         }
 
@@ -103,7 +105,26 @@ class IngredientDetailFragment : Fragment() {
         }
 
         binding.notiBtn.setOnClickListener {
-            showPushAgreeDialog()
+            val ingredient = arguments?.getSerializable("ingredient") as? Ingredient
+            val dday = selectedDday
+            if (ingredient == null || dday == null) {
+                Toast.makeText(requireContext(), "재료와 알림 기간을 선택해주세요.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            lifecycleScope.launch {
+                val request = IngredientDdaySettingRequest(daySetting = listOf(dday))
+                try {
+                    val response = RetrofitClient.getIngredientApi(requireContext())
+                        .updateIngredientDdaySetting(ingredient.id, request)
+                    if (response.isSuccessful) {
+                        showPushAgreeDialog()
+                    } else {
+                        Toast.makeText(requireContext(), "알림 기간 설정에 실패했습니다.", Toast.LENGTH_SHORT).show()
+                    }
+                } catch (e: Exception) {
+                    Toast.makeText(requireContext(), "알림 기간 설정 중 오류 발생", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
 
         binding.refreshBtn.setOnClickListener {

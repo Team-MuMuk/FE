@@ -31,12 +31,14 @@ import com.example.mumuk.data.api.RetrofitClient
 import com.example.mumuk.data.api.TokenManager
 import com.example.mumuk.data.model.Banner
 import com.example.mumuk.data.model.Recipe
+import com.example.mumuk.data.model.RecipeRank
 import com.example.mumuk.data.model.category.RandomRecipeResponse
 import com.example.mumuk.data.model.mypage.UserProfileResponse
+import com.example.mumuk.data.model.recipe.ClickLikeRequest
+import com.example.mumuk.data.model.recipe.ClickLikeResponse
 import com.example.mumuk.data.repository.RecipeTrendRepository
 import com.example.mumuk.databinding.FragmentHomeBinding
 import com.google.android.material.card.MaterialCardView
-import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
@@ -58,6 +60,8 @@ class HomeFragment : Fragment() {
 
     private val recipeTrendRepository = RecipeTrendRepository()
     private lateinit var recipeRankAdapter: RecipeRankAdapter
+    private var rankList: MutableList<RecipeRank> = mutableListOf()
+    private val inFlight: MutableSet<Long> = mutableSetOf()
 
     private var randomRecipeList: MutableList<Recipe>? = null
 
@@ -79,9 +83,12 @@ class HomeFragment : Fragment() {
     private var isBannerScrolling = false
     private val bannerScrollDurationMs = 200
 
-    val Int.dp: Int get() = TypedValue.applyDimension(
-        TypedValue.COMPLEX_UNIT_DIP, this.toFloat(), Resources.getSystem().displayMetrics
-    ).toInt()
+    private var scrollPosition = 0
+
+    val Int.dp: Int
+        get() = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP, this.toFloat(), Resources.getSystem().displayMetrics
+        ).toInt()
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -112,6 +119,7 @@ class HomeFragment : Fragment() {
         )
         maxPullDistance = loadingIndicatorHeight + extraPullPx
 
+        setupFragmentResultListener() // ++ 찜 상태 업데이트 리스너 설정
         setupCustomPullToRefresh()
         setupRotationAnimator()
         loadUserNicknameForHome()
@@ -156,6 +164,35 @@ class HomeFragment : Fragment() {
         setupRankRecyclerView()
     }
 
+    // ++ RecipeFragment로부터 결과를 수신하는 리스너 설정
+    private fun setupFragmentResultListener() {
+        parentFragmentManager.setFragmentResultListener("likeResult", this) { _, bundle ->
+            val recipeId = bundle.getLong("recipeId")
+            val isLiked = bundle.getBoolean("isLiked")
+            updateLikeStatus(recipeId, isLiked)
+        }
+    }
+
+    // ++ 전달받은 정보로 찜 상태를 업데이트하는 함수
+    private fun updateLikeStatus(recipeId: Long, isLiked: Boolean) {
+        // 인기 레시피 목록 업데이트
+        val rankIndex = rankList.indexOfFirst { it.recipeId?.toLong() == recipeId }
+        if (rankIndex != -1) {
+            rankList[rankIndex] = rankList[rankIndex].copy(isLiked = isLiked)
+            recipeRankAdapter.submitList(rankList.toList())
+        }
+
+        // 오늘의 레시피 목록 업데이트
+        randomRecipeList?.let { list ->
+            val todayIndex = list.indexOfFirst { it.id.toLong() == recipeId }
+            if (todayIndex != -1) {
+                list[todayIndex] = list[todayIndex].copy(isLiked = isLiked)
+                (binding.todayRV.adapter as? HomeRecipeAdapter)?.updateLikeAt(todayIndex, isLiked)
+            }
+        }
+    }
+
+
     private fun setupRotationAnimator() {
         rotationAnimator = ObjectAnimator.ofFloat(binding.loadingIndicator, "rotation", 0f, 360f).apply {
             duration = 1000
@@ -179,7 +216,7 @@ class HomeFragment : Fragment() {
                     if (binding.homeScrollView.scrollY == 0 && event.rawY > initialTouchY) {
                         val pullDistance = event.rawY - initialTouchY
 
-                        var translationY = (pullDistance / 2).coerceAtMost(maxPullDistance)
+                        val translationY = (pullDistance / 2).coerceAtMost(maxPullDistance)
 
                         binding.homeScrollView.translationY = translationY
                         binding.loadingIndicator.alpha = (translationY / refreshThreshold).coerceAtMost(1f)
@@ -238,13 +275,66 @@ class HomeFragment : Fragment() {
     private fun refreshData() {
         randomRecipeList = null
         fetchRandomRecipes()
+
+        rankList.clear()
         viewLifecycleOwner.lifecycleScope.launch {
-            val rankList = recipeTrendRepository.getRecipeTrendRank(requireContext())
-            recipeRankAdapter.submitList(rankList)
+            val rank = recipeTrendRepository.getRecipeTrendRank(requireContext())
+            rankList.addAll(rank)
+            recipeRankAdapter.submitList(rankList.toList())
         }
+
         loadUserNicknameForHome()
         updatePopularKeywordsTime()
     }
+
+    private fun handleRankHeartClick(item: RecipeRank) {
+        val idLong = item.recipeId?.toLong() ?: run {
+            Toast.makeText(requireContext(), "잘못된 레시피 ID", Toast.LENGTH_SHORT).show()
+            return
+        }
+        if (inFlight.contains(idLong)) return
+        inFlight.add(idLong)
+
+        val idx = rankList.indexOfFirst { it.recipeId == item.recipeId }
+        if (idx == -1) {
+            inFlight.remove(idLong)
+            return
+        }
+
+        val old = rankList[idx]
+        val optimistic = old.copy(isLiked = !old.isLiked)
+
+        rankList[idx] = optimistic
+        recipeRankAdapter.submitList(rankList.toList())
+
+        RetrofitClient.getUserRecipeApi(requireContext())
+            .clickLike(ClickLikeRequest(idLong))
+            .enqueue(object : Callback<ClickLikeResponse> {
+                override fun onResponse(
+                    call: Call<ClickLikeResponse>,
+                    response: Response<ClickLikeResponse>
+                ) {
+                    inFlight.remove(idLong)
+                    val ok = response.isSuccessful && (response.body()?.status == "OK")
+                    if (!ok) rollback()
+                }
+
+                override fun onFailure(call: Call<ClickLikeResponse>, t: Throwable) {
+                    inFlight.remove(idLong)
+                    rollback()
+                }
+
+                private fun rollback() {
+                    val i2 = rankList.indexOfFirst { it.recipeId == item.recipeId }
+                    if (i2 != -1) {
+                        rankList[i2] = old
+                        recipeRankAdapter.submitList(rankList.toList())
+                    }
+                    Toast.makeText(requireContext(), "찜 실패", Toast.LENGTH_SHORT).show()
+                }
+            })
+    }
+
 
     private fun fetchRandomRecipes() {
         if (randomRecipeList != null) {
@@ -314,30 +404,108 @@ class HomeFragment : Fragment() {
     private fun setupRecyclerView(recyclerView: RecyclerView, recipeList: List<Recipe>) {
         recyclerView.apply {
             layoutManager = GridLayoutManager(requireContext(), 2)
-            adapter = HomeRecipeAdapter(recipeList.toMutableList()) { clickedRecipe ->
-                val bundle = bundleOf("recipeId" to clickedRecipe.id)
-                findNavController().navigate(R.id.action_navigation_home_to_recipeFragment, bundle)
-            }
+            adapter = HomeRecipeAdapter(
+                recipeList.toMutableList(),
+                onItemClick = { clickedRecipe ->
+                    val bundle = bundleOf("recipeId" to clickedRecipe.id.toLong())
+                    findNavController().navigate(
+                        R.id.action_navigation_home_to_recipeFragment,
+                        bundle
+                    )
+                },
+                onHeartClick = { item, pos ->
+                    handleTodayHeartClick(item, pos) // ← 하트 클릭 처리(낙관적 업데이트 + 서버 호출)
+                }
+            )
         }
     }
+
+    private val todayInFlight: MutableSet<Long> = mutableSetOf()
+
+    private fun handleTodayHeartClick(item: Recipe, pos: Int) {
+        val recipeIdInt = item.id
+        val idLong = recipeIdInt.toLong()
+
+        if (todayInFlight.contains(idLong)) return
+        todayInFlight.add(idLong)
+
+        val oldLiked = item.isLiked
+        val newLiked = !oldLiked
+
+        (binding.todayRV.adapter as? HomeRecipeAdapter)?.updateLikeAt(pos, newLiked)
+
+        randomRecipeList?.let { full ->
+            val i = full.indexOfFirst { it.id == recipeIdInt }
+            if (i != -1) full[i] = full[i].copy(isLiked = newLiked)
+        }
+
+        RetrofitClient.getUserRecipeApi(requireContext())
+            .clickLike(ClickLikeRequest(idLong))
+            .enqueue(object : Callback<ClickLikeResponse> {
+                override fun onResponse(
+                    call: Call<ClickLikeResponse>,
+                    response: Response<ClickLikeResponse>
+                ) {
+                    todayInFlight.remove(idLong)
+                    val ok = response.isSuccessful && (response.body()?.status == "OK")
+                    if (!ok) rollback()
+                    else {
+                        val idx = rankList.indexOfFirst { it.recipeId?.toLong() == idLong }
+                        if (idx != -1) {
+                            rankList[idx] = rankList[idx].copy(isLiked = newLiked)
+                            recipeRankAdapter.submitList(rankList.toList())
+                        }
+                    }
+                }
+
+                override fun onFailure(call: Call<ClickLikeResponse>, t: Throwable) {
+                    todayInFlight.remove(idLong)
+                    rollback()
+                }
+
+                fun rollback() {
+                    (binding.todayRV.adapter as? HomeRecipeAdapter)?.updateLikeAt(pos, oldLiked)
+                    randomRecipeList?.let { full ->
+                        val i = full.indexOfFirst { it.id == recipeIdInt }
+                        if (i != -1) full[i] = full[i].copy(isLiked = oldLiked)
+                    }
+                    Toast.makeText(requireContext(), "찜 실패", Toast.LENGTH_SHORT).show()
+                }
+            })
+    }
+
 
     private fun setupRankRecyclerView() {
         recipeRankAdapter = RecipeRankAdapter(
             onItemClick = { recipeRank ->
-                val bundle = bundleOf("recipeId" to recipeRank.recipeId?.toLong())
+                val idLong = recipeRank.recipeId?.toLong() ?: run {
+                    Toast.makeText(requireContext(), "잘못된 레시피 ID", Toast.LENGTH_SHORT).show()
+                    return@RecipeRankAdapter
+                }
+                val bundle = bundleOf("recipeId" to idLong)
                 findNavController().navigate(R.id.action_navigation_home_to_recipeFragment, bundle)
             },
-            onHeartClick = { recipeRank, position -> }
+            onHeartClick = { recipeRank, _ ->
+                handleRankHeartClick(recipeRank)
+            }
         )
+
         binding.rankRV.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = recipeRankAdapter
         }
-        viewLifecycleOwner.lifecycleScope.launch {
-            val rankList = recipeTrendRepository.getRecipeTrendRank(requireContext())
-            recipeRankAdapter.submitList(rankList)
+
+        if (rankList.isNotEmpty()) {
+            recipeRankAdapter.submitList(rankList.toList())
+        } else {
+            viewLifecycleOwner.lifecycleScope.launch {
+                val rank = recipeTrendRepository.getRecipeTrendRank(requireContext())
+                rankList.addAll(rank)
+                recipeRankAdapter.submitList(rankList.toList())
+            }
         }
     }
+
 
     private fun loadUserNicknameForHome() {
         val loginType = TokenManager.getLoginType(requireContext()) ?: "LOCAL"
@@ -391,6 +559,7 @@ class HomeFragment : Fragment() {
                         binding.loadingIndicator.visibility = View.VISIBLE
                         binding.loadingIndicator.alpha = 0f
                     }
+
                     override fun onAnimationEnd(animation: android.animation.Animator) {
                         // 공간 펼침이 끝나면 indicator를 자연스럽게 fade-in + 새로고침 시작
                         binding.loadingIndicator.animate()
@@ -401,6 +570,7 @@ class HomeFragment : Fragment() {
                             }
                             .start()
                     }
+
                     override fun onAnimationCancel(animation: android.animation.Animator) {}
                     override fun onAnimationRepeat(animation: android.animation.Animator) {}
                 })
@@ -508,7 +678,7 @@ class HomeFragment : Fragment() {
                             // 바로 다음 배너로 스크롤 (6초 기다리지 않음)
                             autoScrollHandler?.postDelayed({
                                 smoothScrollToBanner(2) // 두 번째 배너로 이동
-                                autoScrollHandler?.postDelayed(autoScrollRunnable!!, autoScrollInterval)
+                                autoScrollHandler?.postDelayed(this, autoScrollInterval)
                             }, 500) // 점프 후 0.5초 뒤에 바로 스크롤
                             return
                         } else {
@@ -558,6 +728,8 @@ class HomeFragment : Fragment() {
     }
 
     private fun smoothScrollToBanner(targetItem: Int) {
+        if (_binding == null) return // View가 이미 파괴됐으면 아무 것도 하지 않음
+
         val viewPager = binding.bannerViewPager
         try {
             val recyclerViewField = ViewPager2::class.java.getDeclaredField("mRecyclerView")
@@ -568,7 +740,6 @@ class HomeFragment : Fragment() {
             if (layoutManager != null) {
                 val smoothScroller = object : LinearSmoothScroller(requireContext()) {
                     override fun calculateSpeedPerPixel(displayMetrics: DisplayMetrics): Float {
-                        // 애니메이션 속도 (작을수록 느림)
                         return bannerScrollDurationMs / displayMetrics.densityDpi.toFloat()
                     }
                 }
@@ -576,8 +747,9 @@ class HomeFragment : Fragment() {
                 layoutManager.startSmoothScroll(smoothScroller)
             }
         } catch (e: Exception) {
-            // 리플렉션 실패 시 기본 애니메이션 사용
-            viewPager.setCurrentItem(targetItem, true)
+            if (_binding != null) {
+                viewPager.setCurrentItem(targetItem, true)
+            }
         }
     }
 
@@ -597,7 +769,16 @@ class HomeFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        binding.bannerViewPager.setCurrentItem(1, false)
+        binding.homeScrollView.post {
+            binding.homeScrollView.scrollTo(0, scrollPosition)
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (_binding != null) {
+            scrollPosition = binding.homeScrollView.scrollY
+        }
     }
 
     override fun onDestroyView() {
