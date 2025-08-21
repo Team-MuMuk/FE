@@ -42,6 +42,10 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import kotlin.math.abs
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 
 class HomeFragment : Fragment() {
     interface BottomNavSelector {
@@ -147,6 +151,7 @@ class HomeFragment : Fragment() {
             findNavController().navigate(R.id.action_navigation_home_to_ingredientExpiringFragment)
         }
 
+        updatePopularKeywordsTime()
         fetchRandomRecipes()
         setupRankRecyclerView()
     }
@@ -238,6 +243,7 @@ class HomeFragment : Fragment() {
             recipeRankAdapter.submitList(rankList)
         }
         loadUserNicknameForHome()
+        updatePopularKeywordsTime()
     }
 
     private fun fetchRandomRecipes() {
@@ -573,6 +579,15 @@ class HomeFragment : Fragment() {
             // 리플렉션 실패 시 기본 애니메이션 사용
             viewPager.setCurrentItem(targetItem, true)
         }
+    }
+
+    private fun updatePopularKeywordsTime() {
+        val now = Date()
+        val sdf = SimpleDateFormat("yyyy.MM.dd HH:00", Locale.getDefault())
+        // 시간대를 한국 시간으로 설정합니다.
+        sdf.timeZone = TimeZone.getTimeZone("Asia/Seoul")
+        val formattedTime = sdf.format(now)
+        binding.rankTime.text = "$formattedTime 기준"
     }
 
     override fun onDetach() {
