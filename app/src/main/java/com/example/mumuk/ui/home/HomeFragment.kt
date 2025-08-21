@@ -31,8 +31,11 @@ import com.example.mumuk.data.api.RetrofitClient
 import com.example.mumuk.data.api.TokenManager
 import com.example.mumuk.data.model.Banner
 import com.example.mumuk.data.model.Recipe
+import com.example.mumuk.data.model.RecipeRank
 import com.example.mumuk.data.model.category.RandomRecipeResponse
 import com.example.mumuk.data.model.mypage.UserProfileResponse
+import com.example.mumuk.data.model.recipe.ClickLikeRequest
+import com.example.mumuk.data.model.recipe.ClickLikeResponse
 import com.example.mumuk.data.repository.RecipeTrendRepository
 import com.example.mumuk.databinding.FragmentHomeBinding
 import com.google.android.material.card.MaterialCardView
@@ -54,6 +57,8 @@ class HomeFragment : Fragment() {
 
     private val recipeTrendRepository = RecipeTrendRepository()
     private lateinit var recipeRankAdapter: RecipeRankAdapter
+    private var rankList: MutableList<RecipeRank> = mutableListOf()
+    private val inFlight: MutableSet<Long> = mutableSetOf()
 
     private var randomRecipeList: MutableList<Recipe>? = null
 
@@ -233,12 +238,66 @@ class HomeFragment : Fragment() {
     private fun refreshData() {
         randomRecipeList = null
         fetchRandomRecipes()
+
         viewLifecycleOwner.lifecycleScope.launch {
-            val rankList = recipeTrendRepository.getRecipeTrendRank(requireContext())
-            recipeRankAdapter.submitList(rankList)
+            val rank = recipeTrendRepository.getRecipeTrendRank(requireContext())
+            rankList = rank.toMutableList()
+            recipeRankAdapter.submitList(rankList.toList())
         }
+
         loadUserNicknameForHome()
     }
+
+    private fun handleRankHeartClick(item: RecipeRank) {
+        val idLong = item.recipeId?.toLong() ?: run {
+            Toast.makeText(requireContext(), "잘못된 레시피 ID", Toast.LENGTH_SHORT).show()
+            return
+        }
+        if (inFlight.contains(idLong)) return
+        inFlight.add(idLong)
+
+        val idx = rankList.indexOfFirst { it.recipeId == item.recipeId }
+        if (idx == -1) {
+            inFlight.remove(idLong)
+            return
+        }
+
+        val old = rankList[idx]
+        val optimistic = old.copy(isLiked = !old.isLiked)
+
+        rankList[idx] = optimistic
+        recipeRankAdapter.submitList(rankList.toList())
+
+        RetrofitClient.getUserRecipeApi(requireContext())
+            .clickLike(ClickLikeRequest(idLong))
+            .enqueue(object : Callback<ClickLikeResponse> {
+                override fun onResponse(
+                    call: Call<ClickLikeResponse>,
+                    response: Response<ClickLikeResponse>
+                ) {
+                    inFlight.remove(idLong)
+                    val ok = response.isSuccessful && (response.body()?.status == "OK")
+                    if (!ok) rollback()
+                }
+
+                override fun onFailure(call: Call<ClickLikeResponse>, t: Throwable) {
+                    inFlight.remove(idLong)
+                    rollback()
+                }
+
+                private fun rollback() {
+                    val i2 = rankList.indexOfFirst { it.recipeId == item.recipeId }
+                    if (i2 != -1) {
+                        rankList[i2] = old
+                        recipeRankAdapter.submitList(rankList.toList())
+                    }
+                    Toast.makeText(requireContext(), "찜 실패", Toast.LENGTH_SHORT).show()
+                }
+            })
+    }
+
+
+
 
     private fun fetchRandomRecipes() {
         if (randomRecipeList != null) {
@@ -308,30 +367,103 @@ class HomeFragment : Fragment() {
     private fun setupRecyclerView(recyclerView: RecyclerView, recipeList: List<Recipe>) {
         recyclerView.apply {
             layoutManager = GridLayoutManager(requireContext(), 2)
-            adapter = HomeRecipeAdapter(recipeList.toMutableList()) { clickedRecipe ->
-                val bundle = bundleOf("recipeId" to clickedRecipe.id)
-                findNavController().navigate(R.id.action_navigation_home_to_recipeFragment, bundle)
-            }
+            adapter = HomeRecipeAdapter(
+                recipeList.toMutableList(),
+                onItemClick = { clickedRecipe ->
+                    val bundle = bundleOf("recipeId" to clickedRecipe.id.toLong())
+                    findNavController().navigate(
+                        R.id.action_navigation_home_to_recipeFragment,
+                        bundle
+                    )
+                },
+                onHeartClick = { item, pos ->
+                    handleTodayHeartClick(item, pos) // ← 하트 클릭 처리(낙관적 업데이트 + 서버 호출)
+                }
+            )
         }
     }
+    private val todayInFlight: MutableSet<Long> = mutableSetOf()
+
+    private fun handleTodayHeartClick(item: Recipe, pos: Int) {
+        val recipeIdInt = item.id
+        val idLong = recipeIdInt.toLong()
+
+        if (todayInFlight.contains(idLong)) return
+        todayInFlight.add(idLong)
+
+        val oldLiked = item.isLiked
+        val newLiked = !oldLiked
+
+        (binding.todayRV.adapter as? HomeRecipeAdapter)?.updateLikeAt(pos, newLiked)
+
+        randomRecipeList?.let { full ->
+            val i = full.indexOfFirst { it.id == recipeIdInt }
+            if (i != -1) full[i] = full[i].copy(isLiked = newLiked)
+        }
+
+        RetrofitClient.getUserRecipeApi(requireContext())
+            .clickLike(ClickLikeRequest(idLong))
+            .enqueue(object : Callback<ClickLikeResponse> {
+                override fun onResponse(
+                    call: Call<ClickLikeResponse>,
+                    response: Response<ClickLikeResponse>
+                ) {
+                    todayInFlight.remove(idLong)
+                    val ok = response.isSuccessful && (response.body()?.status == "OK")
+                    if (!ok) rollback()
+                    else {
+                        val idx = rankList.indexOfFirst { it.recipeId?.toLong() == recipeIdInt }
+                        if (idx != -1) {
+                            rankList[idx] = rankList[idx].copy(isLiked = newLiked)
+                            recipeRankAdapter.submitList(rankList.toList())
+                        }
+                    }
+                }
+
+                override fun onFailure(call: Call<ClickLikeResponse>, t: Throwable) {
+                    todayInFlight.remove(idLong)
+                    rollback()
+                }
+
+                fun rollback() {
+                    (binding.todayRV.adapter as? HomeRecipeAdapter)?.updateLikeAt(pos, oldLiked)
+                    randomRecipeList?.let { full ->
+                        val i = full.indexOfFirst { it.id == recipeIdInt }
+                        if (i != -1) full[i] = full[i].copy(isLiked = oldLiked)
+                    }
+                    Toast.makeText(requireContext(), "찜 실패", Toast.LENGTH_SHORT).show()
+                }
+            })
+    }
+
 
     private fun setupRankRecyclerView() {
         recipeRankAdapter = RecipeRankAdapter(
             onItemClick = { recipeRank ->
-                val bundle = bundleOf("recipeId" to recipeRank.recipeId?.toLong())
+                val idLong = recipeRank.recipeId?.toLong() ?: run {
+                    Toast.makeText(requireContext(), "잘못된 레시피 ID", Toast.LENGTH_SHORT).show()
+                    return@RecipeRankAdapter
+                }
+                val bundle = bundleOf("recipeId" to idLong)
                 findNavController().navigate(R.id.action_navigation_home_to_recipeFragment, bundle)
             },
-            onHeartClick = { recipeRank, position -> }
+            onHeartClick = { recipeRank, _ ->
+                handleRankHeartClick(recipeRank)
+            }
         )
+
         binding.rankRV.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = recipeRankAdapter
         }
+
         viewLifecycleOwner.lifecycleScope.launch {
-            val rankList = recipeTrendRepository.getRecipeTrendRank(requireContext())
-            recipeRankAdapter.submitList(rankList)
+            val rank = recipeTrendRepository.getRecipeTrendRank(requireContext())
+            rankList = rank.toMutableList()
+            recipeRankAdapter.submitList(rankList.toList())
         }
     }
+
 
     private fun loadUserNicknameForHome() {
         val loginType = TokenManager.getLoginType(requireContext()) ?: "LOCAL"
@@ -583,6 +715,8 @@ class HomeFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         binding.bannerViewPager.setCurrentItem(1, false)
+        refreshData()
+
     }
 
     override fun onDestroyView() {
