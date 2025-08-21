@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mumuk.databinding.ItemShopBinding
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.mumuk.data.model.recipe.NaverShoppingItem
 
 class ShopAdapter : ListAdapter<NaverShoppingItem, ShopAdapter.ShopViewHolder>(ShopDiffCallback()) {
@@ -17,7 +18,12 @@ class ShopAdapter : ListAdapter<NaverShoppingItem, ShopAdapter.ShopViewHolder>(S
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: NaverShoppingItem) {
-            Glide.with(binding.shopImg.context).load(item.imageUrl).into(binding.shopImg)
+            Glide.with(binding.shopImg.context)
+                .load(item.imageUrl)
+                .override(400, 400)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .thumbnail(0.1f)
+                .into(binding.shopImg)
             binding.shopTitle.text = item.title
             binding.textView8.text = "가격: ${item.price}원"
             binding.root.setOnClickListener {

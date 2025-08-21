@@ -12,4 +12,8 @@
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">image.nmv.naver.net</domain>
     </domain-config>
+
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">shop1.phinf.naver.net</domain>
+    </domain-config>
 </network-security-config>
