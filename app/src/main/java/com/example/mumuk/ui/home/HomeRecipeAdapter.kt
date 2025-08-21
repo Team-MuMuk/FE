@@ -23,7 +23,8 @@ import retrofit2.Response
 
 class HomeRecipeAdapter(
     private val recipes: MutableList<Recipe>,
-    private val onItemClick: (Recipe) -> Unit
+    private val onItemClick: (Recipe) -> Unit,
+    private val onHeartClick: (Recipe, Int) -> Unit
 ) : RecyclerView.Adapter<HomeRecipeAdapter.RecipeViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecipeViewHolder {
@@ -34,24 +35,29 @@ class HomeRecipeAdapter(
     override fun onBindViewHolder(holder: RecipeViewHolder, position: Int) {
         val recipe = recipes[position]
         holder.bind(recipe)
+
         holder.itemView.setOnClickListener {
             onItemClick(recipe)
         }
-        holder.binding.imageView6.setOnClickListener {
-            val context = holder.binding.root.context
-            recipe.isLiked = !recipe.isLiked
-            notifyItemChanged(position)
 
-            val api = RetrofitClient.getUserRecipeApi(context)
-            val request = ClickLikeRequest(recipeId = recipe.id)
-            api.clickLike(request).enqueue(object : Callback<ClickLikeResponse> {
-                override fun onResponse(
-                    call: Call<ClickLikeResponse>,
-                    response: Response<ClickLikeResponse>
-                ) {}
-                override fun onFailure(call: Call<ClickLikeResponse>, t: Throwable) {}
-            })
+        holder.binding.imageView6.setOnClickListener {
+            val pos = holder.bindingAdapterPosition
+            if (pos != RecyclerView.NO_POSITION) {
+                onHeartClick(recipe, pos)
+            }
         }
+    }
+
+    fun updateLikeAt(pos: Int, liked: Boolean) {
+        if (pos !in recipes.indices) return
+        recipes[pos] = recipes[pos].copy(isLiked = liked)
+        notifyItemChanged(pos)
+    }
+
+    fun submitAll(newList: List<Recipe>) {
+        recipes.clear()
+        recipes.addAll(newList)
+        notifyDataSetChanged()
     }
 
     override fun getItemCount(): Int = recipes.size
