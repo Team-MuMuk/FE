@@ -72,6 +72,9 @@ class SearchAutocompleteFragment : Fragment() {
         }, 100)
 
         _binding?.let { binding ->
+            binding.searchAutocompleteBackBtn.setOnClickListener {
+                findNavController().popBackStack()
+            }
             binding.searchAutocompleteEditEt.setOnEditorActionListener { _, actionId, _ ->
                 if (actionId == EditorInfo.IME_ACTION_SEARCH
                     || actionId == EditorInfo.IME_ACTION_DONE
